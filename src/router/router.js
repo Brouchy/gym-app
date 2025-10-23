@@ -1,10 +1,10 @@
 
 import { obtenerSesionUsuario } from "./auth";
 import { renderizarBarraNavegacion } from "../components/Navbar/Navbar";
-import { renderizarPanelAdmin } from "../views/admin/adminDashboard";
 import { renderizarVistaLogin } from "../views/login/LoginView";
 import { renderizarPanelEntrenador } from "../views/trainer/TrainerDashboard";
-
+import { renderizarPanelAdmin } from "../views/admin/AdminDashboard";
+//TODO:adminddashboard 
 
 export const navegar=(contenedor)=>{
     if(!contenedor){
@@ -14,7 +14,7 @@ export const navegar=(contenedor)=>{
     const usuario=obtenerSesionUsuario();
 
     contenedor.innerHTML=``;
-
+    
     renderizarBarraNavegacion(contenedor);
     
     if(!usuario){
