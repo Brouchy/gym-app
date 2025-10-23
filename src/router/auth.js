@@ -15,7 +15,7 @@ export function obtenerSesionUsuario() {
     // return null; 
     
     // Prueba 2: Descomenta esto para simular ser Admin
-    // return { role: 'admin', nombre: 'Admin' };
+    return { role: 'admin', nombre: 'Admin' };
     
     // Prueba 3: Descomenta esto para simular ser Trainer
     // return { role: 'trainer', nombre: 'Juan' };
