@@ -1,28 +1,42 @@
-// src/router/auth.js
 
+import {apiLogin} from '../api/apiLogin.js';
+import { navegar } from './router';
 const CLAVE_SESION = 'gymUser';
 
-/**
- * Obtiene el usuario guardado desde sessionStorage.
- * Por ahora, lo "falseamos" para probar.
- */
-export function obtenerSesionUsuario() {
-    // ----------------------------------------------------
-    // --- ¡MODIFICA ESTA LÍNEA PARA PROBAR! ---
-    // ----------------------------------------------------
-    
-    // Prueba 1: Devuelve 'null' para ver la vista de Login
-    // return null; 
-    
-    // Prueba 2: Descomenta esto para simular ser Admin
-    return { role: 'admin', nombre: 'Admin' };
-    
-    // Prueba 3: Descomenta esto para simular ser Trainer
-    // return { role: 'trainer', nombre: 'Juan' };
 
-    // ----------------------------------------------------
 
-    // El código real (que usaremos después) sería:
-    // const usuario = sessionStorage.getItem(CLAVE_SESION);
-    // return usuario ? JSON.parse(usuario) : null;
+
+const guardarSesionUsuario = (usuario) => {
+    sessionStorage.setItem(CLAVE_SESION, JSON.stringify(usuario));
+}
+
+export const obtenerSesionUsuario = () => {
+    const usuario = sessionStorage.getItem(CLAVE_SESION);
+    // Leemos de la sesión real
+    return usuario ? JSON.parse(usuario) : null;
+}
+
+const limpiarSesionUsuario = () => {
+    sessionStorage.removeItem(CLAVE_SESION);
+}
+// --- Funciones de Control (Usadas por las Vistas) ---
+export const manejarLogin = async (email, password) => {
+    const usuario = await apiLogin(email, password);
+    
+    if (usuario) {
+        guardarSesionUsuario(usuario);
+        // ¡Importante! Forzamos al router a re-evaluar la página
+        // (Usamos el #app que ya sabemos que existe)
+        navegar(document.getElementById('app')); 
+        return true;
+    }
+    return false; // El login falló
+}
+
+
+export const manejarLogout = () => {
+    console.log("paisho");
+    limpiarSesionUsuario();
+    // Forzamos al router a re-evaluar (esto nos mandará al login)
+    navegar(document.getElementById('app'));
 }
