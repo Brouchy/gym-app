@@ -1,52 +1,60 @@
-/* src/views/admin/AdminDashboard.module.css */
 
 .panelContenedor {
     display: flex;
-    gap: 20px;
-    padding: 20px;
-    max-width: 1400px;
-    margin: 0 auto;
+    gap: 20px; /* Espacio entre menú y contenido */
+    padding: 20px; /* Espacio alrededor del panel */
 }
 
+/* --- 3. Menú Lateral (Sidebar) --- */
 .menuLateral {
-    flex: 0 0 220px; /* Ancho fijo de 220px */
+    flex: 0 0 220px; /* Ancho fijo */
     background-color: #ffffff;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Sombra más sutil */
     padding: 15px;
-    align-self: flex-start; /* Para que no se estire */
+    align-self: flex-start; /* Evita que se estire verticalmente */
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
+/* --- 4. Botones del Menú --- */
 .menuBoton {
     width: 100%;
     padding: 12px 15px;
     border: none;
-    background-color: #f4f7f6;
+    background-color: transparent; /* Fondo transparente por defecto */
+    color: #4A5568; /* Un gris oscuro para el texto */
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 0.95rem; /* Ligeramente más pequeño */
     text-align: left;
-    border-radius: 5px;
+    border-radius: 6px; /* Bordes un poco más suaves */
     font-weight: 500;
+    transition: background-color 0.2s, color 0.2s; /* Transición suave */
 }
 
 .menuBoton:hover {
-    background-color: #e0e0e0;
+    background-color: #EDF2F7; /* Un gris muy claro al pasar el mouse */
+    color: #2D3748; /* Texto un poco más oscuro */
 }
 
 .menuBoton.activo {
     background-color: #4C51BF; /* Indigo */
     color: white;
     font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Sombra ligera al botón activo */
+}
+.menuBoton.activo:hover {
+    background-color: #434190; /* Indigo más oscuro al pasar mouse sobre activo */
 }
 
+
+/* --- 5. Área de Contenido Principal --- */
 .contenidoPrincipal {
-    flex: 1; /* Ocupa el resto del espacio */
+    flex: 1; /* Ocupa el espacio restante */
     background-color: #ffffff;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    padding: 20px;
-    min-height: 400px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    padding: 25px; /* Un poco más de padding interno */
+    min-height: 400px; /* Opcional, para que no colapse si está vacío */
 }

@@ -1,4 +1,3 @@
-
 {
   "miembros": [
     {
@@ -6,7 +5,7 @@
       "tipoDeMiembroId": 2,
       "entrenadorId": 2,
       "nombre": "Ana",
-      "dni":"1234567",
+      "dni": "1234567",
       "direccion": "Calle Falsa 456",
       "telefono": "1144889900",
       "fechaNacimiento": "1985-10-15T00:00:00",
@@ -19,7 +18,7 @@
       "tipoDeMiembroId": 1,
       "entrenadorId": 1,
       "nombre": "Carla",
-      "dni":"123432437",
+      "dni": "123432437",
       "direccion": "Calle Falsa 987",
       "telefono": "1144889900",
       "fechaNacimiento": "1995-09-20T00:00:00",
@@ -32,7 +31,7 @@
       "tipoDeMiembroId": 1,
       "entrenadorId": 1,
       "nombre": "Luis",
-      "dni":"212412412",
+      "dni": "212412412",
       "direccion": "Av. Siempre Viva 321",
       "telefono": "1144001122",
       "fechaNacimiento": "1992-03-10T00:00:00",
@@ -45,7 +44,7 @@
       "tipoDeMiembroId": 2,
       "entrenadorId": 2,
       "nombre": "María",
-      "dni":"24124122412",
+      "dni": "24124122412",
       "direccion": "Calle Luna 55",
       "telefono": "1144223344",
       "fechaNacimiento": "1988-07-25T00:00:00",
@@ -58,7 +57,7 @@
       "tipoDeMiembroId": 2,
       "entrenadorId": 2,
       "nombre": "Pedro",
-      "dni":"2131414",
+      "dni": "2131414",
       "direccion": "Av. Sol 100",
       "telefono": "1144332211",
       "fechaNacimiento": "1990-11-05T00:00:00",
@@ -71,7 +70,7 @@
       "tipoDeMiembroId": 1,
       "entrenadorId": 1,
       "nombre": "Lucía",
-      "dni":"241241414",
+      "dni": "241241414",
       "direccion": "Calle Mar 78",
       "telefono": "1144556677",
       "fechaNacimiento": "1993-02-18T00:00:00",
@@ -84,7 +83,7 @@
       "tipoDeMiembroId": 2,
       "entrenadorId": 2,
       "nombre": "Sofía",
-      "dni":"2414124",
+      "dni": "2414124",
       "direccion": "Av. Libertad 200",
       "telefono": "1144998877",
       "fechaNacimiento": "1991-06-30T00:00:00",
@@ -123,6 +122,20 @@
       "porcentajeDescuento": 10
     }
   ],
+  "estadoMembresiaIds":[
+    {
+    "id": 1,
+    "descripcion": "Activa"
+    },
+    {
+    "id": 2,
+    "descripcion": "Expirada"
+    },
+    {
+    "id": 3,
+    "descripcion": "Cancelada"
+    }
+    ],
   "users": [
     {
       "id": 1,

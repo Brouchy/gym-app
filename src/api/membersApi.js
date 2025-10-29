@@ -106,21 +106,7 @@ export const apiEliminarMiembro = async (id) => {
     }
 }
 
-// --- Endpoints Auxiliares (para los <select> del formulario) ---
 
-/**
- * Endpoint 7: Obtener Entrenadores (para <select>)
- */
-export const apiObtenerEntrenadores = async () => {
-    try {
-        const respuesta = await fetch(`${URL_BASE}/entrenadores`);
-        if (!respuesta.ok) throw new Error(`Error HTTP: ${respuesta.status}`);
-        return await respuesta.json();
-    } catch (error) { 
-        console.error("Error en apiObtenerEntrenadores:", error);
-        return []; 
-    }
-}
 
 /**
  * Endpoint 8: Obtener Tipos de Miembro (para <select>)

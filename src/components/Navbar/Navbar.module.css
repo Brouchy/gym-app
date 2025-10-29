@@ -1,33 +1,53 @@
+/* src/views/components/Navbar/Navbar.module.css */
+
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 2rem;
-    background-color: #fff;
-    border-bottom: 1px solid #eee;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    padding: 0.8rem 2rem; /* Slightly reduced vertical padding */
+    background-color: #ffffff; /* White background */
+    border-bottom: 1px solid #e2e8f0; /* Lighter border */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Softer shadow */
+    font-family: 'Poppins', sans-serif; /* Added Poppins font */
 }
+
 .navbar h1 {
     margin: 0;
     font-size: 1.5rem;
-    color: #4C51BF;
+    color: #4C51BF; /* Your primary violet color */
+    font-weight: 600; /* Bolder title */
 }
+
 .infoUsuario {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 15px; /* Space between name and button */
 }
+
 .infoUsuario span {
     font-weight: 500;
+    color: #4A5568; /* Dark gray for the name */
+    font-size: 0.95rem;
 }
+
+/* Updated Logout Button */
 .botonLogout {
-    padding: 8px 12px;
-    background-color: #E53E3E;
+    padding: 8px 14px; /* Slightly more horizontal padding */
+    background-color: #4C51BF; /* Primary Violet */
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px; /* Slightly rounder corners */
     cursor: pointer;
+    font-weight: 600; /* Bolder text */
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease; /* Smooth hover */
 }
+
 .botonLogout:hover {
-    background-color: #C53030;
+    background-color: #434190; /* Darker Violet on hover */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow on hover */
+}
+
+.botonLogout:active {
+    transform: translateY(1px); /* Click effect */
 }

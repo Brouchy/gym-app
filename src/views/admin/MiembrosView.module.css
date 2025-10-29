@@ -1,0 +1,243 @@
+/* src/views/admin/MiembrosView.module.css */
+
+/* Animación de entrada */
+.contenedor {
+    animation: fadeIn 0.3s ease-out;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Cabecera con Buscador y Botón */
+.cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.buscador {
+    padding: 0.65rem 1rem;
+    border: 1px solid #E2E8F0;
+    border-radius: 6px;
+    font-size: 1rem;
+    width: 350px;
+}
+.buscador:focus {
+    outline: none;
+    border-color: #4C51BF;
+    box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.2);
+}
+
+.botonAgregar {
+    padding: 0.65rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background-color: #4C51BF;
+    color: white;
+}
+.botonAgregar:hover {
+    background-color: #434190;
+}
+
+/* Tabla */
+.tablaWrapper {
+    overflow-x: auto;
+}
+.tabla {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+    font-family: 'Poppins', sans-serif; /* <-- APLICA LA FUENTE AQUÍ */
+    font-size: 0.9rem;
+}
+.tabla th,
+.tabla td {
+    border: 1px solid #E2E8F0;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    vertical-align: middle;
+}
+.tabla th {
+    background-color: #FEF9C7; /* Tu color amarillo */
+    color: #713F12;
+    font-weight: 600;
+}
+.tabla tr:nth-child(even) {
+    background-color: #F8F9FA;
+}
+.tabla td img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+}
+.fotoNombre {
+    display: flex;
+    align-items: center;
+}
+
+/* Acciones de la Tabla */
+.acciones {
+    display: flex;
+    gap: 0.5rem;
+}
+.botonEditar {
+    background-color: #F6AD55; /* Naranja */
+    color: white;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.875rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.botonEliminar {
+    background-color: #E53E3E; /* Rojo */
+    color: white;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.875rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.botonEditar:hover { background-color: #ED8936; }
+.botonEliminar:hover { background-color: #C53030; }
+
+/* Paginación */
+.paginacion {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap:15px;
+}
+.indicadorPagina {
+    font-size: 0.875rem;
+    color: #718096;
+}
+.botonPagina {
+    padding: 0.5rem 1rem;
+    background-color: #E2E8F0;
+    color: #2D3748;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+.botonPagina:hover {
+    background-color: #CBD5E0;
+}
+.botonPagina:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* --- Estilos de Modales --- */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.modal.activo {
+    display: flex;
+    opacity: 1;
+}
+.modalFondo {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(45, 55, 72, 0.7);
+}
+.modalContenido {
+    background-color: #fff;
+    padding: 1.5rem 2rem;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    z-index: 1001;
+    position: relative;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+.modal.activo .modalContenido {
+    transform: scale(1);
+}
+.modalCabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+.modalCerrar {
+    color: #A0AEC0;
+    font-size: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+.modalAcciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+.botonSecundario {
+    background-color: #E2E8F0;
+    color: #2D3748;
+}
+
+/* Formulario del Modal */
+.formularioModal {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: 70vh; /* Para que el formulario tenga scroll si es muy alto */
+    overflow-y: auto;
+}
+.grupoInput {
+    display: flex;
+    flex-direction: column;
+}
+.grupoInput label {
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+.grupoInput input,
+.grupoInput select {
+    width: 100%;
+    padding: 0.65rem 1rem;
+    font-size: 1rem;
+    border: 1px solid #E2E8F0;
+    border-radius: 6px;
+    background-color: #fff;
+}
+.grupoInput input:focus,
+.grupoInput select:focus {
+    outline: none;
+    border-color: #4C51BF;
+    box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.2);
+}
+.grupoCheckbox {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+}
+.grupoCheckbox input {
+    width: auto;
+}
