@@ -1,5 +1,8 @@
 import { apiObtenerMiembros,apiObtenerMiembroPorId,apiCrearMiembro,apiActualizarMiembro,apiEliminarMiembro,apiObtenerTiposDeMiembro } from "../../api/membersApi";
+import { apiObtenerMembresiasXMiembros } from "../../api/membershipApi.js";
 import {apiObtenerEntrenadores} from '../../api/trainersApi.js';
+
+
 
 /* src/views/admin/MiembrosView.js */
 
@@ -45,6 +48,8 @@ export const renderizarVistaMiembros = async (contenedor) => {
 
     // 4. Cargamos los datos de los miembros y los mostramos
     await cargarYMostrarMiembros();
+    const membresiasXMiembros = await apiObtenerMembresiasXMiembros();
+    console.log('Membresias por Miembros:', membresiasXMiembros);
 }
 
 /**

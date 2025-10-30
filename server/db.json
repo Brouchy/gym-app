@@ -122,20 +122,6 @@
       "porcentajeDescuento": 10
     }
   ],
-  "estadoMembresiaIds":[
-    {
-    "id": 1,
-    "descripcion": "Activa"
-    },
-    {
-    "id": 2,
-    "descripcion": "Expirada"
-    },
-    {
-    "id": 3,
-    "descripcion": "Cancelada"
-    }
-    ],
   "users": [
     {
       "id": 1,
@@ -151,6 +137,83 @@
       "role": "trainer",
       "trainerId": 101,
       "nombre": "Juan Perez"
+    }
+  ],
+  "membresias": [
+    {
+      "id": 101,
+      "tipoDeMembresiaId": 1,
+      "duracionEnDias": 30,
+      "costoBase": 5000,
+      "nombrePlan": "Plan Mensual Básico"
+    },
+    {
+      "id": 102,
+      "tipoDeMembresiaId": 2,
+      "duracionEnDias": 365,
+      "costoBase": 50000,
+      "nombrePlan": "Plan Anual Premium"
+    }
+  ],
+    "tipoDeMembresias": [
+    {
+      "id": 1,
+      "descripcion": "Mensual"
+    },
+    {
+      "id": 2,
+      "descripcion": "Anual"
+    }
+  ],
+  "membresiaXMiembros": [
+    {
+      "id": 1001,
+      "miembroId": 1,
+      "membresiaId": 102,
+      "estadoMembresiaId": 1,
+      "pagoId": 2,
+      "fechaInicio": "2025-09-15T00:00:00Z",
+      "fechaFin": "2026-09-14T23:59:59Z"
+    },
+    {
+      "id": 1002,
+      "miembroId": 2,
+      "membresiaId": 101,
+      "estadoMembresiaId": 1,
+      "pagoId": 1,
+      "fechaInicio": "2025-10-01T00:00:00Z",
+      "fechaFin": "2025-10-31T23:59:59Z"
+    }
+  ],
+    "pagos": [
+    {
+      "id": 1,
+      "monto": 5000,
+      "fechaPago": "2025-10-01T10:00:00Z",
+      "metodoPago": "Tarjeta",
+      "descuentoAplicado": 0
+    },
+    {
+      "id": 2,
+      "monto": 45000,
+      "fechaPago": "2025-09-15T11:30:00Z",
+      "metodoPago": "Transferencia",
+      "descuentoAplicado": 5000
+   
+    }
+  ],
+ "estadoMembresias": [
+    {
+      "id": 1,
+      "descripcion": "Activa"
+    },
+    {
+      "id": 2,
+      "descripcion": "Vencida"
+    },
+    {
+      "id": 3,
+      "descripcion": "Pendiente de Pago"
     }
   ]
 }
