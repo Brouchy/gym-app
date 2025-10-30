@@ -90,26 +90,37 @@ const mostrarContenido = () => {
 
     // 3. Renderizar Tabla
     cuerpoTabla.innerHTML = ''; // Limpiar
+    const TOTAL_COLUMNAS = 11;
+
     if (miembrosPaginados.length === 0) {
-        cuerpoTabla.innerHTML = `<tr><td colspan="7">No se encontraron miembros.</td></tr>`;
+        cuerpoTabla.innerHTML = `<tr><td colspan="${TOTAL_COLUMNAS}">No se encontraron miembros.</td></tr>`;
     } else {
         miembrosPaginados.forEach(miembro => {
             const fila = document.createElement('tr');
+            // Formatear fecha
+            const fechaNac = miembro.fechaNacimiento
+                ? new Date(miembro.fechaNacimiento).toLocaleDateString()
+                : 'N/A';
+            // Combinar entrenador y certificación
+            const entrenadorInfo = miembro.entrenador
+                ? `${miembro.entrenador.nombre} (${miembro.entrenador.certificacion || 'N/A'})`
+                : 'N/A';
+
             fila.innerHTML = `
                 <td>${miembro.id}</td>
-                <td>
-                    <div class="${estilos.fotoNombre}">
-                        <img src="${miembro.foto}" alt="${miembro.nombre}">
-                        <span>${miembro.nombre}</span>
-                    </div>
-                </td>
+                <td>${miembro.nombre}</td>
+                <td>${miembro.dni || 'N/A'}</td>
+                <td>${miembro.direccion || 'N/A'}</td>
+                <td>${miembro.telefono || 'N/A'}</td>
+                <td>${fechaNac}</td>
                 <td>${miembro.email}</td>
-                <td>${miembro.telefono}</td>
+                <td><img src="${miembro.foto}" alt="${miembro.nombre}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"></td>
                 <td>${miembro.tipoDeMiembro?.descripcion || 'N/A'}</td>
-                <td>${miembro.entrenador?.nombre || 'N/A'}</td>
+                <td>${entrenadorInfo}</td>
                 <td class="${estilos.acciones}">
-                    <button class="${estilos.botonEditar}" data-id="${miembro.id}">Editar</button>
-                    <button class="${estilos.botonEliminar}" data-id="${miembro.id}">Eliminar</button>
+                    <button class="${estilos.botonEditar}" data-id="${miembro.id}" title="Editar">Editar</button>
+                    <button class="${estilos.botonEliminar}" data-id="${miembro.id}" title="Eliminar">Eliminar</button>
+                    <button class="${estilos.botonImprimir}" data-id="${miembro.id}" title="Imprimir">Imprimir</button>
                 </td>
             `;
             cuerpoTabla.appendChild(fila);
@@ -195,9 +206,6 @@ const abrirModalEditar = async (id) => {
     form.querySelector('#direccion').value = miembro.direccion;
     form.querySelector('#fechaNacimiento').value = miembro.fechaNacimiento.split('T')[0];
     form.querySelector('#foto').value = miembro.foto;
-    form.querySelector('#tipoDeMiembroId').value = miembro.tipoDeMiembroId;
-    form.querySelector('#entrenadorId').value = miembro.entrenadorId;
-    form.querySelector('#eliminado').checked = miembro.eliminado;
     
     contenedorVista.querySelector('#modal-titulo').textContent = 'Editar Miembro';
     contenedorVista.querySelector('#modal-miembro').classList.add(estilos.activo);
@@ -216,35 +224,33 @@ const cerrarModales = () => {
 // --- Lógica de Formularios ---
 
 const manejarSubmitFormulario = async (e) => {
-    e.preventDefault();
-    const form = e.target;
-    const id = form.querySelector('#miembro-id').value;
+  e.preventDefault();
+  const form = e.target;
+  const id = form.querySelector('#miembro-id').value;
 
-    // Creamos el objeto con los datos (igual a tu POST)
-    const datosMiembro = {
-        nombre: form.querySelector('#nombre').value,
-        email: form.querySelector('#email').value,
-        dni: form.querySelector('#dni').value,
-        telefono: form.querySelector('#telefono').value,
-        direccion: form.querySelector('#direccion').value,
-        fechaNacimiento: form.querySelector('#fechaNacimiento').value,
-        foto: form.querySelector('#foto').value,
-        eliminado: form.querySelector('#eliminado').checked,
-        tipoDeMiembroId: parseInt(form.querySelector('#tipoDeMiembroId').value),
-        entrenadorId: parseInt(form.querySelector('#entrenadorId').value)
-    };
+  const datosMiembro = {
+    nombre: form.querySelector('#nombre').value,
+    email: form.querySelector('#email').value,
+    dni: form.querySelector('#dni').value,
+    telefono: form.querySelector('#telefono').value,
+    direccion: form.querySelector('#direccion').value,
+    fechaNacimiento: form.querySelector('#fechaNacimiento').value,
+    foto: form.querySelector('#foto').value,
+    tipoDeMiembroId: null,
+    entrenadorId: null
+  };
 
-    if (id) {
-        // --- Es una ACTUALIZACIÓN (PUT) ---
-        await apiActualizarMiembro(id, datosMiembro);
-    } else {
-        // --- Es una CREACIÓN (POST) ---
-        await apiCrearMiembro(datosMiembro);
-    }
+  if (id) {
+    // --- ACTUALIZACIÓN (PUT) ---
+    await apiActualizarMiembro(id, datosMiembro);
+  } else {
+    // --- CREACIÓN (POST) ---
+    await apiCrearMiembro(datosMiembro);
+  }
 
-    cerrarModales();
-    await cargarYMostrarMiembros(); // Recargar la tabla
-}
+  cerrarModales();
+  await cargarYMostrarMiembros(); // Recargar tabla
+};
 
 const manejarConfirmarEliminar = async (id) => {
     await apiEliminarMiembro(id);
@@ -284,13 +290,17 @@ const renderizarEsqueleto = () => {
             <div class="${estilos.tablaWrapper}">
                 <table class="${estilos.tabla}">
                     <thead>
-                        <tr>
+                       <tr>
                             <th>ID</th>
                             <th>Nombre</th>
-                            <th>Email</th>
+                            <th>DNI</th>
+                            <th>Dirección</th>
                             <th>Teléfono</th>
+                            <th>F. Nac.</th>
+                            <th>Email</th>
+                             <th>Foto</th>
                             <th>Tipo</th>
-                            <th>Entrenador</th>
+                            <th>Entrenador (Cert.)</th> {/* Nueva cabecera combinada */}
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -306,74 +316,59 @@ const renderizarEsqueleto = () => {
             </div>
         </div>
 
-        <div id="modal-miembro" class="${estilos.modal}">
+       <div id="modal-miembro" class="${estilos.modal}">
             <div class="${estilos.modalFondo} modal-cerrar"></div>
             <div class="${estilos.modalContenido}">
                 <div class="${estilos.modalCabecera}">
-                    <h3 id="modal-titulo">Agregar Miembro</h3>
-                    <span class="${estilos.modalCerrar} modal-cerrar">&times;</span>
+                <h3 id="modal-titulo">Agregar Miembro</h3>
+                <span class="${estilos.modalCerrar} modal-cerrar">&times;</span>
                 </div>
                 
                 <form id="modal-formulario-miembro" class="${estilos.formularioModal}">
-                    <input type="hidden" id="miembro-id">
-                    
-                    <div class="${estilos.grupoInput}">
-                        <label for="nombre">Nombre Completo</label>
-                        <input type="text" id="nombre" name="nombre" required>
-                    </div>
-                    
-                    <div class="${estilos.grupoInput}">
-                        <label for="dni">DNI</label>
-                        <input type="text" id="dni" name="dni" required>
-                    </div>
+                <input type="hidden" id="miembro-id">
 
-                    <div class="${estilos.grupoInput}">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
+                <div class="${estilos.grupoInput}">
+                    <label for="nombre">Nombre Completo</label>
+                    <input type="text" id="nombre" name="nombre" required>
+                </div>
 
-                    <div class="${estilos.grupoInput}">
-                        <label for="telefono">Teléfono</label>
-                        <input type="tel" id="telefono" name="telefono">
-                    </div>
+                <div class="${estilos.grupoInput}">
+                    <label for="dni">DNI</label>
+                    <input type="text" id="dni" name="dni" required>
+                </div>
 
-                    <div class="${estilos.grupoInput}">
-                        <label for="direccion">Dirección</label>
-                        <input type="text" id="direccion" name="direccion">
-                    </div>
+                <div class="${estilos.grupoInput}">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
 
-                    <div class="${estilos.grupoInput}">
-                        <label for="fechaNacimiento">Fecha Nacimiento</label>
-                        <input type="date" id="fechaNacimiento" name="fechaNacimiento">
-                    </div>
+                <div class="${estilos.grupoInput}">
+                    <label for="telefono">Teléfono</label>
+                    <input type="tel" id="telefono" name="telefono">
+                </div>
 
-                    <div class="${estilos.grupoInput}">
-                        <label for="foto">URL de Foto</label>
-                        <input type="text" id="foto" name="foto">
-                    </div>
+                <div class="${estilos.grupoInput}">
+                    <label for="direccion">Dirección</label>
+                    <input type="text" id="direccion" name="direccion">
+                </div>
 
-                    <div class="${estilos.grupoInput}">
-                        <label for="tipoDeMiembroId">Tipo de Miembro</label>
-                        <select id="tipoDeMiembroId" name="tipoDeMiembroId"></select>
-                    </div>
+                <div class="${estilos.grupoInput}">
+                    <label for="fechaNacimiento">Fecha Nacimiento</label>
+                    <input type="date" id="fechaNacimiento" name="fechaNacimiento">
+                </div>
 
-                    <div class="${estilos.grupoInput}">
-                        <label for="entrenadorId">Entrenador Asignado</label>
-                        <select id="entrenadorId" name="entrenadorId"></select>
-                    </div>
-                    
-                    <div class="${estilos.grupoInput} ${estilos.grupoCheckbox}">
-                        <input type="checkbox" id="eliminado" name="eliminado" style="width: auto;">
-                        <label for="eliminado">Marcado como eliminado</label>
-                    </div>
-                    
-                    <div class="${estilos.modalAcciones}">
-                        <button type="button" class="${estilos.botonPagina} ${estilos.botonSecundario} modal-cerrar">Cancelar</button>
-                        <button type="submit" class="${estilos.botonAgregar}">Guardar</button>
-                    </div>
+                <div class="${estilos.grupoInput}">
+                    <label for="foto">URL de Foto</label>
+                    <input type="text" id="foto" name="foto">
+                </div>
+
+                <div class="${estilos.modalAcciones}">
+                    <button type="button" class="${estilos.botonPagina} ${estilos.botonSecundario} modal-cerrar">Cancelar</button>
+                    <button type="submit" class="${estilos.botonAgregar}">Guardar</button>
+                </div>
                 </form>
             </div>
-        </div>
+            </div>
 
         <div id="modal-eliminar" class="${estilos.modal}">
             <div class="${estilos.modalFondo} modal-cerrar"></div>

@@ -107,6 +107,15 @@
     border-radius: 6px;
     cursor: pointer;
 }
+.botonImprimir {
+    background-color: #6dc75b; /* Rojo */
+    color: white;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.875rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
 .botonEditar:hover { background-color: #ED8936; }
 .botonEliminar:hover { background-color: #C53030; }
 
