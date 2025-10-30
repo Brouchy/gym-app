@@ -89,6 +89,7 @@ export const apiActualizarMiembro = async (id, datosMiembro) => {
  * Endpoint 6: Eliminar un Miembro (DELETE)
  */
 export const apiEliminarMiembro = async (id) => {
+    console.log("elimar miembro",id);
     const ENDPOINT = `miembros/${id}`;
     
     try {

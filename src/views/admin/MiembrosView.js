@@ -1,7 +1,9 @@
 import { apiObtenerMiembros,apiObtenerMiembroPorId,apiCrearMiembro,apiActualizarMiembro,apiEliminarMiembro,apiObtenerTiposDeMiembro } from "../../api/membersApi";
 import {apiObtenerEntrenadores} from '../../api/trainersApi.js';
+import { imprimirCredencial } from "../../utils/imprimirCredencial.js";
 import estilos from './MiembrosView.module.css';
 import { renderizarWizardAgregarMiembro } from "./WizardAgregarMiembro/WizardAgregarMiembro.js";
+
 
 // --- Estado del Módulo (variables que guardan la información) ---
 let listaMiembros = [];       // Cache de todos los miembros
@@ -172,6 +174,11 @@ const adjuntarEventListeners = () => {
         if (e.target.matches(`.${estilos.modalCerrar}`) || e.target.matches(`.${estilos.modalFondo}`)) {
             cerrarModales();
         }
+        if (e.target.matches(`.${estilos.botonImprimir}`)) {
+            const id = e.target.dataset.id;
+            const miembro = listaMiembros.find(m => m.id === Number(id));
+            imprimirCredencial(miembro);
+}
     });
 
     // --- Buscador (evento 'input') ---
