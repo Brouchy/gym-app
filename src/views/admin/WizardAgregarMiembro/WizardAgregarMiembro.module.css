@@ -1,0 +1,194 @@
+/* === Fondo del Wizard === */
+.modalFondo {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(17, 24, 39, 0.6); /* fondo translúcido */
+  backdrop-filter: blur(8px);
+  animation: aparecerFondo 0.3s ease forwards;
+}
+
+@keyframes aparecerFondo {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* === Contenedor principal del wizard === */
+.modalContenido {
+  background: #ffffff;
+  border-radius: 1rem;
+  padding: 2rem 2.5rem;
+  width: 100%;
+  max-width: 480px;
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+  animation: slideIn 0.35s ease;
+  position: relative;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(40px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* === Títulos y textos === */
+h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+p {
+  color: #4b5563;
+  font-size: 0.95rem;
+  text-align: center;
+  margin-bottom: 1.2rem;
+}
+
+/* === Selects === */
+select {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.2s;
+}
+
+select:focus {
+  outline: none;
+  border-color: #6366f1;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+/* === Nombre destacado del miembro === */
+.nombre {
+  color: #6366f1;
+  font-weight: 600;
+}
+
+/* === Sección de botones === */
+.botones {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+}
+
+/* === Botones generales === */
+.btnCancelar,
+.btnContinuar,
+.btnAtras,
+.btnConfirmar,
+.btnCerrar {
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0.7rem 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* --- Estilo por tipo --- */
+.btnCancelar {
+  background: #f3f4f6;
+  color: #374151;
+}
+.btnCancelar:hover {
+  background: #e5e7eb;
+}
+
+.btnContinuar,
+.btnConfirmar,
+.btnCerrar {
+  background: #6366f1;
+  color: #ffffff;
+}
+.btnContinuar:hover,
+.btnConfirmar:hover,
+.btnCerrar:hover {
+  background: #4f46e5;
+}
+
+.btnAtras {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+.btnAtras:hover {
+  background: #c7d2fe;
+}
+
+/* === Mensajes de estado === */
+#estado-carga {
+  text-align: center;
+  color: #6b7280;
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+
+/* === Estado de éxito === */
+.exito h3 {
+  color: #10b981;
+}
+
+.exito p {
+  color: #047857;
+}
+
+/* === Animaciones para los pasos === */
+@keyframes aparecerPaso {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modalContenido > * {
+  animation: aparecerPaso 0.3s ease;
+}
+
+/* === Responsivo (móvil) === */
+@media (max-width: 500px) {
+  .modalContenido {
+    padding: 1.5rem;
+    width: 92%;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+  }
+
+  .btnCancelar,
+  .btnContinuar,
+  .btnConfirmar {
+    width: 100%;
+  }
+
+  .botones {
+    flex-direction: column;
+  }
+}

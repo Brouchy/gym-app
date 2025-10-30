@@ -77,19 +77,6 @@
       "email": "lucia@example.com",
       "foto": "https://i.pravatar.cc/150?img=7",
       "eliminado": false
-    },
-    {
-      "id": 7,
-      "tipoDeMiembroId": 2,
-      "entrenadorId": 2,
-      "nombre": "Sofía",
-      "dni": "2414124",
-      "direccion": "Av. Libertad 200",
-      "telefono": "1144998877",
-      "fechaNacimiento": "1991-06-30T00:00:00",
-      "email": "sofia@example.com",
-      "foto": "https://i.pravatar.cc/150?img=8",
-      "eliminado": false
     }
   ],
   "entrenadors": [
@@ -155,7 +142,7 @@
       "nombrePlan": "Plan Anual Premium"
     }
   ],
-    "tipoDeMembresias": [
+  "tipoDeMembresias": [
     {
       "id": 1,
       "descripcion": "Mensual"
@@ -185,7 +172,7 @@
       "fechaFin": "2025-10-31T23:59:59Z"
     }
   ],
-    "pagos": [
+  "pagos": [
     {
       "id": 1,
       "monto": 5000,
@@ -199,10 +186,35 @@
       "fechaPago": "2025-09-15T11:30:00Z",
       "metodoPago": "Transferencia",
       "descuentoAplicado": 5000
-   
+    },
+    {
+      "fechaPago": "2025-10-30T05:46:46.151Z",
+      "metodoPago": "Tarjeta",
+      "descuentoAplicado": 0,
+      "id": 3
+    },
+    {
+      "fechaPago": "2025-10-30T05:50:46.848Z",
+      "metodoPago": "Efectivo",
+      "descuentoAplicado": 0,
+      "id": 4
+    },
+    {
+      "monto": 50000,
+      "fechaPago": "2025-10-30T14:40:38.126Z",
+      "metodoPago": "Tarjeta",
+      "descuentoAplicado": 0,
+      "id": 5
+    },
+    {
+      "monto": 50000,
+      "fechaPago": "2025-10-30T15:36:50.153Z",
+      "metodoPago": "Efectivo",
+      "descuentoAplicado": 0,
+      "id": 6
     }
   ],
- "estadoMembresias": [
+  "estadoMembresias": [
     {
       "id": 1,
       "descripcion": "Activa"

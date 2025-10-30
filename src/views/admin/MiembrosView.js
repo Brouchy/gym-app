@@ -1,16 +1,7 @@
 import { apiObtenerMiembros,apiObtenerMiembroPorId,apiCrearMiembro,apiActualizarMiembro,apiEliminarMiembro,apiObtenerTiposDeMiembro } from "../../api/membersApi";
-import { apiObtenerMembresiasXMiembros } from "../../api/membershipApi.js";
 import {apiObtenerEntrenadores} from '../../api/trainersApi.js';
-
-
-
-/* src/views/admin/MiembrosView.js */
-
-// 1. Importamos TODAS las funciones de nuestra API de Miembros
-
-
-// 2. Importamos los estilos
 import estilos from './MiembrosView.module.css';
+import { renderizarWizardAgregarMiembro } from "./WizardAgregarMiembro/WizardAgregarMiembro.js";
 
 // --- Estado del Módulo (variables que guardan la información) ---
 let listaMiembros = [];       // Cache de todos los miembros
@@ -18,6 +9,7 @@ let listaEntrenadores = [];   // Cache para el <select>
 let listaTiposMiembro = []; // Cache para el <select>
 let paginaActual = 1;
 const FILAS_POR_PAGINA = 5;
+let modoFormulario = 'crear';
 
 // --- Contenedor Principal ---
 let contenedorVista; // El 'div' donde se renderiza este módulo
@@ -42,14 +34,12 @@ export const renderizarVistaMiembros = async (contenedor) => {
     ]).then(([entrenadores, tipos]) => {
         listaEntrenadores = entrenadores;
         listaTiposMiembro = tipos;
-        // Llenamos los <select> en el modal (que ya está en el DOM)
-        poblarSelectsFormulario();
     });
 
     // 4. Cargamos los datos de los miembros y los mostramos
     await cargarYMostrarMiembros();
-    const membresiasXMiembros = await apiObtenerMembresiasXMiembros();
-    console.log('Membresias por Miembros:', membresiasXMiembros);
+    // const membresiasXMiembros = await apiObtenerMembresiasXMiembros();
+    // console.log('Membresias por Miembros:', membresiasXMiembros);
 }
 
 /**
@@ -144,33 +134,43 @@ const mostrarContenido = () => {
 const adjuntarEventListeners = () => {
     // Usamos delegación de eventos en el contenedor de la vista
     contenedorVista.addEventListener('click', async (e) => {
+        if (e.target.matches('#boton-confirmar-eliminar')) {
+            const { id } = e.target.dataset;
+            if (id) {
+                await manejarConfirmarEliminar(id);
+            }
+            return;
+        }
+
         // --- Botones de la Tabla ---
         if (e.target.matches(`.${estilos.botonEditar}`)) {
             abrirModalEditar(e.target.dataset.id);
+            return;
         }
         if (e.target.matches(`.${estilos.botonEliminar}`)) {
             abrirModalEliminar(e.target.dataset.id);
+            return;
         }
         
         // --- Botones de Paginación ---
         if (e.target.matches('#boton-prev') && paginaActual > 1) {
             paginaActual--;
             mostrarContenido();
+            return;
         }
         if (e.target.matches('#boton-next')) {
             paginaActual++; 
             mostrarContenido();
+            return;
         }
 
         // --- Botón Agregar y Cerrar Modales ---
         if (e.target.matches('#boton-agregar-miembro')) {
             abrirModalAgregar();
+            return;
         }
         if (e.target.matches(`.${estilos.modalCerrar}`) || e.target.matches(`.${estilos.modalFondo}`)) {
             cerrarModales();
-        }
-        if (e.target.matches('#boton-confirmar-eliminar')) {
-            await manejarConfirmarEliminar(e.target.dataset.id);
         }
     });
 
@@ -187,21 +187,24 @@ const adjuntarEventListeners = () => {
 // --- Lógica de Modales ---
 
 const abrirModalAgregar = () => {
+    modoFormulario = 'crear';
+
     const form = contenedorVista.querySelector('#modal-formulario-miembro');
-    form.reset(); 
-    form.querySelector('#miembro-id').value = ''; 
+    form.reset();
+    form.querySelector('#miembro-id').value = '';
+
     contenedorVista.querySelector('#modal-titulo').textContent = 'Agregar Nuevo Miembro';
     contenedorVista.querySelector('#modal-miembro').classList.add(estilos.activo);
-}
-
+};
 const abrirModalEditar = async (id) => {
+    modoFormulario = 'editar';
+
     const miembro = await apiObtenerMiembroPorId(id);
     if (!miembro) {
         alert("Error: No se pudo encontrar al miembro.");
         return;
     }
 
-    // Llenar el formulario con los datos
     const form = contenedorVista.querySelector('#modal-formulario-miembro');
     form.querySelector('#miembro-id').value = miembro.id;
     form.querySelector('#nombre').value = miembro.nombre;
@@ -211,10 +214,10 @@ const abrirModalEditar = async (id) => {
     form.querySelector('#direccion').value = miembro.direccion;
     form.querySelector('#fechaNacimiento').value = miembro.fechaNacimiento.split('T')[0];
     form.querySelector('#foto').value = miembro.foto;
-    
+
     contenedorVista.querySelector('#modal-titulo').textContent = 'Editar Miembro';
     contenedorVista.querySelector('#modal-miembro').classList.add(estilos.activo);
-}
+};
 
 const abrirModalEliminar = (id) => {
     contenedorVista.querySelector('#boton-confirmar-eliminar').dataset.id = id;
@@ -241,43 +244,47 @@ const manejarSubmitFormulario = async (e) => {
     direccion: form.querySelector('#direccion').value,
     fechaNacimiento: form.querySelector('#fechaNacimiento').value,
     foto: form.querySelector('#foto').value,
-    tipoDeMiembroId: null,
-    entrenadorId: null
+    tipoDeMiembroId: 0,
+    entrenadorId: 0,
+    eliminado: false
   };
 
-  if (id) {
-    // --- ACTUALIZACIÓN (PUT) ---
+  // 🟢 Si estamos editando, todo sigue igual
+  if (modoFormulario === 'editar' && id) {
     await apiActualizarMiembro(id, datosMiembro);
-  } else {
-    // --- CREACIÓN (POST) ---
-    await apiCrearMiembro(datosMiembro);
+    cerrarModales();
+    await cargarYMostrarMiembros();
+    return;
   }
 
-  cerrarModales();
-  await cargarYMostrarMiembros(); // Recargar tabla
+  // 🟢 Si estamos creando un nuevo miembro, abrimos el wizard
+  const miembroCreado = await apiCrearMiembro(datosMiembro);
+cerrarModales();
+
+// ✅ Mostrar wizard solo si se creó correctamente
+if (miembroCreado) {
+  renderizarWizardAgregarMiembro(contenedorVista, miembroCreado, async () => {
+    // 🟢 Callback al cerrar wizard (éxito o cancelación)
+    await cargarYMostrarMiembros();
+  });
+} else {
+  await cargarYMostrarMiembros();
+}
 };
 
 const manejarConfirmarEliminar = async (id) => {
-    await apiEliminarMiembro(id);
+    const miembroId = Number(id);
+    if (Number.isNaN(miembroId)) {
+        console.warn('ID de miembro inválido para eliminar:', id);
+        return;
+    }
+
+    await apiEliminarMiembro(miembroId);
     cerrarModales();
     await cargarYMostrarMiembros(); // Recargar la tabla
 }
 
-/**
- * Llena los <select> del formulario con datos de la API
- */
-const poblarSelectsFormulario = () => {
-    const selectEntrenador = contenedorVista.querySelector('#entrenadorId');
-    const selectTipo = contenedorVista.querySelector('#tipoDeMiembroId');
 
-    selectEntrenador.innerHTML = listaEntrenadores
-        .map(e => `<option value="${e.id}">${e.nombre}</option>`)
-        .join('');
-        
-    selectTipo.innerHTML = listaTiposMiembro
-        .map(t => `<option value="${t.id}">${t.descripcion}</option>`)
-        .join('');
-}
 
 /**
  * Renderiza el HTML "esqueleto" (vacío)
