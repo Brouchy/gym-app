@@ -3,7 +3,7 @@ import { renderizarVistaAsistencia } from "../views/admin/AsistenciaView";
 import { renderizarVistaClases } from "../views/admin/ClasesView";
 import { renderizarVistaEntrenadores } from "../views/admin/EntrenadoresView";
 import { renderizarVistaMembresias } from "../views/admin/MembresiasView";
-import { renderizarVistaMiembros } from "../views/admin/MiembrosView";
+import { renderizarVistaMiembros } from "../views/admin/MiembrosView.js";
 import { renderizarVistaReportes } from "../views/admin/ReportesView";
 
 

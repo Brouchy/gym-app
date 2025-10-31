@@ -77,6 +77,19 @@
       "tipoDeMiembroId": 0,
       "entrenadorId": 0,
       "eliminado": false
+    },
+    {
+      "nombre": "karen romero",
+      "email": "admin@gym.com",
+      "dni": "47337884",
+      "telefono": "2131231",
+      "direccion": "werwer",
+      "fechaNacimiento": "1199-04-02",
+      "foto": "https://i.pravatar.cc/150?img=8",
+      "tipoDeMiembroId": 0,
+      "entrenadorId": 0,
+      "eliminado": false,
+      "id": 7
     }
   ],
   "entrenadors": [
@@ -128,11 +141,11 @@
   ],
   "membresias": [
     {
-      "id": 101,
-      "tipoDeMembresiaId": 1,
+      "nombrePlan": "Plan Mensual Básico",
       "duracionEnDias": 30,
       "costoBase": 5000,
-      "nombrePlan": "Plan Mensual Básico"
+      "tipoDeMembresiaId": 1,
+      "id": 101
     },
     {
       "id": 102,
@@ -170,6 +183,15 @@
       "pagoId": 1,
       "fechaInicio": "2025-10-01T00:00:00Z",
       "fechaFin": "2025-10-31T23:59:59Z"
+    },
+    {
+      "miembroId": 7,
+      "membresiaId": 101,
+      "estadoMembresiaId": 1,
+      "pagoId": 7,
+      "fechaInicio": "2025-10-30T23:54:01.947Z",
+      "fechaFin": "2025-11-29T23:54:01.947Z",
+      "id": 1003
     }
   ],
   "pagos": [
@@ -212,6 +234,13 @@
       "metodoPago": "Efectivo",
       "descuentoAplicado": 0,
       "id": 6
+    },
+    {
+      "monto": 5000,
+      "fechaPago": "2025-10-30T23:54:01.913Z",
+      "metodoPago": "Efectivo",
+      "descuentoAplicado": 0,
+      "id": 7
     }
   ],
   "estadoMembresias": [
