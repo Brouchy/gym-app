@@ -113,11 +113,16 @@
   "tipoDeMiembros": [
     {
       "id": 1,
-      "descripcion": "Básico",
+      "descripcion": "Regular",
       "porcentajeDescuento": 0
     },
     {
       "id": 2,
+      "descripcion": "Estudiante",
+      "porcentajeDescuento": 10
+    },
+        {
+      "id": 3,
       "descripcion": "Premium",
       "porcentajeDescuento": 10
     }

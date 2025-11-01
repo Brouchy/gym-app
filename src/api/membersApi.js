@@ -1,5 +1,8 @@
 const URL_BASE = import.meta.env.VITE_URL_BASE;
 
+const URL_BASE_MOCK = import.meta.env.VITE_URL_BASE_MOCK;
+
+
 /**
  * Endpoint 2: Obtener TODOS los Miembros (con datos anidados)
  */
@@ -13,7 +16,10 @@ export const apiObtenerMiembros = async () => {
             return []; 
         }
         
-        return await respuesta.json();
+        const data = await respuesta.json();
+        const miembrosActivos = data.filter(miembro => miembro.eliminado === false);
+
+        return miembrosActivos; 
     } catch (error) {
         console.error("Error en apiObtenerMiembros:", error);
         return []; 
@@ -24,7 +30,7 @@ export const apiObtenerMiembros = async () => {
  * Endpoint 3: Obtener UN Miembro por ID
  */
 export const apiObtenerMiembroPorId = async (id) => {
-    const ENDPOINT = `miembros/${id}?_expand=entrenador&_expand=tipoDeMiembro`;
+    const ENDPOINT = `Miembros/${id}`;
     
     try {
         const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`);
@@ -68,7 +74,8 @@ export const apiCrearMiembro = async (datosMiembro) => {
  * Endpoint 5: Actualizar un Miembro (PUT)
  */
 export const apiActualizarMiembro = async (id, datosMiembro) => {
-    const ENDPOINT = `miembros/${id}`;
+    console.log("actualizar miembro",id,datosMiembro);
+    const ENDPOINT = `Miembros/${id}`;
     
     try {
         const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`, {
@@ -92,7 +99,7 @@ export const apiActualizarMiembro = async (id, datosMiembro) => {
  */
 export const apiEliminarMiembro = async (id) => {
     console.log("elimar miembro",id);
-    const ENDPOINT = `miembros/${id}`;
+    const ENDPOINT = `Miembros/${id}`;
     
     try {
         const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`, {
@@ -109,14 +116,14 @@ export const apiEliminarMiembro = async (id) => {
     }
 }
 
-
+//TODO: JSON-SERVER
 
 /**
  * Endpoint 8: Obtener Tipos de Miembro (para <select>)
  */
 export const apiObtenerTiposDeMiembro = async () => {
     try {
-        const respuesta = await fetch(`${URL_BASE}/tipoDeMiembros`); 
+        const respuesta = await fetch(`${URL_BASE_MOCK}/tipoDeMiembros`); 
         if (!respuesta.ok) throw new Error(`Error HTTP: ${respuesta.status}`);
         return await respuesta.json();
     } catch (error) { 

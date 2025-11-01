@@ -5,6 +5,7 @@ import estilos from './MiembrosView.module.css';
 import { renderizarWizardAgregarMiembro } from "./WizardAgregarMiembro/WizardAgregarMiembro.js";
 
 
+
 // --- Estado del Módulo (variables que guardan la información) ---
 let listaMiembros = [];       // Cache de todos los miembros
 let listaEntrenadores = [];   // Cache para el <select>
@@ -202,6 +203,15 @@ const abrirModalAgregar = () => {
 
     contenedorVista.querySelector('#modal-titulo').textContent = 'Agregar Nuevo Miembro';
     contenedorVista.querySelector('#modal-miembro').classList.add(estilos.activo);
+    const selectTipo = contenedorVista.querySelector('#tipoDeMiembroId');
+    //selects
+    selectTipo.innerHTML = '<option value="">-- Seleccioná un tipo --</option>';
+    listaTiposMiembro.forEach(tipo => {
+    const option = document.createElement('option');
+    option.value = tipo.id;
+    option.textContent = tipo.descripcion;
+    selectTipo.appendChild(option);
+    });
 };
 const abrirModalEditar = async (id) => {
     modoFormulario = 'editar';
@@ -221,6 +231,17 @@ const abrirModalEditar = async (id) => {
     form.querySelector('#direccion').value = miembro.direccion;
     form.querySelector('#fechaNacimiento').value = miembro.fechaNacimiento.split('T')[0];
     form.querySelector('#foto').value = miembro.foto;
+    const selectTipo = contenedorVista.querySelector('#tipoDeMiembroId');
+    selectTipo.innerHTML = '<option value="">-- Seleccioná un tipo --</option>';
+    listaTiposMiembro.forEach(tipo => {
+    const option = document.createElement('option');
+    option.value = tipo.id;
+    option.textContent = tipo.descripcion;
+    selectTipo.appendChild(option);
+    });
+        if (miembro.tipoDeMiembroId) {
+    selectTipo.value = miembro.tipoDeMiembroId;
+    }
 
     contenedorVista.querySelector('#modal-titulo').textContent = 'Editar Miembro';
     contenedorVista.querySelector('#modal-miembro').classList.add(estilos.activo);
@@ -251,10 +272,20 @@ const manejarSubmitFormulario = async (e) => {
     direccion: form.querySelector('#direccion').value,
     fechaNacimiento: form.querySelector('#fechaNacimiento').value,
     foto: form.querySelector('#foto').value,
-    tipoDeMiembroId: 0,
-    entrenadorId: 0,
+    tipoDeMiembroId: parseInt(form.querySelector('#tipoDeMiembroId').value, 10),
+    entrenadorId: null,
     eliminado: false
   };
+
+  // 🧠 Validar que el DNI no esté repetido
+  const dniExistente = listaMiembros.find(
+    m => m.dni === datosMiembro.dni
+  );
+
+  if (dniExistente && modoFormulario === 'crear') {
+    alert(`⚠️ Ya existe un miembro registrado con el DNI ${datosMiembro.dni}.`);
+    return;
+  }
 
   // 🟢 Si estamos editando, todo sigue igual
   if (modoFormulario === 'editar' && id) {
@@ -266,18 +297,18 @@ const manejarSubmitFormulario = async (e) => {
 
   // 🟢 Si estamos creando un nuevo miembro, abrimos el wizard
   const miembroCreado = await apiCrearMiembro(datosMiembro);
-cerrarModales();
+  cerrarModales();
 
-// ✅ Mostrar wizard solo si se creó correctamente
-if (miembroCreado) {
-  renderizarWizardAgregarMiembro(contenedorVista, miembroCreado, async () => {
-    // 🟢 Callback al cerrar wizard (éxito o cancelación)
+  // ✅ Mostrar wizard solo si se creó correctamente
+  if (miembroCreado) {
+    renderizarWizardAgregarMiembro(contenedorVista, miembroCreado, async () => {
+      await cargarYMostrarMiembros();
+    });
+  } else {
     await cargarYMostrarMiembros();
-  });
-} else {
-  await cargarYMostrarMiembros();
-}
+  }
 };
+
 
 const manejarConfirmarEliminar = async (id) => {
     const miembroId = Number(id);
@@ -374,6 +405,12 @@ const renderizarEsqueleto = () => {
                 <div class="${estilos.grupoInput}">
                     <label for="fechaNacimiento">Fecha Nacimiento</label>
                     <input type="date" id="fechaNacimiento" name="fechaNacimiento">
+                </div>
+                <div class="${estilos.grupoInput}">
+                    <label for="tipoDeMiembroId">Tipo de miembro</label>
+                    <select id="tipoDeMiembroId" name="tipoDeMiembroId" required>
+                        <option value="">-- Seleccioná un tipo --</option>
+                    </select>
                 </div>
 
                 <div class="${estilos.grupoInput}">
