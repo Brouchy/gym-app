@@ -246,7 +246,7 @@ const manejarSubmitFormulario = async (e) => {
   const datosMiembro = {
     nombre: form.querySelector('#nombre').value,
     email: form.querySelector('#email').value,
-    dni: form.querySelector('#dni').value,
+    dni: parseInt(form.querySelector('#dni').value, 10),
     telefono: form.querySelector('#telefono').value,
     direccion: form.querySelector('#direccion').value,
     fechaNacimiento: form.querySelector('#fechaNacimiento').value,

@@ -1,6 +1,6 @@
 // 1. Lee la variable de entorno de Vite
 // (Recuerda que debe llamarse VITE_URL_BASE en tu .env)
-const URL_BASE = import.meta.env.VITE_URL_BASE;
+const URL_BASE = import.meta.env.VITE_URL_BASE_LOGIN;
 
 /**
  * Llama a la API para verificar el email y la contraseña.

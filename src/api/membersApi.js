@@ -4,7 +4,7 @@ const URL_BASE = import.meta.env.VITE_URL_BASE;
  * Endpoint 2: Obtener TODOS los Miembros (con datos anidados)
  */
 export const apiObtenerMiembros = async () => {
-    const ENDPOINT = 'miembros?_expand=entrenador&_expand=tipoDeMiembro';
+    const ENDPOINT = 'Miembros';
     
     try {
         const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`);
@@ -12,6 +12,7 @@ export const apiObtenerMiembros = async () => {
             console.error(`Error HTTP: ${respuesta.status}`);
             return []; 
         }
+        
         return await respuesta.json();
     } catch (error) {
         console.error("Error en apiObtenerMiembros:", error);
@@ -43,7 +44,8 @@ export const apiObtenerMiembroPorId = async (id) => {
  * (Usa la estructura de datos que necesita tu backend real)
  */
 export const apiCrearMiembro = async (datosMiembro) => {
-    const ENDPOINT = 'miembros';
+    console.log("crear miembro",datosMiembro);
+    const ENDPOINT = 'Miembros';
     
     try {
         const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`, {
