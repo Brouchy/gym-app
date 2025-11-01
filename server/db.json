@@ -192,6 +192,24 @@
       "fechaInicio": "2025-10-30T23:54:01.947Z",
       "fechaFin": "2025-11-29T23:54:01.947Z",
       "id": 1003
+    },
+    {
+      "miembroId": 1,
+      "membresiaId": 101,
+      "estadoMembresiaId": 2,
+      "pagoId": 7,
+      "fechaInicio": "2024-10-29T23:54:01.947Z",
+      "fechaFin": "2024-11-29T23:54:01.947Z",
+      "id": 1003
+    },
+    {
+      "miembroId": 1,
+      "membresiaId": 101,
+      "estadoMembresiaId": 1,
+      "pagoId": 8,
+      "fechaInicio": "2025-10-31T03:37:19.865Z",
+      "fechaFin": "2025-11-30T03:37:19.865Z",
+      "id": 1004
     }
   ],
   "pagos": [
@@ -241,6 +259,13 @@
       "metodoPago": "Efectivo",
       "descuentoAplicado": 0,
       "id": 7
+    },
+    {
+      "monto": 5000,
+      "fechaPago": "2025-10-31T03:37:19.835Z",
+      "metodoPago": "Efectivo",
+      "descuentoAplicado": 0,
+      "id": 8
     }
   ],
   "estadoMembresias": [

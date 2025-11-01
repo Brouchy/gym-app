@@ -285,3 +285,13 @@
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+.estadoActiva {
+  color: #16a34a; /* verde */
+  font-weight: 600;
+}
+
+.estadoVencida {
+  color: #dc2626; /* rojo */
+  font-weight: 600;
+}

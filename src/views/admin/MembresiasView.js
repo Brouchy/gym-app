@@ -375,14 +375,13 @@ modal.querySelector('#form-asignar').addEventListener('submit', async (e) => {
   const fechaFin = new Date(fechaInicio);
   fechaFin.setDate(fechaInicio.getDate() + membresia.duracionEnDias);
 
-  await apiCrearMembresiaXMiembro({
-    miembroId: miembroSeleccionado.id,
-    membresiaId,
-    estadoMembresiaId: 1,
-    pagoId: pago.id,
-    fechaInicio: fechaInicio.toISOString(),
-    fechaFin: fechaFin.toISOString()
-  });
+await apiCrearMembresiaXMiembro({
+  miembroId: miembroSeleccionado.id,
+  membresiaId,
+  pagoId: pago.id,
+  fechaInicio: fechaInicio.toISOString(),
+  fechaFin: fechaFin.toISOString()
+});
 
   modal.remove();
   await cargarAsignaciones(zona);
@@ -407,7 +406,13 @@ const cargarAsignaciones = async (zona) => {
       <td>${a.id}</td>
       <td>${a.miembro?.nombre || 'N/A'}</td>
       <td>${a.membresia?.nombrePlan || 'N/A'}</td>
-      <td>${a.estadoMembresia?.descripcion || 'Activa'}</td>
+      <td class="${
+          a.estadoMembresia?.descripcion === 'Activa'
+            ? estilos.estadoActiva
+            : estilos.estadoVencida
+        }">
+          ${a.estadoMembresia?.descripcion || 'Sin estado'}
+      </td>
       <td>$${a.pago?.monto || '-'}</td>
       <td>${new Date(a.fechaInicio).toLocaleDateString()}</td>
       <td>${new Date(a.fechaFin).toLocaleDateString()}</td>

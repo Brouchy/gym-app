@@ -100,31 +100,24 @@ export const apiObtenerMembresiasXMiembros = async () => {
 };
 
 
-/**
- * Crear un nuevo vínculo Miembro ↔ Membresía (POST)
- */
 export const apiCrearMembresiaXMiembro = async (nuevoRegistro) => {
   const ENDPOINT = 'membresiaXMiembros';
-
   try {
     const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(nuevoRegistro)
     });
-
     if (!respuesta.ok) {
       console.error(`Error HTTP: ${respuesta.status}`);
       return null;
     }
-
     return await respuesta.json();
   } catch (error) {
     console.error("Error en apiCrearMembresiaXMiembro:", error);
     return null;
   }
 };
-
 
 export const apiObtenerTiposDeMembresia = async () => {
   try {
