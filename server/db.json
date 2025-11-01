@@ -282,7 +282,7 @@
       "descripcion": "Pendiente de Pago"
     }
   ],
-   "clases": [
+  "clases": [
     {
       "claseId": 1,
       "actividadId": 1,
@@ -302,9 +302,16 @@
       "cupo": 15
     }
   ],
-
   "actividads": [
-    { "id": 1, "nombre": "Funcional", "descripcion": "Entrenamiento completo" },
-    { "id": 2, "nombre": "Zumba", "descripcion": "Cardio y ritmo" }
+    {
+      "id": 1,
+      "nombre": "Funcional",
+      "descripcion": "Entrenamiento completo"
+    },
+    {
+      "id": 2,
+      "nombre": "Zumba",
+      "descripcion": "Cardio y ritmo"
+    }
   ]
 }

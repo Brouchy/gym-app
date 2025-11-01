@@ -2,7 +2,7 @@ const URL_BASE = import.meta.env.VITE_URL_BASE || "http://localhost:3001";
 
 
 export const apiObtenerActividades = async () => {
-  const ENDPOINT = "actividades";
+  const ENDPOINT = "actividads";
 
   try {
     const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`);

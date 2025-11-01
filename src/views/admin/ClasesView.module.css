@@ -1,0 +1,130 @@
+.contenedor {
+  padding: 1.5rem;
+}
+
+.cabecera {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.buscador {
+  width: 50%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.botonAgregar {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.botonAgregar:hover {
+  background-color: #1e40af;
+}
+
+.tablaWrapper {
+  overflow-x: auto;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla th, .tabla td {
+  border: 1px solid #e2e8f0;
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.tabla th {
+  background-color: #f1f5f9;
+}
+
+.acciones button {
+  margin-right: 5px;
+}
+
+.botonEditar {
+  background-color: #38a169;
+  color: white;
+  border: none;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.botonEliminar {
+  background-color: #e53e3e;
+  color: white;
+  border: none;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modalFondo {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContenido {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.modalContenido h3 {
+  margin-bottom: 1rem;
+  text-align: center;
+  color: #1e3a8a;
+}
+
+.modalContenido form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.modalContenido input, .modalContenido select {
+  padding: 0.6rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+}
+
+.modalAcciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.botonPagina {
+  background: #e2e8f0;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.paginacion {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
