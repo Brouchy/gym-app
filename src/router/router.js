@@ -4,6 +4,7 @@ import { renderizarBarraNavegacion } from "../components/Navbar/Navbar";
 import { renderizarVistaLogin } from "../views/login/LoginView";
 import { renderizarPanelEntrenador } from "../views/trainer/TrainerDashboard";
 import { renderizarPanelAdmin } from "../views/admin/AdminDashboard";
+
 //TODO:adminddashboard 
 
 export const navegar=(contenedor)=>{

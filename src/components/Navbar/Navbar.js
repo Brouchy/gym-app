@@ -10,7 +10,7 @@ export const renderizarBarraNavegacion = (contenedorApp) => {
     if (usuario) {
         // Si el usuario está logueado
         nav.innerHTML = `
-            <h1>Gym App</h1>
+            <h1>Sistema Cuerpo Sano</h1>
             <div class="${estilos.infoUsuario}">
                 <span>Bienvenido, ${usuario.nombre}</span>
                 <button id="logout-button" class="${estilos.botonLogout}">Cerrar Sesión</button>
@@ -18,7 +18,7 @@ export const renderizarBarraNavegacion = (contenedorApp) => {
         `;
     } else {
         // Si no está logueado (en la vista de Login)
-        nav.innerHTML = `<h1>Gym App</h1>`;
+        nav.innerHTML = `<h1>Sistema Cuerpo Sano</h1>`;
     }
     
     // Lo insertamos al principio del contenedor de la app
