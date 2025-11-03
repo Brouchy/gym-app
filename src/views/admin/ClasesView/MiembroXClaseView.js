@@ -11,10 +11,13 @@ let listaMiembrosXClase = [];
 let listaClases = [];
 let claseSeleccionada = null;
 
+const normalizarId = (valor) => String(valor ?? "");
+
 /**
  * Vista principal para asignar miembros a las clases
  */
 export const renderizarVistaMiembroXClase = async (contenedor) => {
+  contenedor.dataset.vistaActiva = "miembroXClase";
   contenedor.innerHTML = `
     <div class="${estilos.contenedor}">
       <div class="${estilos.cabecera}">
@@ -51,22 +54,30 @@ export const renderizarVistaMiembroXClase = async (contenedor) => {
   const select = contenedor.querySelector("#selectClase");
   listaClases.forEach(c => {
     const opt = document.createElement("option");
-    opt.value = c.id ?? c.claseId;
+    opt.value = normalizarId(c.id ?? c.claseId);
     opt.textContent = `${c.actividad?.nombre} - ${c.entrenador?.nombre || "Sin entrenador"} (${new Date(c.fecha).toLocaleDateString()})`;
     select.appendChild(opt);
   });
 
   // Eventos
   select.addEventListener("change", async () => {
-    const id = select.value;
-    claseSeleccionada = listaClases.find(c => c.id == id || c.claseId == id);
-    if (!id) {
+    const idSeleccionado = normalizarId(select.value);
+    claseSeleccionada = listaClases.find(
+      (c) => normalizarId(c.id ?? c.claseId) === idSeleccionado
+    );
+
+    if (!idSeleccionado || !claseSeleccionada) {
       renderTabla([], contenedor);
       return;
     }
 
     listaMiembrosXClase = await apiObtenerMiembrosXClase();
-    const filtrados = listaMiembrosXClase.filter(mx => mx.clase?.id == id || mx.clase?.claseId == id);
+    const filtrados = listaMiembrosXClase.filter(
+      (mx) =>
+        normalizarId(mx.clase?.claseId ?? mx.clase?.id) ===
+        normalizarId(claseSeleccionada.claseId ?? claseSeleccionada.id)
+    );
+
     renderTabla(filtrados, contenedor);
   });
 
@@ -83,6 +94,7 @@ export const renderizarVistaMiembroXClase = async (contenedor) => {
  * Renderiza tabla con los miembros asignados a la clase
  */
 function renderTabla(lista, contenedor) {
+  if (!contenedor?.isConnected) return;
   const cuerpo = contenedor.querySelector("#cuerpo-tabla-miembrosxclase");
   cuerpo.innerHTML = "";
 
@@ -90,45 +102,52 @@ function renderTabla(lista, contenedor) {
     cuerpo.innerHTML = `<tr><td colspan="5">No hay miembros asignados.</td></tr>`;
     return;
   }
+  console.log(lista);
 
-  lista.forEach(m => {
-    const fila = document.createElement("tr");
-    fila.innerHTML = `
-      <td>${m.miembroXClaseId}</td>
-      <td>${m.miembro?.nombre || "-"}</td>
-      <td>${m.miembro?.entrenador?.nombre || "-"}</td>
-      <td>${new Date(m.fechaInscripcion).toLocaleDateString()}</td>
-      <td class="${estilos.acciones}">
-        <button class="${estilos.botonEliminar}" data-id="${m.miembroXClaseId}">Eliminar</button>
-      </td>
-    `;
-    cuerpo.appendChild(fila);
-  });
+lista.forEach(m => {
+  const fila = document.createElement("tr");
+  fila.innerHTML = `
+    <td>${m.id}</td>
+    <td>${m.miembro?.nombre || "-"}</td>
+    <td>${m.clase?.entrenador?.nombre || "-"}</td>
+    <td>${new Date(m.fechaInscripcion).toLocaleDateString()}</td>
+    <td class="${estilos.acciones}">
+      <button class="${estilos.botonEliminar}" data-id="${m.id}">Eliminar</button>
+    </td>
+  `;
+  cuerpo.appendChild(fila);
+});
 
-  // Listener eliminar
-  cuerpo.querySelectorAll(`.${estilos.botonEliminar}`).forEach(btn => {
-    btn.addEventListener("click", async (e) => {
-      const id = e.target.dataset.id;
-      if (confirm("¿Eliminar asignación?")) {
-        await apiEliminarMiembroXClase(id);
-        const nuevaLista = lista.filter(m => m.miembroXClaseId != id);
-        renderTabla(nuevaLista, contenedor);
-      }
-    });
+// Listener eliminar
+cuerpo.querySelectorAll(`.${estilos.botonEliminar}`).forEach(btn => {
+  btn.addEventListener("click", async (e) => {
+    const id = e.target.dataset.id;
+    if (confirm("¿Eliminar asignación?")) {
+      await apiEliminarMiembroXClase(id);
+      const nuevaLista = lista.filter(m => m.id != id);
+      renderTabla(nuevaLista, contenedor);
+    }
   });
+});
 }
 
 /**
  * Modal para asignar un nuevo miembro a la clase
  */
 async function abrirModalAsignar(clase, contenedor) {
+  if (!contenedor?.isConnected) return;
   const modal = document.createElement("div");
   modal.className = estilos.modalFondo;
 
   const miembros = await apiObtenerMiembros();
-  const asignados = listaMiembrosXClase.filter(mx => mx.clase?.id == clase.id || mx.clase?.claseId == clase.claseId);
+  const asignados = listaMiembrosXClase.filter(
+    (mx) =>
+      normalizarId(mx.clase?.claseId ?? mx.clase?.id) ===
+      normalizarId(clase.claseId ?? clase.id)
+  );
   const cupoActual = asignados.length;
   const cupoMaximo = clase.cupo || 0;
+  if (!contenedor?.isConnected) return;
 
   modal.innerHTML = `
     <div class="${estilos.modalContenido}">
@@ -150,6 +169,7 @@ async function abrirModalAsignar(clase, contenedor) {
     </div>
   `;
 
+  if (!document.body.contains(contenedor)) return;
   document.body.appendChild(modal);
 
   const form = modal.querySelector("#form-asignacion");
@@ -172,7 +192,7 @@ async function abrirModalAsignar(clase, contenedor) {
 
     await apiCrearMiembroXClase({
       miembroId,
-      claseId: clase.id ?? clase.claseId,
+      claseId: clase.claseId ?? clase.id,
       fechaInscripcion: new Date().toISOString()
     });
 
@@ -180,7 +200,12 @@ async function abrirModalAsignar(clase, contenedor) {
     modal.remove();
 
     listaMiembrosXClase = await apiObtenerMiembrosXClase();
-    const filtrados = listaMiembrosXClase.filter(mx => mx.clase?.id == clase.id || mx.clase?.claseId == clase.claseId);
+    const filtrados = listaMiembrosXClase.filter(
+      (mx) =>
+        normalizarId(mx.clase?.claseId ?? mx.clase?.id) ===
+        normalizarId(clase.claseId ?? clase.id)
+    );
+    if (!contenedor?.isConnected) return;
     renderTabla(filtrados, contenedor);
   });
 }

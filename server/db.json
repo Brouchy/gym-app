@@ -236,31 +236,22 @@
   ],
   "clases": [
     {
-      "id": 1,
       "actividadId": 1,
       "entrenadorId": 1,
-      "fecha": "2025-11-05T00:00:00Z",
+      "fecha": "2025-04-02T00:00:00.000Z",
       "horaInicio": "18:00",
       "horaFin": "19:00",
-      "cupo": 20
-    },
-    {
-      "id": 2,
-      "actividadId": 2,
-      "entrenadorId": 2,
-      "fecha": "2025-11-06T00:00:00Z",
-      "horaInicio": "19:00",
-      "horaFin": "20:00",
-      "cupo": 15
+      "cupo": 20,
+      "id": 1
     },
     {
       "actividadId": 2,
       "entrenadorId": 2,
-      "fecha": "2000-04-02T00:00:00.000Z",
+      "fecha": "2028-05-02T00:00:00.000Z",
       "horaInicio": "18:00",
       "horaFin": "19:00",
-      "cupo": 18,
-      "id": 3
+      "cupo": 20,
+      "id": 2
     }
   ],
   "actividads": [
@@ -277,27 +268,21 @@
   ],
   "miembrosXClase": [
     {
-      "id": 1,
-      "miembroId": 1,
+      "miembroId": 4,
       "claseId": 1,
-      "fechaInscripcion": "2025-11-02T15:00:00Z"
+      "fechaInscripcion": "2025-11-03T13:56:37.412Z",
+      "id": 1
     },
     {
-      "id": 2,
-      "miembroId": 2,
-      "claseId": 2,
-      "fechaInscripcion": "2025-11-03T10:30:00Z"
-    },
-    {
-      "miembroId": 1,
-      "claseId": 2,
-      "fechaInscripcion": "2025-11-03T10:16:28.620Z",
-      "id": 3
+      "miembroId": 4,
+      "claseId": 1,
+      "fechaInscripcion": "2025-11-03T14:14:27.638Z",
+      "id": 2
     },
     {
       "miembroId": 3,
-      "claseId": 1,
-      "fechaInscripcion": "2025-11-03T10:17:23.164Z",
+      "claseId": 2,
+      "fechaInscripcion": "2025-11-03T14:32:14.599Z",
       "id": 4
     }
   ]

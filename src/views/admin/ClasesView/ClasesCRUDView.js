@@ -7,6 +7,60 @@ let listaClases = [];
 let paginaActual = 1;
 const FILAS_POR_PAGINA = 5;
 
+const marcarListenersRegistrados = (contenedor) => {
+  if (contenedor.dataset.clasesCrudListeners === "true") return false;
+  contenedor.dataset.clasesCrudListeners = "true";
+  return true;
+};
+
+const handleCrudInput = (e) => {
+  const contenedor = e.currentTarget;
+  if (!contenedor?.isConnected || contenedor.dataset.vistaActiva !== "crud") return;
+  if (!e.target.closest('[data-clases-crud="true"]')) return;
+  if (e.target.matches("#buscador")) {
+    paginaActual = 1;
+    renderizarTabla(contenedor);
+  }
+};
+
+const handleCrudClick = async (e) => {
+  const contenedor = e.currentTarget;
+  if (!contenedor?.isConnected || contenedor.dataset.vistaActiva !== "crud") return;
+  if (!e.target.closest('[data-clases-crud="true"]')) return;
+
+  if (e.target.matches("#boton-prev")) {
+    paginaActual--;
+    renderizarTabla(contenedor);
+    return;
+  }
+
+  if (e.target.matches("#boton-next")) {
+    paginaActual++;
+    renderizarTabla(contenedor);
+    return;
+  }
+
+  if (e.target.matches("#boton-agregar")) {
+    abrirModal(contenedor);
+    return;
+  }
+
+  if (e.target.matches(`.${estilos.botonEditar}`)) {
+    const id = e.target.dataset.id;
+    const clase = listaClases.find((c) => c.id == id || c.claseId == id);
+    abrirModal(contenedor, clase);
+    return;
+  }
+
+  if (e.target.matches(`.${estilos.botonEliminar}`)) {
+    if (confirm("¿Eliminar clase?")) {
+      await apiEliminarClase(e.target.dataset.id);
+      listaClases = await apiObtenerClases();
+      renderizarTabla(contenedor);
+    }
+  }
+};
+
 /**
  * CRUD de Clases (Actividad + Entrenador)
  */
@@ -14,72 +68,51 @@ export const renderizarVistaClasesCRUD = async (contenedor) => {
   document.querySelectorAll('[class*="modal"]').forEach((m) => m.remove());
 
   contenedor.innerHTML = `
-    <div class="${estilos.cabecera}">
-      <input id="buscador" class="${estilos.buscador}" placeholder="Buscar por actividad o entrenador...">
-      <button id="boton-agregar" class="${estilos.botonAgregar}">+ Nueva Clase</button>
-    </div>
+    <div data-clases-crud="true">
+      <div class="${estilos.cabecera}">
+        <input id="buscador" class="${estilos.buscador}" placeholder="Buscar por actividad o entrenador...">
+        <button id="boton-agregar" class="${estilos.botonAgregar}">+ Nueva Clase</button>
+      </div>
 
-    <div class="${estilos.tablaWrapper}">
-      <table class="${estilos.tabla}">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Actividad</th>
-            <th>Descripción</th>
-            <th>Entrenador</th>
-            <th>Fecha</th>
-            <th>Horario</th>
-            <th>Cupo</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="cuerpo-tabla"></tbody>
-      </table>
-    </div>
+      <div class="${estilos.tablaWrapper}">
+        <table class="${estilos.tabla}">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Actividad</th>
+              <th>Descripción</th>
+              <th>Entrenador</th>
+              <th>Fecha</th>
+              <th>Horario</th>
+              <th>Cupo</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="cuerpo-tabla"></tbody>
+        </table>
+      </div>
 
-    <div class="${estilos.paginacion}">
-      <button id="boton-prev" class="${estilos.botonPagina}" disabled>Anterior</button>
-      <span id="indicador-pagina">Página 1 de 1</span>
-      <button id="boton-next" class="${estilos.botonPagina}" disabled>Siguiente</button>
+      <div class="${estilos.paginacion}">
+        <button id="boton-prev" class="${estilos.botonPagina}" disabled>Anterior</button>
+        <span id="indicador-pagina">Página 1 de 1</span>
+        <button id="boton-next" class="${estilos.botonPagina}" disabled>Siguiente</button>
+      </div>
     </div>
   `;
 
+  contenedor.dataset.vistaActiva = "crud";
+
+  if (marcarListenersRegistrados(contenedor)) {
+    contenedor.addEventListener("input", handleCrudInput);
+    contenedor.addEventListener("click", handleCrudClick);
+  }
+
   listaClases = await apiObtenerClases();
   renderizarTabla(contenedor);
-
-  contenedor.addEventListener("input", (e) => {
-    if (e.target.matches("#buscador")) {
-      paginaActual = 1;
-      renderizarTabla(contenedor);
-    }
-  });
-
-  contenedor.addEventListener("click", async (e) => {
-    if (e.target.matches("#boton-prev")) {
-      paginaActual--;
-      renderizarTabla(contenedor);
-    }
-    if (e.target.matches("#boton-next")) {
-      paginaActual++;
-      renderizarTabla(contenedor);
-    }
-    if (e.target.matches("#boton-agregar")) abrirModal();
-    if (e.target.matches(`.${estilos.botonEditar}`)) {
-      const id = e.target.dataset.id;
-      const clase = listaClases.find((c) => c.id == id || c.claseId == id);
-      abrirModal(clase);
-    }
-    if (e.target.matches(`.${estilos.botonEliminar}`)) {
-      if (confirm("¿Eliminar clase?")) {
-        await apiEliminarClase(e.target.dataset.id);
-        listaClases = await apiObtenerClases();
-        renderizarTabla(contenedor);
-      }
-    }
-  });
 };
 
 const renderizarTabla = (contenedor) => {
+  if (!contenedor?.isConnected) return;
   const cuerpo = contenedor.querySelector("#cuerpo-tabla");
   const buscador = contenedor.querySelector("#buscador");
   const termino = (buscador.value || "").toLowerCase();
@@ -119,12 +152,14 @@ const renderizarTabla = (contenedor) => {
           .join("");
 };
 
-const abrirModal = async (clase = null) => {
+const abrirModal = async (contenedor, clase = null) => {
+  if (!contenedor?.isConnected) return;
   const modal = document.createElement("div");
   modal.className = estilos.modalFondo;
 
   const actividades = await apiObtenerActividades();
   const entrenadores = await apiObtenerEntrenadores();
+  if (!contenedor?.isConnected) return;
 
   modal.innerHTML = `
     <div class="${estilos.modalContenido}">
@@ -162,6 +197,7 @@ const abrirModal = async (clase = null) => {
     </div>
   `;
 
+  if (!document.body.contains(contenedor)) return;
   document.body.appendChild(modal);
 
   modal.querySelector("#cancelar").addEventListener("click", () => modal.remove());
@@ -183,6 +219,6 @@ const abrirModal = async (clase = null) => {
     else await apiCrearClase(nuevaClase);
     modal.remove();
     listaClases = await apiObtenerClases();
-    renderizarTabla(document.querySelector(`.${estilos.tablaWrapper}`).parentNode);
+    renderizarTabla(contenedor);
   });
 };
