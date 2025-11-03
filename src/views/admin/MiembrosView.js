@@ -322,7 +322,7 @@ const renderizarEsqueleto = () => {
                             <th>Email</th>
                              <th>Foto</th>
                             <th>Tipo</th>
-                            <th>Entrenador (Cert.)</th> 
+                            <th>Entrenador a cargo</th> 
                             <th>Acciones</th>
                         </tr>
                     </thead>
