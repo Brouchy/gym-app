@@ -51,45 +51,6 @@
       "email": "luis@example.com",
       "foto": "https://i.pravatar.cc/150?img=4",
       "eliminado": false
-    },
-    {
-      "nombre": "karen romero gila",
-      "email": "admin@gym.com",
-      "dni": "2414124",
-      "telefono": "3424234",
-      "direccion": "ffsdfds",
-      "fechaNacimiento": "1993-04-02",
-      "foto": "https://i.pravatar.cc/150?img=8",
-      "tipoDeMiembroId": 0,
-      "entrenadorId": 0,
-      "eliminado": false,
-      "id": 5
-    },
-    {
-      "id": 6,
-      "nombre": "leon novas",
-      "email": "juan@gym.com",
-      "dni": "1234567",
-      "telefono": "3424234",
-      "direccion": "ffsdfds",
-      "fechaNacimiento": "1993-04-02",
-      "foto": "https://i.pravatar.cc/150?img=8",
-      "tipoDeMiembroId": 0,
-      "entrenadorId": 0,
-      "eliminado": false
-    },
-    {
-      "nombre": "karen romero",
-      "email": "admin@gym.com",
-      "dni": "47337884",
-      "telefono": "2131231",
-      "direccion": "werwer",
-      "fechaNacimiento": "1199-04-02",
-      "foto": "https://i.pravatar.cc/150?img=8",
-      "tipoDeMiembroId": 0,
-      "entrenadorId": 0,
-      "eliminado": false,
-      "id": 7
     }
   ],
   "entrenadors": [
@@ -282,7 +243,7 @@
       "descripcion": "Pendiente de Pago"
     }
   ],
-   "clases": [
+  "clases": [
     {
       "claseId": 1,
       "actividadId": 1,
@@ -302,9 +263,16 @@
       "cupo": 15
     }
   ],
-
   "actividads": [
-    { "id": 1, "nombre": "Funcional", "descripcion": "Entrenamiento completo" },
-    { "id": 2, "nombre": "Zumba", "descripcion": "Cardio y ritmo" }
+    {
+      "id": 1,
+      "nombre": "Funcional",
+      "descripcion": "Entrenamiento completo"
+    },
+    {
+      "id": 2,
+      "nombre": "Zumba",
+      "descripcion": "Cardio y ritmo"
+    }
   ]
 }

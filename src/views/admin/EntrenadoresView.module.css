@@ -292,3 +292,22 @@
     width: 100%;
   }
 }
+/* === Agrupación en dos columnas === */
+.grupoDosColumnas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.5rem;
+}
+
+.grupoDosColumnas div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+/* Ajuste responsivo */
+@media (max-width: 600px) {
+  .grupoDosColumnas {
+    grid-template-columns: 1fr;
+  }
+}
