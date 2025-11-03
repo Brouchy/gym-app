@@ -22,6 +22,11 @@ const FILAS_POR_PAGINA = 5;
 export const renderizarVistaMembresias = async (contenedor) => {
   contenedor.innerHTML = `
     <div class="${estilos.contenedor}">
+    <div class="${estilos.tituloModulo}">
+    <h2>📋 Módulo de Gestión de Membresías</h2>
+  </div>
+    <div class="${estilos.tituloModulo}">
+    
       <div class="${estilos.tabs}">
         <button id="tab-planes" class="${estilos.tab} ${estilos.activa}">🧾 Planes de Membresía</button>
         <button id="tab-asignaciones" class="${estilos.tab}">👥 Asignaciones a Miembros</button>
@@ -246,7 +251,6 @@ const renderizarAsignaciones = async (zona) => {
   zona.innerHTML = `
     <div class="${estilos.bloqueAsignaciones}">
       <div class="${estilos.asigHeader}">
-        <h2>Asignar Membresías a Miembros</h2>
         <button id="boton-asignar" class="${estilos.botonAgregar}">+ Nueva Asignación</button>
       </div>
       <table class="${estilos.tabla}">
