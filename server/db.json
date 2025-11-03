@@ -200,53 +200,6 @@
       "fechaPago": "2025-09-15T11:30:00Z",
       "metodoPago": "Transferencia",
       "descuentoAplicado": 5000
-    },
-    {
-      "fechaPago": "2025-10-30T05:46:46.151Z",
-      "metodoPago": "Tarjeta",
-      "descuentoAplicado": 0,
-      "id": 3
-    },
-    {
-      "fechaPago": "2025-10-30T05:50:46.848Z",
-      "metodoPago": "Efectivo",
-      "descuentoAplicado": 0,
-      "id": 4
-    },
-    {
-      "monto": 50000,
-      "fechaPago": "2025-10-30T14:40:38.126Z",
-      "metodoPago": "Tarjeta",
-      "descuentoAplicado": 0,
-      "id": 5
-    },
-    {
-      "monto": 50000,
-      "fechaPago": "2025-10-30T15:36:50.153Z",
-      "metodoPago": "Efectivo",
-      "descuentoAplicado": 0,
-      "id": 6
-    },
-    {
-      "monto": 5000,
-      "fechaPago": "2025-10-30T23:54:01.913Z",
-      "metodoPago": "Efectivo",
-      "descuentoAplicado": 0,
-      "id": 7
-    },
-    {
-      "monto": 5000,
-      "fechaPago": "2025-10-31T03:37:19.835Z",
-      "metodoPago": "Efectivo",
-      "descuentoAplicado": 0,
-      "id": 8
-    },
-    {
-      "monto": 50000,
-      "fechaPago": "2025-11-03T21:56:18.800Z",
-      "metodoPago": "Transferencia",
-      "descuentoAplicado": 0,
-      "id": 9
     }
   ],
   "estadoMembresias": [
@@ -332,7 +285,7 @@
   "asistencias": [
     {
       "miembroXClaseId": 1,
-      "tipoDeAsistenciaId": 2,
+      "tipoDeAsistenciaId": 1,
       "fecha": "2025-11-03T00:00:00.000Z",
       "membresiaXMiembroId": 1001,
       "id": 1

@@ -24,3 +24,17 @@ export const apiCrearPago = async (datosPago) => {
     return null;
   }
 };
+
+
+export const apiObtenerPagos = async () => {
+  const ENDPOINT = "pagos";
+
+  try {
+    const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`);
+    if (!respuesta.ok) throw new Error(`Error HTTP ${respuesta.status}`);
+    return await respuesta.json();
+  } catch (error) {
+    console.error("❌ Error en apiObtenerPagos:", error);
+    return [];
+  }
+};

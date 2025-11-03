@@ -1,0 +1,102 @@
+.contenedor {
+  padding: 1.5rem;
+  background-color: #f9fafb;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+.cabecera h2 {
+  margin-bottom: 1rem;
+  color: #1e293b;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.2rem;
+}
+
+.inputFecha, .selectInput {
+  padding: 0.4rem 0.7rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 0.9rem;
+}
+
+.botonFiltrar {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 0.45rem 0.9rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.botonFiltrar:hover {
+  background-color: #1d4ed8;
+}
+
+.tablaWrapper {
+  overflow-x: auto;
+  margin-top: 1rem;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  background-color: #fff;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.tabla th {
+  background-color: #e2e8f0;
+  text-align: left;
+  padding: 0.75rem;
+  border-bottom: 2px solid #cbd5e1;
+}
+
+.tabla td {
+  padding: 0.7rem;
+  border-bottom: 1px solid #e5e7eb;
+  color: #334155;
+}
+
+.tabla tr:hover {
+  background-color: #f8fafc;
+}
+
+.resumen {
+  margin-top: 1rem;
+  text-align: right;
+  font-weight: 600;
+  color: #2563eb;
+}
+
+.paginacion {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.botonPagina {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f3f4f6;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.botonPagina:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
