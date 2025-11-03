@@ -1,0 +1,294 @@
+/* === Animación de entrada general === */
+.contenedor {
+  animation: fadeIn 0.3s ease-out;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === Cabecera con buscador y botón === */
+.cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.buscador {
+  padding: 0.65rem 1rem;
+  border: 1px solid #E2E8F0;
+  border-radius: 6px;
+  font-size: 1rem;
+  width: 350px;
+}
+.buscador:focus {
+  outline: none;
+  border-color: #4C51BF;
+  box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.2);
+}
+
+.botonAgregar {
+  padding: 0.65rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: #4C51BF;
+  color: white;
+  transition: background 0.25s;
+}
+.botonAgregar:hover {
+  background-color: #434190;
+}
+
+/* === Tabla de Entrenadores === */
+.tablaWrapper {
+  overflow-x: auto;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+}
+
+.tabla th,
+.tabla td {
+  border: 1px solid #e2e8f0;
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.tabla th {
+  background-color: #edf2f7;
+  color: #2c5282;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.tabla tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+.acciones {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.botonEditar,
+.botonEliminar {
+  color: white;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.875rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+
+.botonEditar {
+  background-color: #F6AD55;
+}
+.botonEditar:hover {
+  background-color: #ED8936;
+}
+
+.botonEliminar {
+  background-color: #E53E3E;
+}
+.botonEliminar:hover {
+  background-color: #C53030;
+}
+
+/* === Paginación === */
+.paginacion {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 1rem;
+}
+
+.indicadorPagina {
+  font-size: 0.875rem;
+  color: #718096;
+}
+
+.botonPagina {
+  padding: 0.5rem 1rem;
+  background-color: #E2E8F0;
+  color: #2D3748;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.25s;
+}
+.botonPagina:hover {
+  background-color: #CBD5E0;
+}
+.botonPagina:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* === Modal === */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(17, 24, 39, 0.6);
+  backdrop-filter: blur(6px);
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.25s ease-in-out;
+}
+
+.modal.activo {
+  display: flex;
+  opacity: 1;
+}
+
+.modalFondo {
+  position: absolute;
+  inset: 0;
+}
+
+.modalContenido {
+  position: relative;
+  background: #ffffff;
+  border-radius: 1rem;
+  padding: 2rem 2.2rem;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  animation: aparecerModal 0.3s ease;
+}
+
+@keyframes aparecerModal {
+  from {
+    transform: translateY(30px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.modalCabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.5rem;
+}
+
+.modalCabecera h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.modalCerrar {
+  font-size: 1.5rem;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.modalCerrar:hover {
+  color: #4b5563;
+}
+
+/* === Formulario del Modal === */
+.formularioModal {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.formularioModal label {
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.4rem;
+}
+
+.formularioModal input,
+.formularioModal select {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.95rem;
+  background: #f9fafb;
+  transition: all 0.2s ease;
+}
+
+.formularioModal input:focus,
+.formularioModal select:focus {
+  border-color: #6366f1;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  outline: none;
+}
+
+/* === Botones del Modal === */
+.modalAcciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.botonAgregar {
+  background-color: #3182ce;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.botonAgregar:hover {
+  background-color: #2b6cb0;
+}
+
+.botonSecundario {
+  background-color: #f3f4f6;
+  color: #374151;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.botonSecundario:hover {
+  background-color: #e5e7eb;
+}
+
+/* === Ajuste Responsivo === */
+@media (max-width: 480px) {
+  .modalContenido {
+    padding: 1.5rem;
+    width: 92%;
+  }
+
+  .buscador {
+    width: 100%;
+  }
+}

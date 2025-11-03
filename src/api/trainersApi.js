@@ -1,18 +1,28 @@
 const URL_BASE = import.meta.env.VITE_URL_BASE;
 
-
-// --- Endpoints Auxiliares (para los <select> del formulario) ---
-
-/**
- * Endpoint 7: Obtener Entrenadores (para <select>)
- */
 export const apiObtenerEntrenadores = async () => {
-    try {
-        const respuesta = await fetch(`${URL_BASE}/entrenadors`);
-        if (!respuesta.ok) throw new Error(`Error HTTP: ${respuesta.status}`);
-        return await respuesta.json();
-    } catch (error) { 
-        console.error("Error en apiObtenerEntrenadores:", error);
-        return []; 
-    }
-}
+  const res = await fetch(`${URL_BASE}/entrenadors`);
+  return res.json();
+};
+
+export const apiCrearEntrenador = async (entrenador) => {
+  const res = await fetch(`${URL_BASE}/entrenadors`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(entrenador),
+  });
+  return res.json();
+};
+
+export const apiActualizarEntrenador = async (id, entrenador) => {
+  const res = await fetch(`${URL_BASE}/entrenadors/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(entrenador),
+  });
+  return res.json();
+};
+
+export const apiEliminarEntrenador = async (id) => {
+  await fetch(`${URL_BASE}/entrenadors/${id}`, { method: "DELETE" });
+};
