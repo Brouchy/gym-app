@@ -25,6 +25,7 @@
     cursor: pointer;
     background-color: #4C51BF;
     color: white;
+    
 }
 .botonAgregar:hover {
     background-color: #434190;
@@ -37,6 +38,8 @@
 .tabla {
   width: 100%;
   border-collapse: collapse;
+  margin-top: 1.5rem;
+
 }
 
 .tabla th, .tabla td {
@@ -299,4 +302,8 @@
 .estadoVencida {
   color: #dc2626; /* rojo */
   font-weight: 600;
+}
+.tituloModulo h2 {
+  margin-top: 0;
+  padding-top: 0;
 }

@@ -254,17 +254,10 @@
       "id": 2
     }
   ],
+
   "actividads": [
-    {
-      "id": 1,
-      "nombre": "Funcional",
-      "descripcion": "Entrenamiento completo"
-    },
-    {
-      "id": 2,
-      "nombre": "Zumba",
-      "descripcion": "Cardio y ritmo"
-    }
+    { "id": 1, "nombre": "Funcional", "descripcion": "Entrenamiento completo" },
+    { "id": 2, "nombre": "Zumba", "descripcion": "Cardio y ritmo" }
   ],
   "miembrosXClase": [
     {
@@ -284,36 +277,6 @@
       "claseId": 2,
       "fechaInscripcion": "2025-11-03T14:32:14.599Z",
       "id": 4
-    }
-  ],
-  "tiposDeAsistencia": [
-    {
-      "id": 1,
-      "descripcion": "Presente"
-    },
-    {
-      "id": 2,
-      "descripcion": "Ausente"
-    },
-    {
-      "id": 3,
-      "descripcion": "Justificada"
-    }
-  ],
-  "asistencias": [
-    {
-      "miembroXClaseId": 1,
-      "tipoDeAsistenciaId": 2,
-      "fecha": "2025-11-03T00:00:00.000Z",
-      "membresiaXMiembroId": 1001,
-      "id": 1
-    },
-    {
-      "id": 2,
-      "miembroXClaseId": 4,
-      "membresiaXMiembroId": 1001,
-      "tipoDeAsistenciaId": 2,
-      "fecha": "2025-11-02T15:34:28.189Z"
     }
   ]
 }

@@ -16,10 +16,74 @@ let listaMembresias = [];
 let paginaActual = 1;
 const FILAS_POR_PAGINA = 5;
 
+const asegurarListenersPlanes = (zona) => {
+  if (zona.__planesListenersRegistrados) return;
+  zona.addEventListener('click', manejarClickPlanes);
+  zona.addEventListener('input', manejarInputPlanes);
+  zona.__planesListenersRegistrados = true;
+};
+
+const manejarClickPlanes = async (e) => {
+  const zona = e.currentTarget;
+  if (!zona?.isConnected || zona.dataset.vistaActiva !== 'planes') return;
+  if (!e.target.closest('[data-zona-planes="true"]')) return;
+
+  const mostrarContenido = zona.__mostrarPlanes;
+  if (typeof mostrarContenido !== 'function') return;
+
+  if (e.target.closest('#boton-prev')) {
+    paginaActual = Math.max(1, paginaActual - 1);
+    mostrarContenido();
+    return;
+  }
+
+  if (e.target.closest('#boton-next')) {
+    paginaActual += 1;
+    mostrarContenido();
+    return;
+  }
+
+  if (e.target.closest('#boton-agregar')) {
+    abrirModal(null, zona);
+    return;
+  }
+
+  const botonEditar = e.target.closest(`.${estilos.botonEditar}`);
+  if (botonEditar) {
+    const registro = listaMembresias.find((m) => m.id == botonEditar.dataset.id);
+    abrirModal(registro, zona);
+    return;
+  }
+
+  const botonEliminar = e.target.closest(`.${estilos.botonEliminar}`);
+  if (botonEliminar) {
+    if (confirm('¿Eliminar esta membresía?')) {
+      await apiEliminarMembresia(botonEliminar.dataset.id);
+      listaMembresias = await apiObtenerMembresias();
+      mostrarContenido();
+    }
+  }
+};
+
+const manejarInputPlanes = (e) => {
+  const zona = e.currentTarget;
+  if (!zona?.isConnected || zona.dataset.vistaActiva !== 'planes') return;
+  if (!e.target.closest('[data-zona-planes="true"]')) return;
+
+  const mostrarContenido = zona.__mostrarPlanes;
+  if (typeof mostrarContenido !== 'function') return;
+
+  if (e.target.matches('#buscador')) {
+    paginaActual = 1;
+    mostrarContenido();
+  }
+};
+
 // ==============================
 //  VISTA PRINCIPAL CON TABS
 // ==============================
 export const renderizarVistaMembresias = async (contenedor) => {
+  document.querySelectorAll('[class*="modal"]').forEach((m) => m.remove());
   contenedor.innerHTML = `
     <div class="${estilos.contenedor}">
     <div class="${estilos.tituloModulo}">
@@ -70,45 +134,56 @@ export const renderizarVistaMembresias = async (contenedor) => {
 //  TAB 1 - CRUD DE PLANES
 // ==============================
 const renderizarTablaPlanes = async (zona) => {
+  document.querySelectorAll('[class*="modal"]').forEach((m) => m.remove());
+
   zona.innerHTML = `
-    <div class="${estilos.cabecera}">
-      <input type="search" id="buscador" class="${estilos.buscador}" placeholder="Buscar membresía...">
-      <button id="boton-agregar" class="${estilos.botonAgregar}">+ Nueva Membresía</button>
-    </div>
+    <div data-zona-planes="true">
+      <div class="${estilos.cabecera}">
+        <input type="search" id="buscador" class="${estilos.buscador}" placeholder="Buscar membresía...">
+        <button id="boton-agregar" class="${estilos.botonAgregar}">+ Nueva Membresía</button>
+      </div>
 
-    <div class="${estilos.tablaWrapper}">
-      <table class="${estilos.tabla}">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Tipo</th>
-            <th>Duración</th>
-            <th>Costo</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="membresias-cuerpo-tabla"></tbody>
-      </table>
-    </div>
+      <div class="${estilos.tablaWrapper}">
+        <table class="${estilos.tabla}">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Tipo</th>
+              <th>Duración</th>
+              <th>Costo</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="membresias-cuerpo-tabla"></tbody>
+        </table>
+      </div>
 
-    <div class="${estilos.paginacion}">
-      <button id="boton-prev" class="${estilos.botonPagina}" disabled>Anterior</button>
-      <span id="indicador-pagina">Página 1 de 1</span>
-      <button id="boton-next" class="${estilos.botonPagina}" disabled>Siguiente</button>
+      <div class="${estilos.paginacion}">
+        <button id="boton-prev" class="${estilos.botonPagina}" disabled>Anterior</button>
+        <span id="indicador-pagina">Página 1 de 1</span>
+        <button id="boton-next" class="${estilos.botonPagina}" disabled>Siguiente</button>
+      </div>
     </div>
   `;
+
+  zona.dataset.vistaActiva = 'planes';
+  asegurarListenersPlanes(zona);
 
   // Estado local del modo "planes"
   listaMembresias = await apiObtenerMembresias();
   paginaActual = 1;
 
   const mostrarContenido = () => {
+    if (!zona?.isConnected || zona.dataset.vistaActiva !== 'planes') return;
+
     const cuerpo = zona.querySelector('#membresias-cuerpo-tabla');
     const buscador = zona.querySelector('#buscador');
     const indicador = zona.querySelector('#indicador-pagina');
     const btnPrev = zona.querySelector('#boton-prev');
     const btnNext = zona.querySelector('#boton-next');
+
+    if (!cuerpo || !buscador || !indicador || !btnPrev || !btnNext) return;
 
     const termino = buscador.value.toLowerCase();
     const filtradas = listaMembresias.filter(m =>
@@ -116,7 +191,7 @@ const renderizarTablaPlanes = async (zona) => {
     );
 
     const totalPaginas = Math.ceil(filtradas.length / FILAS_POR_PAGINA) || 1;
-    paginaActual = Math.min(paginaActual, totalPaginas);
+    paginaActual = Math.max(1, Math.min(paginaActual, totalPaginas));
     const inicio = (paginaActual - 1) * FILAS_POR_PAGINA;
     const pagina = filtradas.slice(inicio, inicio + FILAS_POR_PAGINA);
 
@@ -146,48 +221,15 @@ const renderizarTablaPlanes = async (zona) => {
     btnNext.disabled = paginaActual === totalPaginas;
   };
 
+  zona.__mostrarPlanes = mostrarContenido;
   mostrarContenido();
-
-  // Eventos
-  zona.addEventListener('click', async e => {
-    if (e.target.matches(`#boton-prev`)) {
-      paginaActual--;
-      mostrarContenido();
-    }
-    if (e.target.matches(`#boton-next`)) {
-      paginaActual++;
-      mostrarContenido();
-    }
-    if (e.target.matches(`#boton-agregar`)) {
-      abrirModal(null, zona);
-    }
-    if (e.target.matches(`.${estilos.botonEditar}`)) {
-      const id = e.target.dataset.id;
-      const registro = listaMembresias.find(m => m.id == id);
-      abrirModal(registro, zona);
-    }
-    if (e.target.matches(`.${estilos.botonEliminar}`)) {
-      const id = e.target.dataset.id;
-      if (confirm('¿Eliminar esta membresía?')) {
-        await apiEliminarMembresia(id);
-        listaMembresias = await apiObtenerMembresias();
-        mostrarContenido();
-      }
-    }
-  });
-
-  zona.addEventListener('input', e => {
-    if (e.target.matches('#buscador')) {
-      paginaActual = 1;
-      mostrarContenido();
-    }
-  });
 };
 
 // ==============================
 //  MODAL NUEVA / EDITAR
 // ==============================
 const abrirModal = (registro = null, zona) => {
+  if (!zona?.isConnected) return;
   const modal = document.createElement('div');
   modal.className = estilos.modalFondo;
   modal.innerHTML = `
@@ -211,29 +253,50 @@ const abrirModal = (registro = null, zona) => {
       </form>
     </div>
   `;
+  if (!document.body.contains(zona)) return;
   document.body.appendChild(modal);
-  (async () => {
-  const selectTipo = modal.querySelector('#tipoDeMembresiaId');
-  const tipos = await apiObtenerTiposDeMembresia();
 
-  tipos.forEach(t => {
-    const opt = document.createElement('option');
-    opt.value = t.id;
-    opt.textContent = t.descripcion;
-    if (registro?.tipoDeMembresiaId === t.id) opt.selected = true;
-    selectTipo.appendChild(opt);
-  });
-})();
+  (async () => {
+    const selectTipo = modal.querySelector('#tipoDeMembresiaId');
+    const tipos = await apiObtenerTiposDeMembresia();
+
+    tipos.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = t.descripcion;
+      if (registro?.tipoDeMembresiaId === t.id) opt.selected = true;
+      selectTipo.appendChild(opt);
+    });
+  })();
 
   modal.querySelector('#cancelar').addEventListener('click', () => modal.remove());
   modal.querySelector('#form-membresia').addEventListener('submit', async e => {
     e.preventDefault();
 
+    const tipoDeMembresiaId = parseInt(e.target.tipoDeMembresiaId.value, 10);
+    if (!Number.isFinite(tipoDeMembresiaId)) {
+      alert('Seleccioná un tipo de membresía válido.');
+      return;
+    }
+
+    const duracionEnDias = parseInt(e.target.duracion.value, 10);
+    const costoBase = parseFloat(e.target.costo.value);
+
+    if (!Number.isFinite(duracionEnDias) || duracionEnDias <= 0) {
+      alert('Ingresá una duración válida (en días).');
+      return;
+    }
+
+    if (!Number.isFinite(costoBase) || costoBase <= 0) {
+      alert('Ingresá un costo válido.');
+      return;
+    }
+
     const nueva = {
       nombrePlan: e.target.nombrePlan.value.trim(),
-      duracionEnDias: parseInt(e.target.duracion.value),
-      costoBase: parseFloat(e.target.costo.value),
-      tipoDeMembresia: { descripcion: e.target.tipo.value.trim() }
+      duracionEnDias,
+      costoBase,
+      tipoDeMembresiaId
     };
 
     if (registro) await apiActualizarMembresia(registro.id, nueva);
@@ -248,6 +311,10 @@ const abrirModal = (registro = null, zona) => {
 //  TAB 2 - ASIGNACIONES (RF08)
 // ==============================
 const renderizarAsignaciones = async (zona) => {
+  document.querySelectorAll('[class*="modal"]').forEach((m) => m.remove());
+  zona.dataset.vistaActiva = 'asignaciones';
+  zona.__mostrarPlanes = undefined;
+
   zona.innerHTML = `
     <div class="${estilos.bloqueAsignaciones}">
       <div class="${estilos.asigHeader}">

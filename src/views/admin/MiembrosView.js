@@ -256,7 +256,7 @@ const manejarSubmitFormulario = async (e) => {
     eliminado: false
   };
 
-  // 🟢 Si estamos editando, todo sigue igual
+  // Si estamos editando, todo sigue igual
   if (modoFormulario === 'editar' && id) {
     await apiActualizarMiembro(id, datosMiembro);
     cerrarModales();
@@ -264,14 +264,14 @@ const manejarSubmitFormulario = async (e) => {
     return;
   }
 
-  // 🟢 Si estamos creando un nuevo miembro, abrimos el wizard
+  // Si estamos creando un nuevo miembro, abrimos el wizard
   const miembroCreado = await apiCrearMiembro(datosMiembro);
 cerrarModales();
 
-// ✅ Mostrar wizard solo si se creó correctamente
+// Mostrar wizard solo si se creó correctamente
 if (miembroCreado) {
   renderizarWizardAgregarMiembro(contenedorVista, miembroCreado, async () => {
-    // 🟢 Callback al cerrar wizard (éxito o cancelación)
+    //  Callback al cerrar wizard (éxito o cancelación)
     await cargarYMostrarMiembros();
   });
 } else {
@@ -298,7 +298,10 @@ const manejarConfirmarEliminar = async (id) => {
  */
 const renderizarEsqueleto = () => {
     contenedorVista.innerHTML = `
-        <div class="${estilos.contenedor}">
+        <div class="${estilos.contenedor}"
+        <div class="tituloModulo">
+            <h2>🧑‍🤝‍🧑 Módulo de Gestión de Miembros</h2>
+        </div>
             <div class="${estilos.cabecera}">
                 <input type="search" id="buscador" class="${estilos.buscador}" placeholder="Buscar por ID, DNI, nombre, email...">
                 <button id="boton-agregar-miembro" class="${estilos.botonAgregar}">
@@ -319,7 +322,7 @@ const renderizarEsqueleto = () => {
                             <th>Email</th>
                              <th>Foto</th>
                             <th>Tipo</th>
-                            <th>Entrenador (Cert.)</th> {/* Nueva cabecera combinada */}
+                            <th>Entrenador (Cert.)</th> 
                             <th>Acciones</th>
                         </tr>
                     </thead>

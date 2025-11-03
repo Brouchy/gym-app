@@ -4,7 +4,7 @@ const URL_BASE = import.meta.env.VITE_URL_BASE || "http://localhost:3001";
  *  Obtener TODAS las actividades
  */
 export const apiObtenerActividades = async () => {
-  const ENDPOINT = 'actividades'; // Ajustado según Swagger
+  const ENDPOINT = 'actividads'; // Ajustado según Swagger
 
   try {
     const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`);
@@ -20,7 +20,7 @@ export const apiObtenerActividades = async () => {
  * Crear NUEVA actividad
  */
 export const apiCrearActividad = async (actividad) => {
-  const ENDPOINT = 'actividades';
+  const ENDPOINT = 'actividads';
 
   try {
     const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`, {
@@ -40,7 +40,7 @@ export const apiCrearActividad = async (actividad) => {
  *  Actualizar actividad EXISTENTE
  */
 export const apiActualizarActividad = async (id, actividad) => {
-  const ENDPOINT = `actividades/${id}`;
+  const ENDPOINT = `actividads/${id}`;
 
   try {
     const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`, {
@@ -60,7 +60,7 @@ export const apiActualizarActividad = async (id, actividad) => {
  * Eliminar actividad por ID
  */
 export const apiEliminarActividad = async (id) => {
-  const ENDPOINT = `actividades/${id}`;
+  const ENDPOINT = `actividads/${id}`;
 
   try {
     const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`, {
