@@ -51,6 +51,19 @@
       "email": "luis@example.com",
       "foto": "https://i.pravatar.cc/150?img=4",
       "eliminado": false
+    },
+    {
+      "nombre": "Juan",
+      "email": "magaly3591@gmail.com",
+      "dni": "45444984",
+      "telefono": "5989859",
+      "direccion": "calle 1444",
+      "fechaNacimiento": "2012-07-06",
+      "foto": "https://i.ibb.co/w9qfkbc/UML-Salon-jpg.jpg",
+      "tipoDeMiembroId": 0,
+      "entrenadorId": 0,
+      "eliminado": false,
+      "id": 5
     }
   ],
   "entrenadors": [
@@ -162,6 +175,15 @@
       "fechaInicio": "2025-10-31T03:37:19.865Z",
       "fechaFin": "2025-11-30T03:37:19.865Z",
       "id": 1004
+    },
+    {
+      "miembroId": 5,
+      "membresiaId": 102,
+      "estadoMembresiaId": 1,
+      "pagoId": 9,
+      "fechaInicio": "2025-11-03T21:56:18.863Z",
+      "fechaFin": "2026-11-03T21:56:18.863Z",
+      "id": 1005
     }
   ],
   "pagos": [
@@ -218,6 +240,13 @@
       "metodoPago": "Efectivo",
       "descuentoAplicado": 0,
       "id": 8
+    },
+    {
+      "monto": 50000,
+      "fechaPago": "2025-11-03T21:56:18.800Z",
+      "metodoPago": "Transferencia",
+      "descuentoAplicado": 0,
+      "id": 9
     }
   ],
   "estadoMembresias": [

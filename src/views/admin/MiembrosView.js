@@ -1,6 +1,14 @@
-import { apiObtenerMiembros,apiObtenerMiembroPorId,apiCrearMiembro,apiActualizarMiembro,apiEliminarMiembro,apiObtenerTiposDeMiembro } from "../../api/membersApi";
-import {apiObtenerEntrenadores} from '../../api/trainersApi.js';
+import {
+    apiObtenerMiembros,
+    apiObtenerMiembroPorId,
+    apiCrearMiembro,
+    apiActualizarMiembro,
+    apiEliminarMiembro,
+    apiObtenerTiposDeMiembro
+} from "../../api/membersApi";
+import { apiObtenerEntrenadores } from '../../api/trainersApi.js';
 import { imprimirCredencial } from "../../utils/imprimirCredencial.js";
+import { subirImagenAImgbb } from "../../utils/subirImagen.js";
 import estilos from './MiembrosView.module.css';
 import { renderizarWizardAgregarMiembro } from "./WizardAgregarMiembro/WizardAgregarMiembro.js";
 
@@ -12,6 +20,7 @@ let listaTiposMiembro = []; // Cache para el <select>
 let paginaActual = 1;
 const FILAS_POR_PAGINA = 5;
 let modoFormulario = 'crear';
+let guardandoMiembro = false;
 
 // --- Contenedor Principal ---
 let contenedorVista; // El 'div' donde se renderiza este módulo
@@ -98,6 +107,7 @@ const mostrarContenido = () => {
             const fechaNac = miembro.fechaNacimiento
                 ? new Date(miembro.fechaNacimiento).toLocaleDateString()
                 : 'N/A';
+            const fotoUrl = miembro.foto || 'https://via.placeholder.com/40?text=-';
             // Combinar entrenador y certificación
             const entrenadorInfo = miembro.entrenador
                 ? `${miembro.entrenador.nombre} (${miembro.entrenador.certificacion || 'N/A'})`
@@ -111,7 +121,7 @@ const mostrarContenido = () => {
                 <td>${miembro.telefono || 'N/A'}</td>
                 <td>${fechaNac}</td>
                 <td>${miembro.email}</td>
-                <td><img src="${miembro.foto}" alt="${miembro.nombre}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"></td>
+                <td><img src="${fotoUrl}" alt="${miembro.nombre}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"></td>
                 <td>${miembro.tipoDeMiembro?.descripcion || 'N/A'}</td>
                 <td>${entrenadorInfo}</td>
                 <td class="${estilos.acciones}">
@@ -178,8 +188,24 @@ const adjuntarEventListeners = () => {
             const id = e.target.dataset.id;
             const miembro = listaMiembros.find(m => m.id === Number(id));
             imprimirCredencial(miembro);
-}
+        }
     });
+
+    const inputFoto = contenedorVista.querySelector('#foto');
+    const previewFoto = contenedorVista.querySelector('#preview-foto');
+
+    if (inputFoto && previewFoto) {
+        inputFoto.addEventListener('change', (event) => {
+            const file = event.target.files?.[0];
+            if (file) {
+                previewFoto.src = URL.createObjectURL(file);
+                previewFoto.style.display = 'block';
+            } else {
+                previewFoto.removeAttribute('src');
+                previewFoto.style.display = 'none';
+            }
+        });
+    }
 
     // --- Buscador (evento 'input') ---
     contenedorVista.querySelector('#buscador').addEventListener('input', () => {
@@ -199,6 +225,12 @@ const abrirModalAgregar = () => {
     const form = contenedorVista.querySelector('#modal-formulario-miembro');
     form.reset();
     form.querySelector('#miembro-id').value = '';
+    form.querySelector('#foto-actual').value = '';
+    const preview = form.querySelector('#preview-foto');
+    if (preview) {
+        preview.removeAttribute('src');
+        preview.style.display = 'none';
+    }
 
     contenedorVista.querySelector('#modal-titulo').textContent = 'Agregar Nuevo Miembro';
     contenedorVista.querySelector('#modal-miembro').classList.add(estilos.activo);
@@ -219,8 +251,18 @@ const abrirModalEditar = async (id) => {
     form.querySelector('#dni').value = miembro.dni;
     form.querySelector('#telefono').value = miembro.telefono;
     form.querySelector('#direccion').value = miembro.direccion;
-    form.querySelector('#fechaNacimiento').value = miembro.fechaNacimiento.split('T')[0];
-    form.querySelector('#foto').value = miembro.foto;
+    form.querySelector('#fechaNacimiento').value = miembro.fechaNacimiento ? miembro.fechaNacimiento.split('T')[0] : '';
+    form.querySelector('#foto-actual').value = miembro.foto || '';
+    const preview = form.querySelector('#preview-foto');
+    if (preview) {
+        if (miembro.foto) {
+            preview.src = miembro.foto;
+            preview.style.display = 'block';
+        } else {
+            preview.removeAttribute('src');
+            preview.style.display = 'none';
+        }
+    }
 
     contenedorVista.querySelector('#modal-titulo').textContent = 'Editar Miembro';
     contenedorVista.querySelector('#modal-miembro').classList.add(estilos.activo);
@@ -234,6 +276,17 @@ const abrirModalEliminar = (id) => {
 const cerrarModales = () => {
     contenedorVista.querySelector('#modal-miembro').classList.remove(estilos.activo);
     contenedorVista.querySelector('#modal-eliminar').classList.remove(estilos.activo);
+    const form = contenedorVista.querySelector('#modal-formulario-miembro');
+    if (form) {
+        form.reset();
+        const hidden = form.querySelector('#foto-actual');
+        if (hidden) hidden.value = '';
+        const preview = form.querySelector('#preview-foto');
+        if (preview) {
+            preview.removeAttribute('src');
+            preview.style.display = 'none';
+        }
+    }
 }
 
 // --- Lógica de Formularios ---
@@ -241,7 +294,32 @@ const cerrarModales = () => {
 const manejarSubmitFormulario = async (e) => {
   e.preventDefault();
   const form = e.target;
+  if (guardandoMiembro) return;
+  guardandoMiembro = true;
+
+  const botonSubmit = form.querySelector('button[type="submit"]');
+  const textoOriginalBoton = botonSubmit ? botonSubmit.textContent : '';
+  if (botonSubmit) {
+    botonSubmit.disabled = true;
+    botonSubmit.textContent = 'Guardando...';
+  }
+
   const id = form.querySelector('#miembro-id').value;
+  const file = form.querySelector('#foto').files[0]; // archivo seleccionado
+  const fotoActual = form.querySelector('#foto-actual').value || "";
+
+  // Subimos la imagen si se eligió una
+  let urlFoto = fotoActual;
+  if (file) {
+    const subida = await subirImagenAImgbb(file);
+    if (subida) {
+      urlFoto = subida;
+    } else if (!fotoActual) {
+      alert("No se pudo subir la imagen. El miembro se guardará sin foto.");
+    } else {
+      alert("No se pudo subir la nueva imagen. Se conservará la foto anterior.");
+    }
+  }
 
   const datosMiembro = {
     nombre: form.querySelector('#nombre').value,
@@ -250,7 +328,7 @@ const manejarSubmitFormulario = async (e) => {
     telefono: form.querySelector('#telefono').value,
     direccion: form.querySelector('#direccion').value,
     fechaNacimiento: form.querySelector('#fechaNacimiento').value,
-    foto: form.querySelector('#foto').value,
+    foto: urlFoto || "",
     tipoDeMiembroId: 0,
     entrenadorId: 0,
     eliminado: false
@@ -278,6 +356,7 @@ if (miembroCreado) {
   await cargarYMostrarMiembros();
 }
 };
+
 
 const manejarConfirmarEliminar = async (id) => {
     const miembroId = Number(id);
@@ -350,38 +429,40 @@ const renderizarEsqueleto = () => {
                 <input type="hidden" id="miembro-id">
 
                 <div class="${estilos.grupoInput}">
-                    <label for="nombre">Nombre Completo</label>
-                    <input type="text" id="nombre" name="nombre" required>
+                    <label for="nombre">Nombres Completos</label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Ingrese nombres" required>
                 </div>
 
                 <div class="${estilos.grupoInput}">
                     <label for="dni">DNI</label>
-                    <input type="text" id="dni" name="dni" required>
+                    <input type="number" id="dni" name="dni" required min="10000000" step="1" title="Ingresá un DNI válido con al menos 8 dígitos">
                 </div>
 
                 <div class="${estilos.grupoInput}">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
+                    <label for="email">Ingrese email: </label>
+                    <input type="email" name="email" id="email" placeholder="example@gmail.com" 
                 </div>
 
                 <div class="${estilos.grupoInput}">
                     <label for="telefono">Teléfono</label>
-                    <input type="tel" id="telefono" name="telefono">
+                    <input type="tel" id="telefono" placeholder="example: 1124584102" name="telefono">
                 </div>
 
                 <div class="${estilos.grupoInput}">
-                    <label for="direccion">Dirección</label>
-                    <input type="text" id="direccion" name="direccion">
+                    <label for="direccion">Ingrese direccion: </label>
+                    <input type="text" name="direccion" id="direccion" placeholder="Ingrese direccion" required>
+
                 </div>
 
                 <div class="${estilos.grupoInput}">
                     <label for="fechaNacimiento">Fecha Nacimiento</label>
                     <input type="date" id="fechaNacimiento" name="fechaNacimiento">
                 </div>
-
                 <div class="${estilos.grupoInput}">
-                    <label for="foto">URL de Foto</label>
-                    <input type="text" id="foto" name="foto">
+                <label for="foto">Foto</label>
+                <input type="file" id="foto" name="foto" accept="image/*">
+                <input type="hidden" id="foto-actual" name="fotoActual" value="">
+                <img id="preview-foto" style="width:60px;height:60px;border-radius:50%;margin-top:5px;display:none;">
                 </div>
 
                 <div class="${estilos.modalAcciones}">
