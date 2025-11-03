@@ -254,31 +254,9 @@
       "cupo": 15
     }
   ],
-  "actividades": [
-    {
-      "nombre": "Funcional",
-      "descripcion": "Entrenamiento con pesas",
-      "id": 1
-    },
-    {
-      "id": 2,
-      "nombre": "Zumba",
-      "descripcion": "Cardio y ritmo"
-    },
-    {
-      "nombre": "Crossfit",
-      "descripcion": "Fuul Body",
-      "id": 3
-    },
-    {
-      "nombre": "Boxeo",
-      "descripcion": "Peleas",
-      "id": 4
-    },
-    {
-      "nombre": "KinBoxing",
-      "descripcion": "Pelea",
-      "id": 5
-    }
+
+  "actividads": [
+    { "id": 1, "nombre": "Funcional", "descripcion": "Entrenamiento completo" },
+    { "id": 2, "nombre": "Zumba", "descripcion": "Cardio y ritmo" }
   ]
 }

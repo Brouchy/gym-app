@@ -1,3 +1,4 @@
+// src/views/admin/EntrenadoresView.js
 import estilos from "./EntrenadoresView.module.css";
 import {
   apiObtenerEntrenadores,
@@ -12,8 +13,8 @@ const FILAS_POR_PAGINA = 5;
 let modoFormulario = "crear";
 
 export const renderizarVistaEntrenadores = async (contenedor) => {
-  // Limpia cualquier modal previo al cambiar de vista
-  document.querySelectorAll('[class*="modal"]').forEach(el => el.remove());
+  // Limpia cualquier modal residual al cambiar de vista
+  document.querySelectorAll('[class*="modal"]').forEach((el) => el.remove());
 
   contenedor.innerHTML = `
     <div class="${estilos.contenedor}">
@@ -60,35 +61,38 @@ export const renderizarVistaEntrenadores = async (contenedor) => {
         <form id="form-entrenador" class="${estilos.formularioModal}">
           <input type="hidden" id="entrenador-id">
 
-          <label>Nombre</label>
-          <input type="text" id="nombre" required>
+          <div class="${estilos.grupoDosColumnas}">
+            <div>
+              <label>Nombre</label>
+              <input type="text" id="nombre" required>
 
-          <label>DNI</label>
-          <input type="number" id="dni" required>
+              <label>DNI</label>
+              <input type="number" id="dni" required>
 
-          <label>Fecha de nacimiento</label>
-          <input type="date" id="fechaNacimiento" required>
+              <label>Teléfono</label>
+              <input type="text" id="telefono" required>
 
-          <label>Teléfono</label>
-          <input type="text" id="telefono" required>
+              <label>Activo</label>
+              <select id="activo">
+                <option value="true">Sí</option>
+                <option value="false">No</option>
+              </select>
+            </div>
 
-          <label>Dirección</label>
-          <input type="text" id="direccion" required>
+            <div>
+              <label>Fecha Nacimiento</label>
+              <input type="date" id="fechaNacimiento" required>
 
-          <label>Email</label>
-          <input type="email" id="email" required>
+              <label>Dirección</label>
+              <input type="text" id="direccion" required>
 
-          <label>Foto (URL)</label>
-          <input type="text" id="foto">
+              <label>Email</label>
+              <input type="email" id="email" required>
 
-          <label>Certificación</label>
-          <input type="text" id="certificacion">
-
-          <label>Activo</label>
-          <select id="activo">
-            <option value="true">Sí</option>
-            <option value="false">No</option>
-          </select>
+              <label>Certificación</label>
+              <input type="text" id="certificacion">
+            </div>
+          </div>
 
           <div class="${estilos.modalAcciones}">
             <button type="button" id="cancelar" class="${estilos.botonSecundario}">Cancelar</button>
@@ -113,12 +117,12 @@ const renderizarTabla = (contenedor) => {
   const buscador = contenedor.querySelector("#buscador");
   const indicador = contenedor.querySelector("#indicador-pagina");
 
-  const termino = buscador.value.toLowerCase();
+  const termino = (buscador.value || "").toLowerCase();
   const filtrados = listaEntrenadores.filter(
     (e) =>
-      e.nombre.toLowerCase().includes(termino) ||
-      String(e.dni).includes(termino) ||
-      e.email.toLowerCase().includes(termino)
+      (e.nombre || "").toLowerCase().includes(termino) ||
+      String(e.dni || "").includes(termino) ||
+      (e.email || "").toLowerCase().includes(termino)
   );
 
   const totalPaginas = Math.ceil(filtrados.length / FILAS_POR_PAGINA) || 1;
@@ -140,7 +144,7 @@ const renderizarTabla = (contenedor) => {
           <td>${e.telefono}</td>
           <td>${e.direccion}</td>
           <td>${e.email}</td>
-          <td>${e.certificacion || '-'}</td>
+          <td>${e.certificacion || "-"}</td>
           <td>${e.activo ? "✅" : "❌"}</td>
           <td class="${estilos.acciones}">
             <button class="${estilos.botonEditar}" data-id="${e.id}">Editar</button>
@@ -151,6 +155,12 @@ const renderizarTabla = (contenedor) => {
           .join("");
 
   indicador.textContent = `Página ${paginaActual} de ${totalPaginas}`;
+
+  // Habilitar/Deshabilitar paginación
+  const btnPrev = contenedor.querySelector("#boton-prev");
+  const btnNext = contenedor.querySelector("#boton-next");
+  btnPrev.disabled = paginaActual === 1;
+  btnNext.disabled = paginaActual === totalPaginas;
 };
 
 const adjuntarEventos = (contenedor) => {
@@ -166,18 +176,24 @@ const adjuntarEventos = (contenedor) => {
     if (e.target.matches("#boton-prev")) {
       paginaActual--;
       renderizarTabla(contenedor);
+      return;
     }
 
     if (e.target.matches("#boton-next")) {
       paginaActual++;
       renderizarTabla(contenedor);
+      return;
     }
 
-    if (e.target.matches("#boton-agregar")) abrirModal();
+    if (e.target.matches("#boton-agregar")) {
+      abrirModal();
+      return;
+    }
 
     if (e.target.matches(`.${estilos.botonEditar}`)) {
       const entrenador = listaEntrenadores.find((ent) => ent.id == id);
       abrirModal(entrenador);
+      return;
     }
 
     if (e.target.matches(`.${estilos.botonEliminar}`)) {
@@ -185,6 +201,15 @@ const adjuntarEventos = (contenedor) => {
         await apiEliminarEntrenador(id);
         await cargarYMostrarEntrenadores(contenedor);
       }
+      return;
+    }
+
+    // Cerrar modal al clickear overlay o la X
+    if (
+      e.target.classList.contains("modal-cerrar") &&
+      document.querySelector("#modal-entrenador")
+    ) {
+      document.querySelector("#modal-entrenador").classList.remove(estilos.activo);
     }
   });
 };
@@ -200,32 +225,41 @@ const abrirModal = (entrenador = null) => {
 
   if (entrenador) {
     form.querySelector("#entrenador-id").value = entrenador.id;
-    form.querySelector("#nombre").value = entrenador.nombre;
-    form.querySelector("#dni").value = entrenador.dni;
-    form.querySelector("#fechaNacimiento").value = entrenador.fechaNacimiento.split("T")[0];
-    form.querySelector("#telefono").value = entrenador.telefono;
-    form.querySelector("#direccion").value = entrenador.direccion;
-    form.querySelector("#email").value = entrenador.email;
-    form.querySelector("#foto").value = entrenador.foto || "";
+    form.querySelector("#nombre").value = entrenador.nombre || "";
+    form.querySelector("#dni").value = entrenador.dni || "";
+    form.querySelector("#fechaNacimiento").value = entrenador.fechaNacimiento
+      ? entrenador.fechaNacimiento.split("T")[0]
+      : "";
+    form.querySelector("#telefono").value = entrenador.telefono || "";
+    form.querySelector("#direccion").value = entrenador.direccion || "";
+    form.querySelector("#email").value = entrenador.email || "";
     form.querySelector("#certificacion").value = entrenador.certificacion || "";
     form.querySelector("#activo").value = entrenador.activo ? "true" : "false";
   }
 
   modal.classList.add(estilos.activo);
 
+  // Cancelar
+  modal.querySelector("#cancelar").onclick = (ev) => {
+    ev.stopPropagation();
+    modal.classList.remove(estilos.activo);
+  };
+
+  // Submit
   form.onsubmit = async (e) => {
     e.preventDefault();
 
     const datos = {
       nombre: form.querySelector("#nombre").value.trim(),
       dni: parseInt(form.querySelector("#dni").value, 10),
-      fechaNacimiento: new Date(form.querySelector("#fechaNacimiento").value).toISOString(),
+      fechaNacimiento: new Date(
+        form.querySelector("#fechaNacimiento").value
+      ).toISOString(),
       telefono: form.querySelector("#telefono").value,
       direccion: form.querySelector("#direccion").value,
       email: form.querySelector("#email").value,
-      foto: form.querySelector("#foto").value,
       certificacion: form.querySelector("#certificacion").value,
-      activo: form.querySelector("#activo").value === "true"
+      activo: form.querySelector("#activo").value === "true",
     };
 
     if (modoFormulario === "editar") {
@@ -238,7 +272,4 @@ const abrirModal = (entrenador = null) => {
     modal.classList.remove(estilos.activo);
     await cargarYMostrarEntrenadores(document.querySelector(`.${estilos.contenedor}`));
   };
-
-  modal.querySelector("#cancelar").onclick = () =>
-    modal.classList.remove(estilos.activo);
 };
