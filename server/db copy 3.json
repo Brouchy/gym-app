@@ -278,27 +278,5 @@
       "fechaInscripcion": "2025-11-03T14:32:14.599Z",
       "id": 4
     }
-  ],
-"tiposDeAsistencia": [
-  { "id": 1, "descripcion": "Presente" },
-  { "id": 2, "descripcion": "Ausente" },
-  { "id": 3, "descripcion": "Justificada" }
-],
-
-"asistencias": [
-  {
-    "id": 1,
-    "miembroXClaseId": 1,
-    "membresiaXMiembroId": 1002,
-    "tipoDeAsistenciaId": 1,
-    "fecha": "2025-11-03T15:34:28.189Z"
-  },
-  {
-    "id": 2,
-    "miembroXClaseId": 4,
-    "membresiaXMiembroId": 1001,
-    "tipoDeAsistenciaId": 2,
-    "fecha": "2025-11-02T15:34:28.189Z"
-  }
-]
+  ]
 }
