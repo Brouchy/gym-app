@@ -13,13 +13,11 @@ const FILAS_POR_PAGINA = 5;
 export const renderizarVistaActividades = async (contenedor) => {
   contenedor.innerHTML = `
     <div class="${estilos.contenedor}">
-      <div class="${estilos.cabecera}">
         <h2>🏋️ Módulo de Gestión de Actividades</h2>
+      <div class="${estilos.cabecera}">
+        <input type="search" id="buscador" class="${estilos.buscador}" placeholder="Buscar actividad...">
         <button id="boton-agregar" class="${estilos.botonAgregar}">+ Nueva Actividad</button>
       </div>
-
-      <input type="search" id="buscador" class="${estilos.buscador}" placeholder="Buscar actividad...">
-
       <table class="${estilos.tabla}">
         <thead>
           <tr>

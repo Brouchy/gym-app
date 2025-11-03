@@ -20,8 +20,8 @@ export const renderizarVistaAsistencia = async (contenedor) => {
   // Limpia contenedor
   contenedor.innerHTML = `
     <div class="${estilos.contenedor}">
-      <div class="${estilos.cabecera}">
         <h2>📅 Registro de Asistencias</h2>
+      <div class="${estilos.cabecera}">
         <div class="${estilos.filtros}">
           <label>Seleccionar Clase:</label>
           <select id="selectClase" class="${estilos.selectInput}">

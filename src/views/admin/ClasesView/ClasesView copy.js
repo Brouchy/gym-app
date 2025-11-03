@@ -19,6 +19,7 @@ export const renderizarVistaClases = async (contenedor) => {
   contenedor.innerHTML = `
     <div class="${estilos.contenedor}">
       <div class="${estilos.cabecera}">
+        <h2>📚Módulo de Gestión de Clases</h2>
         <input id="buscador" class="${estilos.buscador}" placeholder="Buscar por actividad o entrenador...">
         <button id="boton-agregar" class="${estilos.botonAgregar}">+ Nueva Clase</button>
       </div>

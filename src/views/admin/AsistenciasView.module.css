@@ -1,15 +1,25 @@
+/* === Animación de entrada general === */
 .contenedor {
-  padding: 1.5rem;
-  background-color: #f9fafb;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  animation: fadeIn 0.3s ease-out;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .cabecera {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .cabecera h2 {
@@ -34,18 +44,19 @@
 }
 
 .botonAgregar {
-  background-color: #2563eb;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 0.5rem 0.9rem;
-  cursor: pointer;
-  font-size: 0.95rem;
-  transition: background 0.2s;
+    padding: 0.65rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background-color: #4C51BF;
+    color: white;
+    
+    
 }
-
 .botonAgregar:hover {
-  background-color: #1d4ed8;
+    background-color: #434190;
 }
 
 /* ===== Tabla ===== */
@@ -251,4 +262,8 @@
     flex-direction: column;
     align-items: stretch;
   }
+}
+.selectInput {
+  width: auto;
+  max-width: 100%;
 }
