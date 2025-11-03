@@ -255,7 +255,7 @@
     }
   ],
 
-  "actividads": [
+  "actividades": [
     { "id": 1, "nombre": "Funcional", "descripcion": "Entrenamiento completo" },
     { "id": 2, "nombre": "Zumba", "descripcion": "Cardio y ritmo" }
   ]
