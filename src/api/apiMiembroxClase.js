@@ -1,80 +1,82 @@
-const URL_BASE = import.meta.env.VITE_URL_BASE || "http://localhost:3001";
+const URL_BASE = import.meta.env.VITE_URL_BASE;
 
-
-export const apiObtenerActividades = async () => {
-  const ENDPOINT = "actividads";
+export const apiObtenerMiembrosXClase = async () => {
+  const ENDPOINT = "miembrosXClase";
   try {
     const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`);
     if (!respuesta.ok) throw new Error(`Error HTTP ${respuesta.status}`);
     return await respuesta.json();
   } catch (error) {
-    console.error("❌ Error en apiObteneractividads:", error);
+    console.error("❌ Error en apiObtenerMiembrosXClase:", error);
     return [];
   }
 };
 
 
-// ✅ Obtener una actividad por ID
-export const apiObtenerActividadPorId = async (id) => {
-  const ENDPOINT = `actividads/${id}`;
+// ✅ Obtener una relación por ID
+export const apiObtenerMiembrosXClasePorId = async (id) => {
+  const ENDPOINT = `miembrosXClase/${id}`;
   try {
     const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`);
     if (!respuesta.ok) throw new Error(`Error HTTP ${respuesta.status}`);
     return await respuesta.json();
   } catch (error) {
-    console.error("❌ Error en apiObtenerActividadPorId:", error);
+    console.error("❌ Error en apiObtenermiembrosXClasePorId:", error);
     return null;
   }
 };
 
 
-// ✅ Crear una nueva actividad
-export const apiCrearActividad = async (datos) => {
-  const ENDPOINT = "actividads";
+// ✅ Crear una nueva relación Miembro ↔ Clase
+export const apiCrearMiembroXClase = async (datos) => {
+  const ENDPOINT = "miembrosXClase";
   try {
     const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(datos),
     });
+
     if (!respuesta.ok) throw new Error(`Error HTTP ${respuesta.status}`);
     return await respuesta.json();
   } catch (error) {
-    console.error("❌ Error en apiCrearActividad:", error);
+    console.error("❌ Error en apiCrearmiembrosXClase:", error);
     return null;
   }
 };
 
 
-// ✅ Actualizar una actividad existente
-export const apiActualizarActividad = async (id, datos) => {
-  const ENDPOINT = `actividads/${id}`;
+// ✅ Actualizar una relación existente
+export const apiActualizarMiembrosXClase = async (id, datos) => {
+  const ENDPOINT = `miembrosXClase/${id}`;
   try {
     const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(datos),
     });
+
     if (!respuesta.ok) throw new Error(`Error HTTP ${respuesta.status}`);
     return await respuesta.json();
   } catch (error) {
-    console.error("❌ Error en apiActualizarActividad:", error);
+    console.error("❌ Error en apiActualizarmiembrosXClase:", error);
     return null;
   }
 };
 
+export const apiEliminarMiembroXClase = async (id) => {
+  console.log(id);
+  const ENDPOINT = `clases/${id}`;
 
-// ✅ Eliminar una actividad
-export const apiEliminarActividad = async (id) => {
-  const ENDPOINT = `actividads/${id}`;
   try {
     const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`, {
-      method: "DELETE",
+      method: "DELETE"
     });
+
     if (!respuesta.ok) throw new Error(`Error HTTP ${respuesta.status}`);
-    return true;
+    return { exito: true };
   } catch (error) {
-    console.error("❌ Error en apiEliminarActividad:", error);
-    return false;
+    console.error("❌ Error en apiEliminarMiembroXClase:", error);
+    return { exito: false };
   }
 };

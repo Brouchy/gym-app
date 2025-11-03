@@ -1,6 +1,6 @@
 import { renderizarVistaActividades } from "../views/admin/ActividadesView";
 import { renderizarVistaAsistencia } from "../views/admin/AsistenciaView";
-import { renderizarVistaClases } from "../views/admin/ClasesView";
+import { renderizarVistaClases } from "../views/admin/ClasesView/ClasesView.js";
 import { renderizarVistaEntrenadores } from "../views/admin/EntrenadoresView";
 import { renderizarVistaMembresias } from "../views/admin/MembresiasView";
 import { renderizarVistaMiembros } from "../views/admin/MiembrosView.js";

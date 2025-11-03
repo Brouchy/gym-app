@@ -146,15 +146,6 @@
       "fechaFin": "2025-10-31T23:59:59Z"
     },
     {
-      "miembroId": 7,
-      "membresiaId": 101,
-      "estadoMembresiaId": 1,
-      "pagoId": 7,
-      "fechaInicio": "2025-10-30T23:54:01.947Z",
-      "fechaFin": "2025-11-29T23:54:01.947Z",
-      "id": 1003
-    },
-    {
       "miembroId": 1,
       "membresiaId": 101,
       "estadoMembresiaId": 2,
@@ -245,7 +236,7 @@
   ],
   "clases": [
     {
-      "claseId": 1,
+      "id": 1,
       "actividadId": 1,
       "entrenadorId": 1,
       "fecha": "2025-11-05T00:00:00Z",
@@ -254,13 +245,22 @@
       "cupo": 20
     },
     {
-      "claseId": 2,
+      "id": 2,
       "actividadId": 2,
       "entrenadorId": 2,
       "fecha": "2025-11-06T00:00:00Z",
       "horaInicio": "19:00",
       "horaFin": "20:00",
       "cupo": 15
+    },
+    {
+      "actividadId": 2,
+      "entrenadorId": 2,
+      "fecha": "2000-04-02T00:00:00.000Z",
+      "horaInicio": "18:00",
+      "horaFin": "19:00",
+      "cupo": 18,
+      "id": 3
     }
   ],
   "actividads": [
@@ -273,6 +273,32 @@
       "id": 2,
       "nombre": "Zumba",
       "descripcion": "Cardio y ritmo"
+    }
+  ],
+  "miembrosXClase": [
+    {
+      "id": 1,
+      "miembroId": 1,
+      "claseId": 1,
+      "fechaInscripcion": "2025-11-02T15:00:00Z"
+    },
+    {
+      "id": 2,
+      "miembroId": 2,
+      "claseId": 2,
+      "fechaInscripcion": "2025-11-03T10:30:00Z"
+    },
+    {
+      "miembroId": 1,
+      "claseId": 2,
+      "fechaInscripcion": "2025-11-03T10:16:28.620Z",
+      "id": 3
+    },
+    {
+      "miembroId": 3,
+      "claseId": 1,
+      "fechaInscripcion": "2025-11-03T10:17:23.164Z",
+      "id": 4
     }
   ]
 }

@@ -36,6 +36,7 @@ export const apiObtenerClasePorId = async (id) => {
  * 🟡 Crear una nueva clase
  */
 export const apiCrearClase = async (nuevaClase) => {
+  console.log(nuevaClase);
   const ENDPOINT = "clases";
 
   try {
@@ -78,6 +79,7 @@ export const apiActualizarClase = async (id, claseActualizada) => {
  * 🔴 Eliminar clase
  */
 export const apiEliminarClase = async (id) => {
+  console.log(id);
   const ENDPOINT = `clases/${id}`;
 
   try {
