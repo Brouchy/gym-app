@@ -1,7 +1,7 @@
 const URL_BASE = import.meta.env.VITE_URL_BASE || "http://localhost:3001";
 
 /**
- * 🟢 Obtener TODAS las actividades
+ *  Obtener TODAS las actividades
  */
 export const apiObtenerActividades = async () => {
   const ENDPOINT = 'actividades'; // Ajustado según Swagger
@@ -11,13 +11,13 @@ export const apiObtenerActividades = async () => {
     if (!respuesta.ok) throw new Error(`Error HTTP ${respuesta.status}`);
     return await respuesta.json();
   } catch (error) {
-    console.error("❌ Error en apiObtenerActividades:", error);
+    console.error(" Error en apiObtenerActividades:", error);
     return [];
   }
 };
 
 /**
- * 🟡 Crear NUEVA actividad
+ * Crear NUEVA actividad
  */
 export const apiCrearActividad = async (actividad) => {
   const ENDPOINT = 'actividades';
@@ -31,13 +31,13 @@ export const apiCrearActividad = async (actividad) => {
     if (!respuesta.ok) throw new Error(`Error HTTP ${respuesta.status}`);
     return await respuesta.json();
   } catch (error) {
-    console.error("❌ Error en apiCrearActividad:", error);
+    console.error("Error en apiCrearActividad:", error);
     return null;
   }
 };
 
 /**
- * 🟠 Actualizar actividad EXISTENTE
+ *  Actualizar actividad EXISTENTE
  */
 export const apiActualizarActividad = async (id, actividad) => {
   const ENDPOINT = `actividades/${id}`;
@@ -51,13 +51,13 @@ export const apiActualizarActividad = async (id, actividad) => {
     if (!respuesta.ok) throw new Error(`Error HTTP ${respuesta.status}`);
     return await respuesta.json();
   } catch (error) {
-    console.error("❌ Error en apiActualizarActividad:", error);
+    console.error(" Error en apiActualizarActividad:", error);
     return null;
   }
 };
 
 /**
- * 🔴 Eliminar actividad por ID
+ * Eliminar actividad por ID
  */
 export const apiEliminarActividad = async (id) => {
   const ENDPOINT = `actividades/${id}`;
@@ -69,7 +69,7 @@ export const apiEliminarActividad = async (id) => {
     if (!respuesta.ok) throw new Error(`Error HTTP ${respuesta.status}`);
     return true;
   } catch (error) {
-    console.error("❌ Error en apiEliminarActividad:", error);
+    console.error(" Error en apiEliminarActividad:", error);
     return false;
   }
 };
