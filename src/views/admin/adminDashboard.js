@@ -20,6 +20,7 @@ export const renderizarPanelAdmin = (contenedorApp) => { // Cambié 'contenedor'
             <button data-modulo="entrenadores" class="${estilos.menuBoton}">Entrenadores</button>
             <button data-modulo="asistencia" class="${estilos.menuBoton}">Asistencia</button>
             <button data-modulo="reportes" class="${estilos.menuBoton}">Reportes</button>
+            <button data-modulo="usuarios" class="${estilos.menuBoton}">Usuarios</button>
         </nav>
 
         <div id="admin-contenido" class="${estilos.contenidoPrincipal}">
@@ -36,7 +37,7 @@ export const renderizarPanelAdmin = (contenedorApp) => { // Cambié 'contenedor'
     const botones = menu.querySelectorAll(`.${estilos.menuBoton}`);
 
     // Usamos delegación de eventos en el menú
-    menu.addEventListener('click', (evento) => {
+    menu.addEventListener('click', async (evento) => {
         const boton = evento.target.closest('button');
         if (!boton) return; 
 
@@ -45,11 +46,13 @@ export const renderizarPanelAdmin = (contenedorApp) => { // Cambié 'contenedor'
         botones.forEach(b => b.classList.remove(estilos.activo));
         boton.classList.add(estilos.activo);
 
-        navegarAdmin(modulo, contenido);
+        await navegarAdmin(modulo, contenido);
     });
 
     // Cargar el módulo por defecto (Inicio/Bienvenida)
-    navegarAdmin('inicio', contenido);
+    navegarAdmin('inicio', contenido).catch(error => {
+        console.error('Error al cargar el módulo inicial:', error);
+    });
 
     // Finalmente, añadimos el panel (que ya tiene todo) al contenedor principal
     contenedorApp.appendChild(divPanel);
