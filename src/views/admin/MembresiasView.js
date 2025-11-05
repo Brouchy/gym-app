@@ -87,13 +87,13 @@ export const renderizarVistaMembresias = async (contenedor) => {
   contenedor.innerHTML = `
     <div class="${estilos.contenedor}">
     <div class="${estilos.tituloModulo}">
-    <h2>📋 Módulo de Gestión de Membresías</h2>
+    <h2>Módulo de Gestión de Membresías</h2>
   </div>
     <div class="${estilos.tituloModulo}">
     
       <div class="${estilos.tabs}">
-        <button id="tab-planes" class="${estilos.tab} ${estilos.activa}">🧾 Planes de Membresía</button>
-        <button id="tab-asignaciones" class="${estilos.tab}">👥 Asignaciones a Miembros</button>
+        <button id="tab-planes" class="${estilos.tab} ${estilos.activa}">Planes de Membresía</button>
+        <button id="tab-asignaciones" class="${estilos.tab}">Asignaciones a Miembros</button>
       </div>
       <div id="zona-dinamica"></div>
     </div>

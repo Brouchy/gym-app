@@ -19,8 +19,8 @@ export const renderizarVistaEntrenadores = async (contenedor) => {
   contenedor.innerHTML = `
     <div class="${estilos.contenedor}">
     <div class="${estilos.tituloModulo}">
-  <h2>🏋️‍♀️ Módulo de Gestión de Entrenadores</h2>
-  </div>
+         <h2>Módulo de Gestión de Entrenadores</h2>
+    </div>
       <div class="${estilos.cabecera}">
         <input type="search" id="buscador" class="${estilos.buscador}" placeholder="Buscar por nombre, DNI o email...">
         <button id="boton-agregar" class="${estilos.botonAgregar}">+ Nuevo Entrenador</button>

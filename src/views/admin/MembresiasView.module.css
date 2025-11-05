@@ -23,12 +23,13 @@
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    background-color: #4C51BF;
+    background-color: #FF6B35;
     color: white;
-    
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 .botonAgregar:hover {
-    background-color: #434190;
+    background-color: #FF5722;
+    box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);
 }
 
 .tablaWrapper {
@@ -303,7 +304,15 @@
   color: #dc2626; /* rojo */
   font-weight: 600;
 }
+/* Normalización del título del módulo */
+.tituloModulo,
 .tituloModulo h2 {
-  margin-top: 0;
-  padding-top: 0;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    padding-top: 0;
+}
+
+.contenedor > h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
 }

@@ -2,11 +2,60 @@
 
 /* Animación de entrada */
 .contenedor {
+    padding: 1.5rem 2rem;
     animation: fadeIn 0.3s ease-out;
+}
+
+/* Normalización del título del módulo */
+.tituloModulo,
+.tituloModulo h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    padding-top: 0;
+}
+
+.contenedor > h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
 }
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+/* === TABS Modernos === */
+.tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.tab {
+    background: #2c2c2c;
+    border: 1px solid #3a3a3a;
+    border-radius: 10px;
+    padding: 0.6rem 1.4rem;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: #ffffff;
+    transition: all 0.25s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.tab:hover {
+    background: #3a3a3a;
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+.tab.activa {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+    box-shadow: 0 3px 8px rgba(37, 99, 235, 0.35);
+    transform: translateY(-1px);
 }
 
 /* Cabecera con Buscador y Botón */
@@ -14,7 +63,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     flex-wrap: wrap;
     gap: 1rem;
 }
@@ -26,10 +75,15 @@
     font-size: 1rem;
     width: 350px;
 }
+.buscador {
+    background-color: #2c2c2c;
+    color: #ffffff;
+    border: 1px solid #2c2c2c;
+}
 .buscador:focus {
     outline: none;
-    border-color: #4C51BF;
-    box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.2);
+    border-color: #FF6B35;
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
 }
 
 .botonAgregar {
@@ -39,11 +93,13 @@
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    background-color: #4C51BF;
+    background-color: #FF6B35;
     color: white;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 .botonAgregar:hover {
-    background-color: #434190;
+    background-color: #FF5722;
+    box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);
 }
 
 /* Tabla */
@@ -65,12 +121,16 @@
     vertical-align: middle;
 }
 .tabla th {
-    background-color: #FEF9C7; /* Tu color amarillo */
-    color: #713F12;
+    background-color: #2c2c2c;
+    color: #ffffff;
     font-weight: 600;
 }
 .tabla tr:nth-child(even) {
-    background-color: #F8F9FA;
+    background-color: #1a1a1a;
+}
+.tabla td {
+    color: #ffffff;
+    border-color: #2c2c2c;
 }
 .tabla td img {
     width: 40px;
@@ -170,15 +230,16 @@
 /* --- Caja del contenido --- */
 .modalContenido {
   position: relative;
-  background: #ffffff;
+  background: #1f1f1f;
   border-radius: 1rem;
   padding: 2rem 2.2rem;
   width: 100%;
   max-width: 550px;
   box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.15),
-    0 0 0 1px rgba(0, 0, 0, 0.05);
+    0 8px 20px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 107, 53, 0.2);
   animation: aparecerModal 0.3s ease;
+  color: #ffffff;
 }
 
 @keyframes aparecerModal {
@@ -198,25 +259,25 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #2c2c2c;
   padding-bottom: 0.5rem;
 }
 
 .modalCabecera h3 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1f2937;
+  color: #ffffff;
 }
 
 .modalCerrar {
   font-size: 1.8rem;
-  color: #9ca3af;
+  color: #ffffff;
   cursor: pointer;
   transition: color 0.2s;
 }
 
 .modalCerrar:hover {
-  color: #4b5563;
+  color: #FF6B35;
 }
 
 /* --- Contenido del formulario --- */
@@ -234,25 +295,26 @@
 
 .grupoInput label {
   font-weight: 500;
-  color: #374151;
+  color: #ffffff;
   margin-bottom: 0.4rem;
 }
 
 .grupoInput input,
 .grupoInput select {
-  border: 1px solid #d1d5db;
+  border: 1px solid #2c2c2c;
   border-radius: 8px;
   padding: 0.6rem 0.9rem;
   font-size: 0.95rem;
-  background: #f9fafb;
+  background: #2c2c2c;
+  color: #ffffff;
   transition: all 0.2s ease;
 }
 
 .grupoInput input:focus,
 .grupoInput select:focus {
-  border-color: #6366f1;
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  border-color: #FF6B35;
+  background: #2c2c2c;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
   outline: none;
 }
 
@@ -265,8 +327,8 @@
 }
 
 .botonSecundario {
-  background-color: #f3f4f6;
-  color: #374151;
+  background-color: #2c2c2c;
+  color: #ffffff;
   border: none;
   border-radius: 6px;
   padding: 0.6rem 1rem;
@@ -275,22 +337,23 @@
 }
 
 .botonSecundario:hover {
-  background-color: #e5e7eb;
+  background-color: #3a3a3a;
 }
 
 .botonAgregar {
-  background-color: #6366f1;
+  background-color: #FF6B35;
   color: white;
   border: none;
   border-radius: 6px;
   padding: 0.6rem 1rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, box-shadow 0.2s ease;
 }
 
 .botonAgregar:hover {
-  background-color: #4f46e5;
+  background-color: #FF5722;
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);
 }
 
 /* --- Ajuste responsivo --- */

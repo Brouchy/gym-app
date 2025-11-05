@@ -1,6 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 body {
-    background-color: #f8f9fa; /* Un gris muy claro */
-     min-height: 100vh;
+    background-color: #1a1a1a; /* Fondo oscuro tipo charcoal */
+    min-height: 100vh;
     font-family: 'Poppins', sans-serif;
+    color: #ffffff; /* Texto blanco por defecto */
 }

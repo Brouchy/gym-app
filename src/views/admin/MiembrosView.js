@@ -377,44 +377,51 @@ const manejarConfirmarEliminar = async (id) => {
  */
 const renderizarEsqueleto = () => {
     contenedorVista.innerHTML = `
-        <div class="${estilos.contenedor}"
-        <div class="tituloModulo">
-            <h2>🧑‍🤝‍🧑 Módulo de Gestión de Miembros</h2>
+        <div class="${estilos.contenedor}">
+        <div class="${estilos.tituloModulo}">
+            <h2>Módulo de Gestión de Miembros</h2>
         </div>
-            <div class="${estilos.cabecera}">
-                <input type="search" id="buscador" class="${estilos.buscador}" placeholder="Buscar por ID, DNI, nombre, email...">
-                <button id="boton-agregar-miembro" class="${estilos.botonAgregar}">
-                    + Agregar Miembro
-                </button>
+        <div class="${estilos.tituloModulo}">
+            <div class="${estilos.tabs}">
+                <button id="tab-gestion" class="${estilos.tab} ${estilos.activa}">Gestión de Miembros</button>
             </div>
+            <div id="zona-dinamica">
+                <div class="${estilos.cabecera}">
+                    <input type="search" id="buscador" class="${estilos.buscador}" placeholder="Buscar por ID, DNI, nombre, email...">
+                    <button id="boton-agregar-miembro" class="${estilos.botonAgregar}">
+                        + Agregar Miembro
+                    </button>
+                </div>
 
-            <div class="${estilos.tablaWrapper}">
-                <table class="${estilos.tabla}">
-                    <thead>
-                       <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>DNI</th>
-                            <th>Dirección</th>
-                            <th>Teléfono</th>
-                            <th>F. Nac.</th>
-                            <th>Email</th>
-                             <th>Foto</th>
-                            <th>Tipo</th>
-                            <th>Entrenador a cargo</th> 
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="miembros-cuerpo-tabla">
-                        </tbody>
-                </table>
-            </div>
+                <div class="${estilos.tablaWrapper}">
+                    <table class="${estilos.tabla}">
+                        <thead>
+                           <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>DNI</th>
+                                <th>Dirección</th>
+                                <th>Teléfono</th>
+                                <th>F. Nac.</th>
+                                <th>Email</th>
+                                 <th>Foto</th>
+                                <th>Tipo</th>
+                                <th>Entrenador a cargo</th> 
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="miembros-cuerpo-tabla">
+                            </tbody>
+                    </table>
+                </div>
 
-            <div class="${estilos.paginacion}">
-                <button id="boton-prev" class="${estilos.botonPagina}" disabled>Anterior</button>
-                <span id="indicador-pagina" class="${estilos.indicadorPagina}">Página 0 de 0</span>
-                <button id="boton-next" class="${estilos.botonPagina}" disabled>Siguiente</button>
+                <div class="${estilos.paginacion}">
+                    <button id="boton-prev" class="${estilos.botonPagina}" disabled>Anterior</button>
+                    <span id="indicador-pagina" class="${estilos.indicadorPagina}">Página 0 de 0</span>
+                    <button id="boton-next" class="${estilos.botonPagina}" disabled>Siguiente</button>
+                </div>
             </div>
+        </div>
         </div>
 
        <div id="modal-miembro" class="${estilos.modal}">

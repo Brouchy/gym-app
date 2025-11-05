@@ -11,7 +11,7 @@ const FILAS_POR_PAGINA = 6;
 export const renderizarVistaReportes = async (contenedor) => {
   contenedor.innerHTML = `
     <div class="${estilos.contenedor}">
-        <h2>📊 Reporte de Pagos Recibidos</h2>
+        <h2>Reporte de Pagos Recibidos</h2>
       <div class="${estilos.cabecera}">
 
         <div class="${estilos.filtros}">

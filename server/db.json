@@ -51,37 +51,30 @@
       "email": "luis@example.com",
       "foto": "https://i.pravatar.cc/150?img=4",
       "eliminado": false
-    },
-    {
-      "nombre": "Juan",
-      "email": "magaly3591@gmail.com",
-      "dni": "45444984",
-      "telefono": "5989859",
-      "direccion": "calle 1444",
-      "fechaNacimiento": "2012-07-06",
-      "foto": "https://i.ibb.co/w9qfkbc/UML-Salon-jpg.jpg",
-      "tipoDeMiembroId": 0,
-      "entrenadorId": 0,
-      "eliminado": false,
-      "id": 5
     }
   ],
   "entrenadors": [
     {
-      "id": 1,
       "nombre": "Karen Pérez",
+      "dni": 94325420,
+      "fechaNacimiento": "1998-08-10T00:00:00.000Z",
       "telefono": "11456781",
+      "direccion": "calle 1444",
       "email": "karenPerez@example.com",
-      "certificacion": "Karate",
-      "activo": true
+      "certificacion": "MEP-8010",
+      "activo": true,
+      "id": 1
     },
     {
-      "id": 2,
-      "nombre": "Javier Pérez",
+      "nombre": "Javier Sandoval",
+      "dni": 6546498,
+      "fechaNacimiento": "1998-11-20T00:00:00.000Z",
       "telefono": "1144990011",
+      "direccion": "calle 123",
       "email": "javier@example.com",
-      "certificacion": "Yoga Instructor",
-      "activo": true
+      "certificacion": "AMM-5047",
+      "activo": true,
+      "id": 2
     }
   ],
   "tipoDeMiembros": [
@@ -159,31 +152,12 @@
       "fechaFin": "2025-10-31T23:59:59Z"
     },
     {
-      "miembroId": 1,
+      "miembroId": 2,
       "membresiaId": 101,
-      "estadoMembresiaId": 2,
-      "pagoId": 7,
-      "fechaInicio": "2024-10-29T23:54:01.947Z",
-      "fechaFin": "2024-11-29T23:54:01.947Z",
+      "pagoId": 3,
+      "fechaInicio": "2025-11-03T23:14:33.671Z",
+      "fechaFin": "2025-12-03T23:14:33.671Z",
       "id": 1003
-    },
-    {
-      "miembroId": 1,
-      "membresiaId": 101,
-      "estadoMembresiaId": 1,
-      "pagoId": 8,
-      "fechaInicio": "2025-10-31T03:37:19.865Z",
-      "fechaFin": "2025-11-30T03:37:19.865Z",
-      "id": 1004
-    },
-    {
-      "miembroId": 5,
-      "membresiaId": 102,
-      "estadoMembresiaId": 1,
-      "pagoId": 9,
-      "fechaInicio": "2025-11-03T21:56:18.863Z",
-      "fechaFin": "2026-11-03T21:56:18.863Z",
-      "id": 1005
     }
   ],
   "pagos": [
@@ -200,6 +174,13 @@
       "fechaPago": "2025-09-15T11:30:00Z",
       "metodoPago": "Transferencia",
       "descuentoAplicado": 5000
+    },
+    {
+      "monto": 5000,
+      "fechaPago": "2025-11-03T23:14:33.638Z",
+      "metodoPago": "Tarjeta",
+      "descuentoAplicado": 0,
+      "id": 3
     }
   ],
   "estadoMembresias": [
@@ -234,6 +215,15 @@
       "horaFin": "19:00",
       "cupo": 20,
       "id": 2
+    },
+    {
+      "actividadId": 3,
+      "entrenadorId": 2,
+      "fecha": "2025-11-06T00:00:00.000Z",
+      "horaInicio": "20:00",
+      "horaFin": "21:00",
+      "cupo": 10,
+      "id": 3
     }
   ],
   "actividads": [
@@ -246,6 +236,11 @@
       "id": 2,
       "nombre": "Zumba",
       "descripcion": "Cardio y ritmo"
+    },
+    {
+      "nombre": "Crossfit",
+      "descripcion": "Pelea",
+      "id": 3
     }
   ],
   "miembrosXClase": [
@@ -256,16 +251,16 @@
       "id": 1
     },
     {
-      "miembroId": 4,
-      "claseId": 1,
-      "fechaInscripcion": "2025-11-03T14:14:27.638Z",
-      "id": 2
-    },
-    {
       "miembroId": 3,
       "claseId": 2,
       "fechaInscripcion": "2025-11-03T14:32:14.599Z",
       "id": 4
+    },
+    {
+      "miembroId": 1,
+      "claseId": 1,
+      "fechaInscripcion": "2025-11-03T22:54:37.825Z",
+      "id": 5
     }
   ],
   "tiposDeAsistencia": [
@@ -284,18 +279,25 @@
   ],
   "asistencias": [
     {
-      "miembroXClaseId": 1,
-      "tipoDeAsistenciaId": 1,
-      "fecha": "2025-11-03T00:00:00.000Z",
-      "membresiaXMiembroId": 1001,
-      "id": 1
-    },
-    {
       "id": 2,
       "miembroXClaseId": 4,
       "membresiaXMiembroId": 1001,
       "tipoDeAsistenciaId": 2,
       "fecha": "2025-11-02T15:34:28.189Z"
+    },
+    {
+      "miembroXClaseId": 1,
+      "membresiaXMiembroId": 1001,
+      "tipoDeAsistenciaId": 2,
+      "fecha": "2025-11-03T00:00:00.000Z",
+      "id": 3
+    },
+    {
+      "miembroXClaseId": 5,
+      "tipoDeAsistenciaId": 1,
+      "fecha": "2025-11-03T00:00:00.000Z",
+      "membresiaXMiembroId": 1001,
+      "id": 4
     }
   ]
 }

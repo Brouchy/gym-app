@@ -21,7 +21,7 @@ export const renderizarVistaMiembroXClase = async (contenedor) => {
   contenedor.innerHTML = `
     <div class="${estilos.contenedor}">
       <div class="${estilos.cabecera}">
-        <h2>🧍‍♂️ Asignación de Miembros a Clases</h2>
+        <h2>Asignación de Miembros a Clases</h2>
         <div class="${estilos.filaSelect}">
           <label>Seleccionar Clase:</label>
           <select id="selectClase" class="${estilos.selectInput}">

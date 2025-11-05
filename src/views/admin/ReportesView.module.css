@@ -5,6 +5,19 @@
   box-shadow: 0 0 10px rgba(0,0,0,0.05);
 }
 
+/* Normalización del título del módulo */
+.tituloModulo,
+.tituloModulo h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    padding-top: 0;
+}
+
+.contenedor > h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
 .cabecera h2 {
   margin-bottom: 1rem;
   color: #1e293b;
@@ -28,17 +41,19 @@
 }
 
 .botonFiltrar {
-  background-color: #2563eb;
+  background-color: #FF6B35;
   color: white;
   border: none;
   border-radius: 5px;
   padding: 0.45rem 0.9rem;
   cursor: pointer;
   font-size: 0.9rem;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .botonFiltrar:hover {
-  background-color: #1d4ed8;
+  background-color: #FF5722;
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);
 }
 
 .tablaWrapper {
@@ -76,7 +91,7 @@
   margin-top: 1rem;
   text-align: right;
   font-weight: 600;
-  color: #2563eb;
+  color: #FF6B35;
 }
 
 .paginacion {

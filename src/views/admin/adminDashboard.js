@@ -12,7 +12,8 @@ export const renderizarPanelAdmin = (contenedorApp) => { // Cambié 'contenedor'
     // (Opcional: es mejor usar '=' que '+=' si el div está vacío)
     divPanel.innerHTML = ` 
         <nav id="adminMenu" class="${estilos.menuLateral}">
-            <button data-modulo="miembros" class="${estilos.menuBoton} ${estilos.activo}">Miembros</button>
+            <button data-modulo="inicio" class="${estilos.menuBoton} ${estilos.activo}">Inicio</button>
+            <button data-modulo="miembros" class="${estilos.menuBoton}">Miembros</button>
             <button data-modulo="membresias" class="${estilos.menuBoton}">Membresías</button>
             <button data-modulo="clases" class="${estilos.menuBoton}">Clases</button>
             <button data-modulo="actividades" class="${estilos.menuBoton}">Actividades</button>
@@ -47,8 +48,8 @@ export const renderizarPanelAdmin = (contenedorApp) => { // Cambié 'contenedor'
         navegarAdmin(modulo, contenido);
     });
 
-    // Cargar el módulo por defecto (Miembros)
-    navegarAdmin('miembros', contenido);
+    // Cargar el módulo por defecto (Inicio/Bienvenida)
+    navegarAdmin('inicio', contenido);
 
     // Finalmente, añadimos el panel (que ya tiene todo) al contenedor principal
     contenedorApp.appendChild(divPanel);

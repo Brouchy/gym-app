@@ -8,9 +8,9 @@
 /* --- 3. Menú Lateral (Sidebar) --- */
 .menuLateral {
     flex: 0 0 220px; /* Ancho fijo */
-    background-color: #ffffff;
+    background-color: #1f1f1f; /* Fondo oscuro */
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Sombra más sutil */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); /* Sombra más pronunciada */
     padding: 15px;
     align-self: flex-start; /* Evita que se estire verticalmente */
     display: flex;
@@ -24,7 +24,7 @@
     padding: 12px 15px;
     border: none;
     background-color: transparent; /* Fondo transparente por defecto */
-    color: #4A5568; /* Un gris oscuro para el texto */
+    color: #ffffff; /* Texto blanco */
     cursor: pointer;
     font-size: 0.95rem; /* Ligeramente más pequeño */
     text-align: left;
@@ -34,27 +34,28 @@
 }
 
 .menuBoton:hover {
-    background-color: #EDF2F7; /* Un gris muy claro al pasar el mouse */
-    color: #2D3748; /* Texto un poco más oscuro */
+    background-color: #2c2c2c; /* Gris oscuro al pasar el mouse */
+    color: #ffffff;
 }
 
 .menuBoton.activo {
-    background-color: #4C51BF; /* Indigo */
+    background-color: #FF6B35; /* Naranja brillante */
     color: white;
     font-weight: 600;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Sombra ligera al botón activo */
+    box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4); /* Sombra naranja */
 }
 .menuBoton.activo:hover {
-    background-color: #434190; /* Indigo más oscuro al pasar mouse sobre activo */
+    background-color: #FF5722; /* Naranja más oscuro al pasar mouse */
 }
 
 
 /* --- 5. Área de Contenido Principal --- */
 .contenidoPrincipal {
     flex: 1; /* Ocupa el espacio restante */
-    background-color: #ffffff;
+    background-color: #1f1f1f; /* Fondo oscuro */
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     padding: 25px; /* Un poco más de padding interno */
     min-height: 400px; /* Opcional, para que no colapse si está vacío */
+    color: #ffffff; /* Texto blanco */
 }

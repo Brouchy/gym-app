@@ -15,10 +15,10 @@ export const renderizarVistaClases = async (contenedor) => {
   // HTML base con pestañas
   contenedor.innerHTML = `
     <div class="${estilos.contenedor}">
-        <h2>📚Módulo de Gestión de Clases</h2>
+        <h2>Módulo de Gestión de Clases</h2>
       <div class="${estilos.navTabs}">
-        <button id="btn-crud" class="${estilos.tabActiva}">📋 Gestión de Clases</button>
-        <button id="btn-asignacion">🧍‍♂️ Asignación de Miembros</button>
+        <button id="btn-crud" class="${estilos.tabActiva}">Gestión de Clases</button>
+        <button id="btn-asignacion">Asignación de Miembros</button>
       </div>
       <div id="contenido-clases"></div>
     </div>

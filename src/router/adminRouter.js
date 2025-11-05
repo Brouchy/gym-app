@@ -5,6 +5,7 @@ import { renderizarVistaEntrenadores } from "../views/admin/EntrenadoresView";
 import { renderizarVistaMembresias } from "../views/admin/MembresiasView";
 import { renderizarVistaMiembros } from "../views/admin/MiembrosView.js";
 import { renderizarVistaReportes } from "../views/admin/ReportesView";
+import { renderizarVistaBienvenida } from "../views/admin/BienvenidaView.js";
 
 
 /**
@@ -23,6 +24,9 @@ export const navegarAdmin = (modulo, contenedor) => {
 
     // 2. Usamos un 'switch' para decidir qué vista renderizar
     switch (modulo) {
+        case 'inicio':
+            renderizarVistaBienvenida(contenedor);
+            break;
         case 'miembros':
             renderizarVistaMiembros(contenedor);
             break;
@@ -45,8 +49,8 @@ export const navegarAdmin = (modulo, contenedor) => {
             renderizarVistaReportes(contenedor);
             break;
         default:
-            // Por defecto, mostramos el módulo de miembros
-            renderizarVistaMiembros(contenedor);
+            // Por defecto, mostramos la vista de bienvenida
+            renderizarVistaBienvenida(contenedor);
             break;
     }
 }
