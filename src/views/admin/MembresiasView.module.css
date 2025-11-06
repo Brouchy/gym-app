@@ -39,18 +39,25 @@
 .tabla {
   width: 100%;
   border-collapse: collapse;
+  background-color: #1f1f1f;
+  border-radius: 6px;
+  overflow: hidden;
   margin-top: 1.5rem;
-
 }
 
 .tabla th, .tabla td {
-  border: 1px solid #e2e8f0;
-  padding: 0.75rem;
+  padding: 12px;
+  border-bottom: 1px solid #333;
   text-align: left;
 }
 
 .tabla th {
-  background-color: #edf2f7;
+  background-color: #2c2c2c;
+  color: #ccc;
+}
+
+.tabla td {
+  color: white;
 }
 
 .acciones button {

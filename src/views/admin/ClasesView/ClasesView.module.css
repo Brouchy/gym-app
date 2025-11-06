@@ -71,23 +71,23 @@
 .tabla {
   width: 100%;
   border-collapse: collapse;
+  background-color: #1f1f1f;
+  border-radius: 6px;
+  overflow: hidden;
   font-size: 0.9rem;
 }
 .tabla th, .tabla td {
-  border: 1px solid #E2E8F0;
-  padding: 0.75rem;
+  padding: 12px;
+  border-bottom: 1px solid #333;
   text-align: left;
 }
 .tabla th {
-  background-color: #F8FAFC;
-  color: #1E3A8A;
+  background-color: #2c2c2c;
+  color: #ccc;
   font-weight: 600;
 }
-.tabla tr:nth-child(even) {
-  background-color: #F9FAFB;
-}
-.tabla tr:hover {
-  background-color: #EEF2FF;
+.tabla td {
+  color: white;
 }
 
 /* ==== Botones de Acciones ==== */
