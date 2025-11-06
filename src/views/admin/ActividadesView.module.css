@@ -356,3 +356,108 @@
 .botonSecundario:hover {
   background-color: #3a3a3a;
 }
+
+/* === Responsive === */
+@media (max-width: 1024px) {
+    .tabla {
+        font-size: 0.85rem;
+    }
+
+    .tabla th,
+    .tabla td {
+        padding: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .contenedor {
+        padding: 1rem;
+    }
+
+    .cabecera {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .cabecera h2 {
+        font-size: 1.3rem;
+    }
+
+    .buscador {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    .botonAgregar {
+        width: 100%;
+    }
+
+    .tabla {
+        font-size: 0.8rem;
+    }
+
+    .tabla th,
+    .tabla td {
+        padding: 8px;
+    }
+
+    .acciones {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+
+    .botonEditar,
+    .botonEliminar {
+        width: 100%;
+        font-size: 0.8rem;
+    }
+
+    .paginacion {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .modalContenido {
+        width: 90%;
+        max-width: 100%;
+        padding: 1.5rem;
+    }
+
+    .modalAcciones {
+        flex-direction: column;
+    }
+
+    .modalAcciones button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .contenedor {
+        padding: 0.8rem;
+    }
+
+    .cabecera h2 {
+        font-size: 1.1rem;
+    }
+
+    .tabla {
+        font-size: 0.75rem;
+    }
+
+    .tabla th,
+    .tabla td {
+        padding: 6px;
+    }
+
+    .modalContenido {
+        width: 95%;
+        padding: 1.2rem;
+    }
+
+    .modalContenido h3 {
+        font-size: 1.1rem;
+    }
+}

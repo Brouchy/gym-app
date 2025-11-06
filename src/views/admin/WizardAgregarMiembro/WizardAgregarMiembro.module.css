@@ -171,7 +171,41 @@ select:focus {
   animation: aparecerPaso 0.3s ease;
 }
 
-/* === Responsivo (móvil) === */
+/* === Responsivo === */
+@media (max-width: 768px) {
+  .modalContenido {
+    padding: 1.8rem;
+    width: 90%;
+    max-width: 100%;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+  }
+
+  p {
+    font-size: 0.9rem;
+  }
+
+  select {
+    font-size: 0.9rem;
+    padding: 0.6rem 0.9rem;
+  }
+
+  .botones {
+    gap: 0.6rem;
+  }
+
+  .btnCancelar,
+  .btnContinuar,
+  .btnAtras,
+  .btnConfirmar,
+  .btnCerrar {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
 @media (max-width: 500px) {
   .modalContenido {
     padding: 1.5rem;
@@ -182,13 +216,26 @@ select:focus {
     font-size: 1.1rem;
   }
 
+  p {
+    font-size: 0.85rem;
+  }
+
+  select {
+    font-size: 0.85rem;
+    padding: 0.55rem 0.8rem;
+  }
+
   .btnCancelar,
   .btnContinuar,
-  .btnConfirmar {
+  .btnAtras,
+  .btnConfirmar,
+  .btnCerrar {
     width: 100%;
+    padding: 0.7rem 1rem;
   }
 
   .botones {
     flex-direction: column;
+    gap: 0.5rem;
   }
 }

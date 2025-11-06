@@ -64,63 +64,132 @@ export const renderizarVistaReportes = async (contenedor) => {
     </div>
   `;
 
-  // Cargar datos
-  const pagos = await apiObtenerPagos();
-  const membresias = await apiObtenerMembresias();
-  const miembros = await apiObtenerMiembros();
-  const membresiasXMiembros = await apiObtenerMembresiasXMiembros();
+  // Cargar datos con validación
+  try {
+    const pagos = await apiObtenerPagos() || [];
+    const membresias = await apiObtenerMembresias() || [];
+    const miembros = await apiObtenerMiembros() || [];
+    const membresiasXMiembros = await apiObtenerMembresiasXMiembros() || [];
 
-  listaReportes = pagos.map(pago => {
-    const relacion = membresiasXMiembros.find(r => r.pagoId === pago.id);
-    const miembro = miembros.find(m => m.id === relacion?.miembroId);
-    const membresia = membresias.find(m => m.id === relacion?.membresiaId);
+    // Validar que sean arrays
+    if (!Array.isArray(pagos)) {
+      console.error('apiObtenerPagos no retornó un array:', pagos);
+      throw new Error('Error al cargar los pagos');
+    }
+    if (!Array.isArray(membresias)) {
+      console.error('apiObtenerMembresias no retornó un array:', membresias);
+      throw new Error('Error al cargar las membresías');
+    }
+    if (!Array.isArray(miembros)) {
+      console.error('apiObtenerMiembros no retornó un array:', miembros);
+      throw new Error('Error al cargar los miembros');
+    }
+    if (!Array.isArray(membresiasXMiembros)) {
+      console.error('apiObtenerMembresiasXMiembros no retornó un array:', membresiasXMiembros);
+      throw new Error('Error al cargar las relaciones de membresías');
+    }
 
-    return {
-      id: pago.id,
-      fecha: pago.fechaPago,
-      metodo: pago.metodoPago,
-      monto: pago.monto || 0,
-      descuento: pago.descuentoAplicado || 0,
-      total: (pago.monto || 0) - (pago.descuentoAplicado || 0),
-      miembro: miembro?.nombre || "—",
-      membresia: membresia?.nombrePlan || "—"
-    };
-  });
+    listaReportes = pagos.map(pago => {
+      const relacion = membresiasXMiembros.find(r => r.pagoId === pago.id);
+      const miembro = miembros.find(m => m.id === relacion?.miembroId);
+      const membresia = membresias.find(m => m.id === relacion?.membresiaId);
 
-  renderizarTabla(contenedor, listaReportes);
+      return {
+        id: pago.id,
+        fecha: pago.fechaPago,
+        metodo: pago.metodoPago,
+        monto: pago.monto || 0,
+        descuento: pago.descuentoAplicado || 0,
+        total: (pago.monto || 0) - (pago.descuentoAplicado || 0),
+        miembro: miembro?.nombre || "—",
+        membresia: membresia?.nombrePlan || "—"
+      };
+    });
 
-  contenedor.querySelector("#boton-filtrar").addEventListener("click", () => {
-    aplicarFiltros(contenedor);
-  });
-
-  contenedor.querySelector("#boton-prev").addEventListener("click", () => {
-    paginaActual--;
     renderizarTabla(contenedor, listaReportes);
-  });
+  } catch (error) {
+    console.error('Error al cargar reportes:', error);
+    const cuerpo = contenedor.querySelector("#cuerpo-tabla-reportes");
+    if (cuerpo) {
+      cuerpo.innerHTML = `<tr><td colspan="7">Error al cargar los datos: ${error.message}</td></tr>`;
+    }
+  }
 
-  contenedor.querySelector("#boton-next").addEventListener("click", () => {
-    paginaActual++;
-    renderizarTabla(contenedor, listaReportes);
-  });
+  const botonFiltrar = contenedor.querySelector("#boton-filtrar");
+  const botonPrev = contenedor.querySelector("#boton-prev");
+  const botonNext = contenedor.querySelector("#boton-next");
+
+  if (botonFiltrar) {
+    botonFiltrar.addEventListener("click", () => {
+      aplicarFiltros(contenedor);
+    });
+  }
+
+  if (botonPrev) {
+    botonPrev.addEventListener("click", () => {
+      paginaActual--;
+      renderizarTabla(contenedor, listaReportes);
+    });
+  }
+
+  if (botonNext) {
+    botonNext.addEventListener("click", () => {
+      paginaActual++;
+      renderizarTabla(contenedor, listaReportes);
+    });
+  }
 };
 
 function aplicarFiltros(contenedor) {
-  const desde = contenedor.querySelector("#filtro-desde").value;
-  const hasta = contenedor.querySelector("#filtro-hasta").value;
-  const metodo = contenedor.querySelector("#filtro-metodo").value;
+  const desdeInput = contenedor.querySelector("#filtro-desde");
+  const hastaInput = contenedor.querySelector("#filtro-hasta");
+  const metodoInput = contenedor.querySelector("#filtro-metodo");
+
+  if (!desdeInput || !hastaInput || !metodoInput) {
+    console.error('Elementos de filtro no encontrados');
+    return;
+  }
+
+  const desde = desdeInput.value;
+  const hasta = hastaInput.value;
+  const metodo = metodoInput.value;
+
+  // Validar que listaReportes sea un array
+  if (!Array.isArray(listaReportes)) {
+    console.error('listaReportes no es un array:', listaReportes);
+    listaReportes = [];
+  }
 
   let filtrados = [...listaReportes];
 
-  if (metodo) filtrados = filtrados.filter(r => r.metodo === metodo);
+  if (metodo) {
+    filtrados = filtrados.filter(r => r.metodo === metodo);
+  }
 
   if (desde) {
-    const d = new Date(desde);
-    filtrados = filtrados.filter(r => new Date(r.fecha) >= d);
+    try {
+      const d = new Date(desde);
+      filtrados = filtrados.filter(r => {
+        if (!r.fecha) return false;
+        const fechaR = new Date(r.fecha);
+        return !isNaN(fechaR.getTime()) && fechaR >= d;
+      });
+    } catch (error) {
+      console.error('Error al filtrar por fecha desde:', error);
+    }
   }
 
   if (hasta) {
-    const h = new Date(hasta);
-    filtrados = filtrados.filter(r => new Date(r.fecha) <= h);
+    try {
+      const h = new Date(hasta);
+      filtrados = filtrados.filter(r => {
+        if (!r.fecha) return false;
+        const fechaR = new Date(r.fecha);
+        return !isNaN(fechaR.getTime()) && fechaR <= h;
+      });
+    } catch (error) {
+      console.error('Error al filtrar por fecha hasta:', error);
+    }
   }
 
   paginaActual = 1;
@@ -134,36 +203,62 @@ function renderizarTabla(contenedor, lista) {
   const btnNext = contenedor.querySelector("#boton-next");
   const resumen = contenedor.querySelector("#resumen-total");
 
-  if (!lista || lista.length === 0) {
+  // Validar que los elementos existan
+  if (!cuerpo || !indicador || !btnPrev || !btnNext || !resumen) {
+    console.error('Elementos del DOM no encontrados en renderizarTabla');
+    return;
+  }
+
+  // Validar que lista sea un array
+  if (!Array.isArray(lista)) {
+    console.error('lista no es un array:', lista);
+    cuerpo.innerHTML = `<tr><td colspan="7">Error: Datos inválidos</td></tr>`;
+    resumen.textContent = "";
+    return;
+  }
+
+  if (lista.length === 0) {
     cuerpo.innerHTML = `<tr><td colspan="7">No hay pagos registrados.</td></tr>`;
     resumen.textContent = "";
+    indicador.textContent = "Página 0 de 0";
+    btnPrev.disabled = true;
+    btnNext.disabled = true;
     return;
   }
 
   const totalPaginas = Math.ceil(lista.length / FILAS_POR_PAGINA);
   paginaActual = Math.max(1, Math.min(paginaActual, totalPaginas));
   const inicio = (paginaActual - 1) * FILAS_POR_PAGINA;
-  const pagina = lista.slice(inicio, inicio + FILAS_POR_PAGINA);
+  const fin = inicio + FILAS_POR_PAGINA;
+  const pagina = lista.slice(inicio, fin);
 
   cuerpo.innerHTML = "";
   pagina.forEach(r => {
     const fila = document.createElement("tr");
+    const fecha = r.fecha ? new Date(r.fecha).toLocaleDateString() : '—';
+    const monto = typeof r.monto === 'number' ? r.monto : 0;
+    const descuento = typeof r.descuento === 'number' ? r.descuento : 0;
+    const total = typeof r.total === 'number' ? r.total : monto - descuento;
+    
     fila.innerHTML = `
-      <td>${new Date(r.fecha).toLocaleDateString()}</td>
-      <td>${r.miembro}</td>
-      <td>${r.membresia}</td>
-      <td>${r.metodo}</td>
-      <td>$${r.monto.toLocaleString()}</td>
-      <td>$${r.descuento.toLocaleString()}</td>
-      <td>$${r.total.toLocaleString()}</td>
+      <td>${fecha}</td>
+      <td>${r.miembro || '—'}</td>
+      <td>${r.membresia || '—'}</td>
+      <td>${r.metodo || '—'}</td>
+      <td>$${monto.toLocaleString()}</td>
+      <td>$${descuento.toLocaleString()}</td>
+      <td>$${total.toLocaleString()}</td>
     `;
     cuerpo.appendChild(fila);
   });
 
   indicador.textContent = `Página ${paginaActual} de ${totalPaginas}`;
   btnPrev.disabled = paginaActual === 1;
-  btnNext.disabled = paginaActual === totalPaginas;
+  btnNext.disabled = paginaActual === totalPaginas || totalPaginas === 0;
 
-  const totalPagado = lista.reduce((acc, r) => acc + r.total, 0);
+  const totalPagado = lista.reduce((acc, r) => {
+    const total = typeof r.total === 'number' ? r.total : 0;
+    return acc + total;
+  }, 0);
   resumen.textContent = `💰 Total cobrado: $${totalPagado.toLocaleString()} (${lista.length} transacciones)`;
 }

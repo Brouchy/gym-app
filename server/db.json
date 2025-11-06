@@ -51,6 +51,19 @@
       "email": "luis@example.com",
       "foto": "https://i.pravatar.cc/150?img=4",
       "eliminado": false
+    },
+    {
+      "nombre": "Juan",
+      "email": "magaly3591@gmail.com",
+      "dni": "94324248",
+      "telefono": "11456781",
+      "direccion": "calle 1444",
+      "fechaNacimiento": "2000-01-11",
+      "foto": "https://i.ibb.co/8D1F91km/Unaj-jpg.jpg",
+      "tipoDeMiembroId": 0,
+      "entrenadorId": 0,
+      "eliminado": false,
+      "id": 5
     }
   ],
   "entrenadors": [
@@ -98,12 +111,17 @@
       "nombre": "Admin General"
     },
     {
-      "id": 2,
+      "nombre": "Juan Perez",
       "email": "juan@gym.com",
-      "password": "123",
-      "role": "trainer",
-      "trainerId": 101,
-      "nombre": "Juan Perez"
+      "role": "recepcion",
+      "id": 2
+    },
+    {
+      "nombre": "Roberta",
+      "email": "rober@gmail.com",
+      "role": "recepcion",
+      "password": "4578",
+      "id": 3
     }
   ],
   "membresias": [
@@ -158,6 +176,15 @@
       "fechaInicio": "2025-11-03T23:14:33.671Z",
       "fechaFin": "2025-12-03T23:14:33.671Z",
       "id": 1003
+    },
+    {
+      "miembroId": 5,
+      "membresiaId": 102,
+      "estadoMembresiaId": 1,
+      "pagoId": 4,
+      "fechaInicio": "2025-11-05T21:19:32.418Z",
+      "fechaFin": "2026-11-05T21:19:32.418Z",
+      "id": 1004
     }
   ],
   "pagos": [
@@ -181,6 +208,13 @@
       "metodoPago": "Tarjeta",
       "descuentoAplicado": 0,
       "id": 3
+    },
+    {
+      "monto": 50000,
+      "fechaPago": "2025-11-05T21:19:32.386Z",
+      "metodoPago": "Tarjeta",
+      "descuentoAplicado": 0,
+      "id": 4
     }
   ],
   "estadoMembresias": [

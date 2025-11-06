@@ -1,7 +1,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+* {
+    box-sizing: border-box;
+}
+
 body {
     background-color: #1a1a1a; /* Fondo oscuro tipo charcoal */
     min-height: 100vh;
     font-family: 'Poppins', sans-serif;
     color: #ffffff; /* Texto blanco por defecto */
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+    body {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        font-size: 0.9rem;
+    }
 }

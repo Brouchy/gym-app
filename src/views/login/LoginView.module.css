@@ -59,3 +59,38 @@
     text-align: center;
     display: none; /* Oculto por defecto */
 }
+
+/* === Responsive === */
+@media (max-width: 768px) {
+    .contenedorLogin {
+        max-width: 90%;
+        margin: 30px auto;
+        padding: 1.5rem;
+    }
+
+    .formulario h2 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .contenedorLogin {
+        max-width: 95%;
+        margin: 20px auto;
+        padding: 1.2rem;
+    }
+
+    .formulario h2 {
+        font-size: 1.3rem;
+    }
+
+    .grupoInput input {
+        padding: 8px;
+        font-size: 0.95rem;
+    }
+
+    .botonLogin {
+        padding: 10px;
+        font-size: 0.95rem;
+    }
+}

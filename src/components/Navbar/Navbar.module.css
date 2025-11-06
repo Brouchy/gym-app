@@ -51,3 +51,50 @@
 .botonLogout:active {
     transform: translateY(1px); /* Click effect */
 }
+
+/* === Responsive === */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 0.6rem 1rem;
+        flex-wrap: wrap;
+    }
+
+    .navbar h1 {
+        font-size: 1.2rem;
+    }
+
+    .infoUsuario {
+        gap: 10px;
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 0.5rem;
+    }
+
+    .infoUsuario span {
+        font-size: 0.85rem;
+    }
+
+    .botonLogout {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar {
+        padding: 0.5rem 0.8rem;
+    }
+
+    .navbar h1 {
+        font-size: 1rem;
+    }
+
+    .infoUsuario span {
+        display: none; /* Ocultar nombre en móviles muy pequeños */
+    }
+
+    .botonLogout {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+    }
+}
