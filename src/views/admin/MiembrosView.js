@@ -7,6 +7,7 @@ import {
     apiObtenerTiposDeMiembro
 } from "../../api/membersApi";
 import { apiObtenerEntrenadores } from '../../api/trainersApi.js';
+import { apiObtenerMembresias } from '../../api/membershipApi.js';
 import { imprimirCredencial } from "../../utils/imprimirCredencial.js";
 import { subirImagenAImgbb } from "../../utils/subirImagen.js";
 import estilos from './MiembrosView.module.css';
@@ -17,10 +18,12 @@ import { renderizarWizardAgregarMiembro } from "./WizardAgregarMiembro/WizardAgr
 let listaMiembros = [];       // Cache de todos los miembros
 let listaEntrenadores = [];   // Cache para el <select>
 let listaTiposMiembro = []; // Cache para el <select>
+let listaMembresias = []; // Cache para el <select> de membresías
 let paginaActual = 1;
 const FILAS_POR_PAGINA = 5;
 let modoFormulario = 'crear';
 let guardandoMiembro = false;
+let seccionActual = 1; // Control de sección actual del formulario
 
 // --- Contenedor Principal ---
 let contenedorVista; // El 'div' donde se renderiza este módulo
@@ -41,10 +44,14 @@ export const renderizarVistaMiembros = async (contenedor) => {
     // (lo hacemos en paralelo para ganar tiempo)
     Promise.all([
         apiObtenerEntrenadores(),
-        apiObtenerTiposDeMiembro()
-    ]).then(([entrenadores, tipos]) => {
+        apiObtenerTiposDeMiembro(),
+        apiObtenerMembresias()
+    ]).then(([entrenadores, tipos, membresias]) => {
         listaEntrenadores = entrenadores;
         listaTiposMiembro = tipos;
+        listaMembresias = membresias;
+        // Cargar los selects del formulario si ya existe
+        cargarSelectsFormulario();
     });
 
     // 4. Cargamos los datos de los miembros y los mostramos
@@ -193,6 +200,7 @@ const adjuntarEventListeners = () => {
 
     const inputFoto = contenedorVista.querySelector('#foto');
     const previewFoto = contenedorVista.querySelector('#preview-foto');
+    const fileInputLabel = contenedorVista.querySelector('.fileInputLabel .fileInputText');
 
     if (inputFoto && previewFoto) {
         inputFoto.addEventListener('change', (event) => {
@@ -200,11 +208,60 @@ const adjuntarEventListeners = () => {
             if (file) {
                 previewFoto.src = URL.createObjectURL(file);
                 previewFoto.style.display = 'block';
+                // Actualizar texto del botón con el nombre del archivo
+                if (fileInputLabel) {
+                    fileInputLabel.textContent = file.name.length > 30 ? file.name.substring(0, 30) + '...' : file.name;
+                }
             } else {
                 previewFoto.removeAttribute('src');
                 previewFoto.style.display = 'none';
+                // Restaurar texto original
+                if (fileInputLabel) {
+                    fileInputLabel.textContent = 'Seleccionar archivo';
+                }
             }
         });
+    }
+
+    // Listener para calcular costo cuando cambian tipo de miembro o membresía
+    const form = contenedorVista.querySelector('#modal-formulario-miembro');
+    if (form) {
+        const tipoMiembroSelect = form.querySelector('#tipoDeMiembroId');
+        const membresiaSelect = form.querySelector('#membresiaId');
+        
+        const calcularCosto = () => {
+            if (!tipoMiembroSelect || !membresiaSelect) return;
+            
+            const tipoMiembroId = parseInt(tipoMiembroSelect.value, 10);
+            const membresiaId = parseInt(membresiaSelect.value, 10);
+            
+            if (!tipoMiembroId || !membresiaId) {
+                const costoCalculado = form.querySelector('#costo-calculado');
+                if (costoCalculado) costoCalculado.textContent = '$0.00';
+                return;
+            }
+            
+            const tipoMiembro = listaTiposMiembro.find(t => t.id === tipoMiembroId);
+            const membresia = listaMembresias.find(m => m.id === membresiaId);
+            
+            if (tipoMiembro && membresia) {
+                const descuento = tipoMiembro.porcentajeDescuento || 0;
+                const costoBase = membresia.costoBase || 0;
+                const costoFinal = costoBase * (1 - descuento / 100);
+                
+                const costoCalculado = form.querySelector('#costo-calculado');
+                if (costoCalculado) {
+                    costoCalculado.textContent = `$${costoFinal.toFixed(2)}`;
+                }
+            }
+        };
+        
+        if (tipoMiembroSelect) {
+            tipoMiembroSelect.addEventListener('change', calcularCosto);
+        }
+        if (membresiaSelect) {
+            membresiaSelect.addEventListener('change', calcularCosto);
+        }
     }
 
     // --- Buscador (evento 'input') ---
@@ -215,12 +272,32 @@ const adjuntarEventListeners = () => {
     
     // --- Formulario (evento 'submit') ---
     contenedorVista.querySelector('#modal-formulario-miembro').addEventListener('submit', manejarSubmitFormulario);
+
+    // --- Navegación entre secciones ---
+    const botonSiguiente = contenedorVista.querySelector('#boton-siguiente');
+    const botonAnterior = contenedorVista.querySelector('#boton-anterior');
+    const botonGuardar = contenedorVista.querySelector('#boton-guardar');
+
+    if (botonSiguiente) {
+        botonSiguiente.addEventListener('click', () => {
+            if (validarSeccionActual()) {
+                avanzarSeccion();
+            }
+        });
+    }
+
+    if (botonAnterior) {
+        botonAnterior.addEventListener('click', () => {
+            retrocederSeccion();
+        });
+    }
 }
 
 // --- Lógica de Modales ---
 
 const abrirModalAgregar = () => {
     modoFormulario = 'crear';
+    seccionActual = 1; // Resetear a la primera sección
 
     const form = contenedorVista.querySelector('#modal-formulario-miembro');
     form.reset();
@@ -232,11 +309,35 @@ const abrirModalAgregar = () => {
         preview.style.display = 'none';
     }
 
+    // Establecer fecha de inicio por defecto (hoy)
+    const fechaInicioInput = form.querySelector('#fechaInicioMembresia');
+    if (fechaInicioInput) {
+        const hoy = new Date().toISOString().split('T')[0];
+        fechaInicioInput.value = hoy;
+    }
+
+    // Limpiar costo calculado
+    const costoCalculado = form.querySelector('#costo-calculado');
+    if (costoCalculado) {
+        costoCalculado.textContent = '$0.00';
+    }
+
+    // Cargar los selects
+    cargarSelectsFormulario();
+
+    // Mostrar stepper en modo crear
+    const stepper = form.querySelector(`.${estilos.stepper}`);
+    if (stepper) stepper.style.display = 'flex';
+
+    // Resetear navegación de secciones
+    actualizarNavegacionSecciones();
+
     contenedorVista.querySelector('#modal-titulo').textContent = 'Agregar Nuevo Miembro';
     contenedorVista.querySelector('#modal-miembro').classList.add(estilos.activo);
 };
 const abrirModalEditar = async (id) => {
     modoFormulario = 'editar';
+    seccionActual = 1; // Resetear a la primera sección
 
     const miembro = await apiObtenerMiembroPorId(id);
     if (!miembro) {
@@ -253,6 +354,13 @@ const abrirModalEditar = async (id) => {
     form.querySelector('#direccion').value = miembro.direccion;
     form.querySelector('#fechaNacimiento').value = miembro.fechaNacimiento ? miembro.fechaNacimiento.split('T')[0] : '';
     form.querySelector('#foto-actual').value = miembro.foto || '';
+    
+    // Cargar tipo de miembro si existe
+    const tipoMiembroSelect = form.querySelector('#tipoDeMiembroId');
+    if (tipoMiembroSelect && miembro.tipoDeMiembroId) {
+        tipoMiembroSelect.value = miembro.tipoDeMiembroId;
+    }
+
     const preview = form.querySelector('#preview-foto');
     if (preview) {
         if (miembro.foto) {
@@ -263,6 +371,32 @@ const abrirModalEditar = async (id) => {
             preview.style.display = 'none';
         }
     }
+
+    // Ocultar campos de membresía en modo edición
+    const camposMembresia = form.querySelectorAll('.campo-membresia');
+    camposMembresia.forEach(campo => {
+        if (campo) campo.style.display = 'none';
+    });
+
+    // Ocultar stepper y navegación en modo edición
+    const stepper = form.querySelector(`.${estilos.stepper}`);
+    const botonSiguiente = contenedorVista.querySelector('#boton-siguiente');
+    const botonAnterior = contenedorVista.querySelector('#boton-anterior');
+    const botonGuardar = contenedorVista.querySelector('#boton-guardar');
+    
+    if (stepper) stepper.style.display = 'none';
+    if (botonSiguiente) botonSiguiente.style.display = 'none';
+    if (botonAnterior) botonAnterior.style.display = 'none';
+    if (botonGuardar) botonGuardar.style.display = 'none';
+    
+    // Mostrar todas las secciones en modo edición
+    const seccion1 = form.querySelector('[data-seccion="1"]');
+    const seccion2 = form.querySelector('[data-seccion="2"]');
+    if (seccion1) seccion1.style.display = 'block';
+    if (seccion2) seccion2.style.display = 'none'; // Mantener oculta la sección 2 en edición
+
+    // Cargar los selects
+    cargarSelectsFormulario();
 
     contenedorVista.querySelector('#modal-titulo').textContent = 'Editar Miembro';
     contenedorVista.querySelector('#modal-miembro').classList.add(estilos.activo);
@@ -286,6 +420,49 @@ const cerrarModales = () => {
             preview.removeAttribute('src');
             preview.style.display = 'none';
         }
+        // Mostrar campos de membresía nuevamente
+        const camposMembresia = form.querySelectorAll('.campo-membresia');
+        camposMembresia.forEach(campo => {
+            if (campo) campo.style.display = '';
+        });
+        // Resetear secciones
+        seccionActual = 1;
+        // Mostrar stepper nuevamente
+        const stepper = form.querySelector(`.${estilos.stepper}`);
+        if (stepper) stepper.style.display = 'flex';
+        actualizarNavegacionSecciones();
+    }
+}
+
+/**
+ * Carga los selects del formulario con las opciones disponibles
+ */
+const cargarSelectsFormulario = () => {
+    const form = contenedorVista.querySelector('#modal-formulario-miembro');
+    if (!form) return;
+
+    // Cargar tipos de miembro
+    const tipoMiembroSelect = form.querySelector('#tipoDeMiembroId');
+    if (tipoMiembroSelect && listaTiposMiembro.length > 0) {
+        tipoMiembroSelect.innerHTML = '<option value="">-- Seleccionar tipo de miembro --</option>';
+        listaTiposMiembro.forEach(tipo => {
+            const option = document.createElement('option');
+            option.value = tipo.id;
+            option.textContent = `${tipo.descripcion}${tipo.porcentajeDescuento > 0 ? ` (${tipo.porcentajeDescuento}% desc.)` : ''}`;
+            tipoMiembroSelect.appendChild(option);
+        });
+    }
+
+    // Cargar membresías
+    const membresiaSelect = form.querySelector('#membresiaId');
+    if (membresiaSelect && listaMembresias.length > 0) {
+        membresiaSelect.innerHTML = '<option value="">-- Seleccionar membresía --</option>';
+        listaMembresias.forEach(membresia => {
+            const option = document.createElement('option');
+            option.value = membresia.id;
+            option.textContent = `${membresia.nombrePlan} - ${membresia.duracionEnDias} días ($${membresia.costoBase})`;
+            membresiaSelect.appendChild(option);
+        });
     }
 }
 
@@ -321,6 +498,10 @@ const manejarSubmitFormulario = async (e) => {
     }
   }
 
+  const tipoDeMiembroId = form.querySelector('#tipoDeMiembroId')?.value 
+    ? parseInt(form.querySelector('#tipoDeMiembroId').value, 10) 
+    : 0;
+
   const datosMiembro = {
     nombre: form.querySelector('#nombre').value,
     email: form.querySelector('#email').value,
@@ -329,7 +510,7 @@ const manejarSubmitFormulario = async (e) => {
     direccion: form.querySelector('#direccion').value,
     fechaNacimiento: form.querySelector('#fechaNacimiento').value,
     foto: urlFoto || "",
-    tipoDeMiembroId: 0,
+    tipoDeMiembroId: tipoDeMiembroId || 0,
     entrenadorId: 0,
     eliminado: false
   };
@@ -344,19 +525,167 @@ const manejarSubmitFormulario = async (e) => {
 
   // Si estamos creando un nuevo miembro, abrimos el wizard
   const miembroCreado = await apiCrearMiembro(datosMiembro);
-cerrarModales();
+  cerrarModales();
 
-// Mostrar wizard solo si se creó correctamente
-if (miembroCreado) {
-  renderizarWizardAgregarMiembro(contenedorVista, miembroCreado, async () => {
-    //  Callback al cerrar wizard (éxito o cancelación)
+  // Obtener datos de membresía del formulario
+  const membresiaId = form.querySelector('#membresiaId')?.value 
+    ? parseInt(form.querySelector('#membresiaId').value, 10) 
+    : null;
+  const fechaInicioMembresia = form.querySelector('#fechaInicioMembresia')?.value || null;
+  const tipoDeMiembroSeleccionado = listaTiposMiembro.find(t => t.id === tipoDeMiembroId);
+
+  // Mostrar wizard solo si se creó correctamente
+  if (miembroCreado) {
+    renderizarWizardAgregarMiembro(
+      contenedorVista, 
+      miembroCreado, 
+      membresiaId,
+      fechaInicioMembresia,
+      tipoDeMiembroSeleccionado,
+      async () => {
+        //  Callback al cerrar wizard (éxito o cancelación)
+        await cargarYMostrarMiembros();
+      }
+    );
+  } else {
     await cargarYMostrarMiembros();
-  });
-} else {
-  await cargarYMostrarMiembros();
-}
+  }
 };
 
+
+/**
+ * Valida los campos de la sección actual
+ */
+const validarSeccionActual = () => {
+    const form = contenedorVista.querySelector('#modal-formulario-miembro');
+    if (!form) return false;
+
+    if (seccionActual === 1) {
+        // Validar campos de la sección 1
+        const nombre = form.querySelector('#nombre');
+        const dni = form.querySelector('#dni');
+        const direccion = form.querySelector('#direccion');
+        
+        if (!nombre || !nombre.value.trim()) {
+            alert('Por favor, ingrese el nombre completo.');
+            nombre?.focus();
+            return false;
+        }
+        if (!dni || !dni.value || dni.value.length < 8) {
+            alert('Por favor, ingrese un DNI válido (mínimo 8 dígitos).');
+            dni?.focus();
+            return false;
+        }
+        if (!direccion || !direccion.value.trim()) {
+            alert('Por favor, ingrese la dirección.');
+            direccion?.focus();
+            return false;
+        }
+        return true;
+    } else if (seccionActual === 2) {
+        // Validar campos de la sección 2
+        const tipoMiembro = form.querySelector('#tipoDeMiembroId');
+        const membresia = form.querySelector('#membresiaId');
+        const fechaInicio = form.querySelector('#fechaInicioMembresia');
+        
+        if (!tipoMiembro || !tipoMiembro.value) {
+            alert('Por favor, seleccione un tipo de miembro.');
+            tipoMiembro?.focus();
+            return false;
+        }
+        if (!membresia || !membresia.value) {
+            alert('Por favor, seleccione una membresía.');
+            membresia?.focus();
+            return false;
+        }
+        if (!fechaInicio || !fechaInicio.value) {
+            alert('Por favor, seleccione la fecha de inicio de la membresía.');
+            fechaInicio?.focus();
+            return false;
+        }
+        return true;
+    }
+    return true;
+};
+
+/**
+ * Avanza a la siguiente sección
+ */
+const avanzarSeccion = () => {
+    if (seccionActual < 2) {
+        seccionActual++;
+        actualizarNavegacionSecciones();
+    }
+};
+
+/**
+ * Retrocede a la sección anterior
+ */
+const retrocederSeccion = () => {
+    if (seccionActual > 1) {
+        seccionActual--;
+        actualizarNavegacionSecciones();
+    }
+};
+
+/**
+ * Actualiza la UI del stepper y los botones de navegación
+ */
+const actualizarNavegacionSecciones = () => {
+    const form = contenedorVista.querySelector('#modal-formulario-miembro');
+    if (!form) return;
+
+    // Ocultar todas las secciones
+    const seccion1 = form.querySelector('[data-seccion="1"]');
+    const seccion2 = form.querySelector('[data-seccion="2"]');
+    
+    if (seccion1) seccion1.style.display = seccionActual === 1 ? 'block' : 'none';
+    if (seccion2) seccion2.style.display = seccionActual === 2 ? 'block' : 'none';
+
+    // Actualizar stepper
+    const stepper = form.querySelector(`.${estilos.stepper}`);
+    if (stepper) {
+        const steps = stepper.querySelectorAll(`.${estilos.step}`);
+        const stepLine = stepper.querySelector(`.${estilos.stepLine}`);
+        
+        steps.forEach((step, index) => {
+            const stepNum = index + 1;
+            if (stepNum === seccionActual) {
+                step.classList.add(estilos.stepActivo);
+                step.classList.remove(estilos.stepCompletado);
+            } else if (stepNum < seccionActual) {
+                step.classList.add(estilos.stepCompletado);
+                step.classList.remove(estilos.stepActivo);
+            } else {
+                step.classList.remove(estilos.stepActivo, estilos.stepCompletado);
+            }
+        });
+        
+        // Colorear la línea si estamos en la sección 2 o si la sección 1 está completada
+        if (stepLine) {
+            if (seccionActual >= 2) {
+                stepLine.classList.add('activo');
+            } else {
+                stepLine.classList.remove('activo');
+            }
+        }
+    }
+
+    // Actualizar botones de navegación
+    const botonAnterior = contenedorVista.querySelector('#boton-anterior');
+    const botonSiguiente = contenedorVista.querySelector('#boton-siguiente');
+    const botonGuardar = contenedorVista.querySelector('#boton-guardar');
+
+    if (botonAnterior) {
+        botonAnterior.style.display = seccionActual > 1 ? 'inline-block' : 'none';
+    }
+    if (botonSiguiente) {
+        botonSiguiente.style.display = seccionActual < 2 ? 'inline-block' : 'none';
+    }
+    if (botonGuardar) {
+        botonGuardar.style.display = seccionActual === 2 ? 'inline-block' : 'none';
+    }
+};
 
 const manejarConfirmarEliminar = async (id) => {
     const miembroId = Number(id);
@@ -435,46 +764,103 @@ const renderizarEsqueleto = () => {
                 <form id="modal-formulario-miembro" class="${estilos.formularioModal}">
                 <input type="hidden" id="miembro-id">
 
-                <div class="${estilos.grupoInput}">
-                    <label for="nombre">Nombres Completos</label>
-                    <input type="text" id="nombre" name="nombre" placeholder="Ingrese nombres" required>
+                <!-- Indicador de Secciones (Stepper) -->
+                <div class="${estilos.stepper}">
+                    <div class="${estilos.step} ${estilos.stepActivo}" data-step="1">
+                        <div class="${estilos.stepNumber}">1</div>
+                        <div class="${estilos.stepLabel}">Registro de Datos</div>
+                    </div>
+                    <div class="${estilos.stepLine}"></div>
+                    <div class="${estilos.step}" data-step="2">
+                        <div class="${estilos.stepNumber}">2</div>
+                        <div class="${estilos.stepLabel}">Membresía</div>
+                    </div>
                 </div>
 
-                <div class="${estilos.grupoInput}">
-                    <label for="dni">DNI</label>
-                    <input type="number" id="dni" name="dni" required min="10000000" step="1" title="Ingresá un DNI válido con al menos 8 dígitos">
+                <!-- Sección 1: Registro de Datos -->
+                <div class="${estilos.seccionFormulario} ${estilos.seccionActiva}" data-seccion="1">
+                    <h4 class="${estilos.tituloSeccion}">📋 Sección 1: Registro de Datos</h4>
+                    
+                    <div class="${estilos.grupoInput}">
+                        <label for="nombre">Nombres Completos</label>
+                        <input type="text" id="nombre" name="nombre" placeholder="Ingrese nombres" required>
+                    </div>
+
+                    <div class="${estilos.grupoInput}">
+                        <label for="dni">DNI</label>
+                        <input type="number" id="dni" name="dni" required min="10000000" step="1" title="Ingresá un DNI válido con al menos 8 dígitos">
+                    </div>
+
+                    <div class="${estilos.grupoInput}">
+                        <label for="email">Ingrese email: </label>
+                        <input type="email" name="email" id="email" placeholder="example@gmail.com">
+                    </div>
+
+                    <div class="${estilos.grupoInput}">
+                        <label for="telefono">Teléfono</label>
+                        <input type="tel" id="telefono" placeholder="example: 1124584102" name="telefono">
+                    </div>
+
+                    <div class="${estilos.grupoInput}">
+                        <label for="direccion">Ingrese direccion: </label>
+                        <input type="text" name="direccion" id="direccion" placeholder="Ingrese direccion" required>
+                    </div>
+
+                    <div class="${estilos.grupoInput}">
+                        <label for="fechaNacimiento">Fecha Nacimiento</label>
+                        <input type="date" id="fechaNacimiento" name="fechaNacimiento">
+                    </div>
+                    
+                    <div class="${estilos.grupoInput}">
+                        <label for="foto">Foto</label>
+                        <div class="${estilos.fileInputWrapper}">
+                            <input type="file" id="foto" name="foto" accept="image/*" class="${estilos.fileInput}">
+                            <label for="foto" class="${estilos.fileInputLabel}">
+                                <span class="${estilos.fileInputText}">Seleccionar archivo</span>
+                                <span class="${estilos.fileInputIcon}">📁</span>
+                            </label>
+                        </div>
+                        <input type="hidden" id="foto-actual" name="fotoActual" value="">
+                        <img id="preview-foto" class="${estilos.previewFoto}" style="display:none;">
+                    </div>
                 </div>
 
-                <div class="${estilos.grupoInput}">
-                    <label for="email">Ingrese email: </label>
-                    <input type="email" name="email" id="email" placeholder="example@gmail.com" 
-                </div>
+                <!-- Sección 2: Membresía -->
+                <div class="${estilos.seccionFormulario} campo-membresia" data-seccion="2" style="display: none;">
+                    <h4 class="${estilos.tituloSeccion}">💳 Sección 2: Membresía</h4>
+                    
+                    <div class="${estilos.grupoInput}">
+                        <label for="tipoDeMiembroId">Tipo de Miembro</label>
+                        <select id="tipoDeMiembroId" name="tipoDeMiembroId" required>
+                            <option value="">-- Seleccionar tipo de miembro --</option>
+                        </select>
+                    </div>
 
-                <div class="${estilos.grupoInput}">
-                    <label for="telefono">Teléfono</label>
-                    <input type="tel" id="telefono" placeholder="example: 1124584102" name="telefono">
-                </div>
+                    <div class="${estilos.grupoInput}">
+                        <label for="membresiaId">Tipo de Membresía</label>
+                        <select id="membresiaId" name="membresiaId" required>
+                            <option value="">-- Seleccionar membresía --</option>
+                        </select>
+                    </div>
 
-                <div class="${estilos.grupoInput}">
-                    <label for="direccion">Ingrese direccion: </label>
-                    <input type="text" name="direccion" id="direccion" placeholder="Ingrese direccion" required>
+                    <div class="${estilos.grupoInput}">
+                        <label for="fechaInicioMembresia">Fecha de Inicio de la Membresía</label>
+                        <input type="date" id="fechaInicioMembresia" name="fechaInicioMembresia" required>
+                    </div>
 
-                </div>
-
-                <div class="${estilos.grupoInput}">
-                    <label for="fechaNacimiento">Fecha Nacimiento</label>
-                    <input type="date" id="fechaNacimiento" name="fechaNacimiento">
-                </div>
-                <div class="${estilos.grupoInput}">
-                <label for="foto">Foto</label>
-                <input type="file" id="foto" name="foto" accept="image/*">
-                <input type="hidden" id="foto-actual" name="fotoActual" value="">
-                <img id="preview-foto" style="width:60px;height:60px;border-radius:50%;margin-top:5px;display:none;">
+                    <div class="${estilos.grupoInput}">
+                        <label>Costo de la Membresía</label>
+                        <div id="costo-calculado" style="font-size: 1.2em; font-weight: bold; color: #ff6600; padding: 8px; background-color: #f5f5f5; border-radius: 4px;">
+                            $0.00
+                        </div>
+                    </div>
                 </div>
 
                 <div class="${estilos.modalAcciones}">
                     <button type="button" class="${estilos.botonPagina} ${estilos.botonSecundario} modal-cerrar">Cancelar</button>
-                    <button type="submit" class="${estilos.botonAgregar}">Guardar</button>
+                    <button type="button" id="boton-anterior" class="${estilos.botonPagina} ${estilos.botonSecundario}" style="display: none;">Anterior</button>
+                    <button type="button" id="boton-siguiente" class="${estilos.botonAgregar}">Siguiente</button>
+                    <button type="submit" id="boton-guardar" class="${estilos.botonAgregar}" style="display: none;">Guardar</button>
                 </div>
                 </form>
             </div>

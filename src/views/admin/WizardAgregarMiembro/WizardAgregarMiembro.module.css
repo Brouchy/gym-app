@@ -22,16 +22,18 @@
 
 /* === Contenedor principal del wizard === */
 .modalContenido {
-  background: #ffffff;
+  background: #1f1f1f;
   border-radius: 1rem;
   padding: 2rem 2.5rem;
   width: 100%;
-  max-width: 480px;
+  max-width: 550px;
   box-shadow:
-    0 10px 25px rgba(0, 0, 0, 0.15),
-    0 0 0 1px rgba(0, 0, 0, 0.05);
+    0 8px 20px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 107, 53, 0.2);
   animation: slideIn 0.35s ease;
   position: relative;
+  color: #ffffff;
+  overflow: visible;
 }
 
 @keyframes slideIn {
@@ -49,13 +51,13 @@
 h3 {
   font-size: 1.3rem;
   font-weight: 600;
-  color: #1f2937;
+  color: #ffffff;
   margin-bottom: 1rem;
   text-align: center;
 }
 
 p {
-  color: #4b5563;
+  color: #cccccc;
   font-size: 0.95rem;
   text-align: center;
   margin-bottom: 1.2rem;
@@ -66,8 +68,9 @@ select {
   width: 100%;
   padding: 0.7rem 1rem;
   border-radius: 8px;
-  border: 1px solid #d1d5db;
-  background: #f9fafb;
+  border: 1px solid #3a3a3a;
+  background: #2a2a2a;
+  color: #ffffff;
   font-size: 0.95rem;
   margin-bottom: 1.5rem;
   transition: all 0.2s;
@@ -75,14 +78,14 @@ select {
 
 select:focus {
   outline: none;
-  border-color: #6366f1;
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  border-color: #FF6B35;
+  background: #2a2a2a;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
 }
 
 /* === Nombre destacado del miembro === */
 .nombre {
-  color: #6366f1;
+  color: #FF6B35;
   font-weight: 600;
 }
 
@@ -111,31 +114,32 @@ select:focus {
 
 /* --- Estilo por tipo --- */
 .btnCancelar {
-  background: #f3f4f6;
-  color: #374151;
+  background: #555;
+  color: #ffffff;
 }
 .btnCancelar:hover {
-  background: #e5e7eb;
+  background: #666;
 }
 
 .btnContinuar,
 .btnConfirmar,
 .btnCerrar {
-  background: #6366f1;
+  background: #FF6B35;
   color: #ffffff;
 }
 .btnContinuar:hover,
 .btnConfirmar:hover,
 .btnCerrar:hover {
-  background: #4f46e5;
+  background: #FF5722;
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);
 }
 
 .btnAtras {
-  background: #e0e7ff;
-  color: #4338ca;
+  background: #555;
+  color: #ffffff;
 }
 .btnAtras:hover {
-  background: #c7d2fe;
+  background: #666;
 }
 
 /* === Mensajes de estado === */

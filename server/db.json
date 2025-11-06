@@ -64,6 +64,32 @@
       "entrenadorId": 0,
       "eliminado": false,
       "id": 5
+    },
+    {
+      "nombre": "gkjkjnf",
+      "email": "manu.arroyo1998@gmail.com",
+      "dni": "6464849849",
+      "telefono": "5989859",
+      "direccion": "calle 123",
+      "fechaNacimiento": "2025-11-20",
+      "foto": "https://i.ibb.co/d4M57WRJ/Complemento-jpg.jpg",
+      "tipoDeMiembroId": 0,
+      "entrenadorId": 0,
+      "eliminado": false,
+      "id": 6
+    },
+    {
+      "nombre": "Gladis Llanos",
+      "email": "magaly3591@gmail.com",
+      "dni": "3498749894",
+      "telefono": "11456781",
+      "direccion": "calle 234",
+      "fechaNacimiento": "1978-08-01",
+      "foto": "https://i.ibb.co/Y4b8xXs3/Facturacion-jpg.jpg",
+      "tipoDeMiembroId": 2,
+      "entrenadorId": 0,
+      "eliminado": false,
+      "id": 7
     }
   ],
   "entrenadors": [
