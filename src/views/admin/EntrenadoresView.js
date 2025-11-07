@@ -150,8 +150,12 @@ const renderizarTabla = (contenedor) => {
           <td>${e.certificacion || "-"}</td>
           <td>${e.activo ? "✅" : "❌"}</td>
           <td class="${estilos.acciones}">
-            <button class="${estilos.botonEditar}" data-id="${e.id}">Editar</button>
-            <button class="${estilos.botonEliminar}" data-id="${e.id}">Eliminar</button>
+            <svg class="${estilos.botonEditar} ${estilos.accionIcon}" data-id="${e.id}" title="Editar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/>
+            </svg>
+            <svg class="${estilos.botonEliminar} ${estilos.accionIcon}" data-id="${e.id}" title="Eliminar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+              <path d="M9 3h6v1h5v2H4V4h5V3zm1 4h1v10h-1V7zm4 0h1v10h-1V7zm-7 0h12v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7z"/>
+            </svg>
           </td>
         </tr>`
           )
@@ -174,8 +178,6 @@ const adjuntarEventos = (contenedor) => {
   });
 
   contenedor.addEventListener("click", async (e) => {
-    const id = e.target.dataset.id;
-
     if (e.target.matches("#boton-prev")) {
       paginaActual--;
       renderizarTabla(contenedor);
@@ -193,13 +195,17 @@ const adjuntarEventos = (contenedor) => {
       return;
     }
 
-    if (e.target.matches(`.${estilos.botonEditar}`)) {
+    const editar = e.target.closest(`.${estilos.botonEditar}`);
+    if (editar) {
+      const id = editar.dataset.id;
       const entrenador = listaEntrenadores.find((ent) => ent.id == id);
       abrirModal(entrenador);
       return;
     }
 
-    if (e.target.matches(`.${estilos.botonEliminar}`)) {
+    const eliminar = e.target.closest(`.${estilos.botonEliminar}`);
+    if (eliminar) {
+      const id = eliminar.dataset.id;
       if (confirm("¿Eliminar entrenador?")) {
         await apiEliminarEntrenador(id);
         await cargarYMostrarEntrenadores(contenedor);

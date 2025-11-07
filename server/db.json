@@ -5,6 +5,7 @@
       "tipoDeMiembroId": 2,
       "entrenadorId": 2,
       "nombre": "Ana",
+      "apellidos": "Gómez",
       "dni": "1234567",
       "direccion": "Calle Falsa 456",
       "telefono": "1144889900",
@@ -18,6 +19,7 @@
       "tipoDeMiembroId": 1,
       "entrenadorId": 1,
       "nombre": "Carla",
+      "apellidos": "Fernández",
       "dni": "123432437",
       "direccion": "Calle Falsa 987",
       "telefono": "1144889900",
@@ -31,6 +33,7 @@
       "tipoDeMiembroId": 1,
       "entrenadorId": 1,
       "nombre": "Luis",
+      "apellidos": "Martínez",
       "dni": "212412412",
       "direccion": "Av. Siempre Viva 321",
       "telefono": "1144001122",
@@ -44,6 +47,7 @@
       "tipoDeMiembroId": 1,
       "entrenadorId": 1,
       "nombre": "pedro",
+      "apellidos": "Pérez",
       "dni": "2141432",
       "direccion": "Av. Siempre Viva 321",
       "telefono": "1144001122",
@@ -54,6 +58,7 @@
     },
     {
       "nombre": "Juan",
+      "apellidos": "Ramírez",
       "email": "magaly3591@gmail.com",
       "dni": "94324248",
       "telefono": "11456781",
@@ -67,6 +72,7 @@
     },
     {
       "nombre": "gkjkjnf",
+      "apellidos": "",
       "email": "manu.arroyo1998@gmail.com",
       "dni": "6464849849",
       "telefono": "5989859",
@@ -80,6 +86,7 @@
     },
     {
       "nombre": "Gladis Llanos",
+      "apellidos": "Llanos",
       "email": "magaly3591@gmail.com",
       "dni": "3498749894",
       "telefono": "11456781",
@@ -90,6 +97,159 @@
       "entrenadorId": 0,
       "eliminado": false,
       "id": 7
+    },
+    {
+      "nombre": "djndkvn",
+      "email": "Chusena.arroyo1975@gmail.com",
+      "dni": "10000002",
+      "telefono": "1144990011",
+      "direccion": "calle 123",
+      "fechaNacimiento": "1995-07-04",
+      "foto": "https://i.ibb.co/d4M57WRJ/Complemento-jpg.jpg",
+      "tipoDeMiembroId": 2,
+      "entrenadorId": 0,
+      "eliminado": false,
+      "id": 8
+    },
+    {
+      "nombre": "pepeorkferpo",
+      "apellidos": "joseles",
+      "email": "manu.arroyo1998@gmail.com",
+      "dni": "9405495049",
+      "telefono": "3686",
+      "direccion": "calle 123",
+      "fechaNacimiento": "1995-05-12",
+      "foto": "https://i.ibb.co/PZg70R82/Pagos-jpg.jpg",
+      "tipoDeMiembroId": 2,
+      "entrenadorId": 0,
+      "eliminado": false,
+      "id": 9
+    },
+    {
+      "nombre": "juan",
+      "apellidos": "Hernesto",
+      "email": "magaly3591@gmail.com",
+      "dni": "9304953049",
+      "telefono": "94095450",
+      "direccion": "calle 1444",
+      "fechaNacimiento": "1994-07-22",
+      "foto": "https://i.ibb.co/spNBLNS2/Reservas-jpg.jpg",
+      "tipoDeMiembroId": 2,
+      "entrenadorId": 0,
+      "eliminado": false,
+      "id": 10
+    },
+    {
+      "nombre": "hthtrh",
+      "apellidos": "ththty",
+      "email": "manu.arroyo1998@gmail.com",
+      "dni": "63896392582",
+      "telefono": "1144990011",
+      "direccion": "calle 1444",
+      "fechaNacimiento": "2001-09-04",
+      "foto": "https://i.ibb.co/9HNTXhPX/UML-Salon-jpg.jpg",
+      "tipoDeMiembroId": 2,
+      "entrenadorId": 0,
+      "eliminado": false,
+      "id": 11
+    },
+    {
+      "nombre": "dvdfbfd",
+      "apellidos": "jgjyjr",
+      "email": "manu.arroyo1998@gmail.com",
+      "dni": "35554654",
+      "telefono": "1144990011",
+      "direccion": "calle 1444",
+      "fechaNacimiento": "1999-01-02",
+      "foto": "https://i.ibb.co/6c5tmhYB/Clientes-jpg.jpg",
+      "tipoDeMiembroId": 2,
+      "entrenadorId": 0,
+      "eliminado": false,
+      "id": 12
+    },
+    {
+      "nombre": "dario",
+      "apellidos": "sandoval",
+      "email": "manu.arroyo1998@gmail.com",
+      "dni": "23456576",
+      "telefono": "1144990011",
+      "direccion": "calle 123",
+      "fechaNacimiento": "1997-04-12",
+      "foto": "https://i.ibb.co/Y4b8xXs3/Facturacion-jpg.jpg",
+      "tipoDeMiembroId": 2,
+      "entrenadorId": 0,
+      "eliminado": false,
+      "id": 13
+    },
+    {
+      "nombre": "juan",
+      "apellidos": "martin",
+      "email": "manu.arroyo1998@gmail.com",
+      "dni": "84958498",
+      "telefono": "546546546",
+      "direccion": "calle 1444",
+      "fechaNacimiento": "1997-05-10",
+      "foto": "https://i.ibb.co/WNqwS4Pf/Unaj-jpg.jpg",
+      "tipoDeMiembroId": 1,
+      "entrenadorId": 0,
+      "eliminado": false,
+      "id": 14
+    },
+    {
+      "nombre": "fabi",
+      "apellidos": "carlos",
+      "email": "manu.arroyo1998@gmail.com",
+      "dni": "85495849",
+      "telefono": "646465465",
+      "direccion": "calle 123",
+      "fechaNacimiento": "1998-01-11",
+      "foto": "https://i.ibb.co/PZg70R82/Pagos-jpg.jpg",
+      "tipoDeMiembroId": 1,
+      "entrenadorId": 0,
+      "eliminado": false,
+      "id": 15
+    },
+    {
+      "nombre": "carlos",
+      "apellidos": "fabian",
+      "email": "Chusena.arroyo1975@gmail.com",
+      "dni": "787986554",
+      "telefono": "564679879",
+      "direccion": "calle 123",
+      "fechaNacimiento": "1998-04-20",
+      "foto": "https://i.ibb.co/WNqwS4Pf/Unaj-jpg.jpg",
+      "tipoDeMiembroId": 2,
+      "entrenadorId": 0,
+      "eliminado": false,
+      "id": 16
+    },
+    {
+      "nombre": "Juan",
+      "apellidos": "romero",
+      "email": "magaly3591@gmail.com",
+      "dni": "84795874",
+      "telefono": "54654664",
+      "direccion": "calle 543",
+      "fechaNacimiento": "1998-02-10",
+      "foto": "https://i.ibb.co/cSNH1gbB/imagen-2025-11-07-094631673-png.png",
+      "tipoDeMiembroId": 2,
+      "entrenadorId": 0,
+      "eliminado": false,
+      "id": 17
+    },
+    {
+      "nombre": "PEPE",
+      "apellidos": "perez",
+      "email": "magaly3591@gmail.com",
+      "dni": "847594759",
+      "telefono": "54646464",
+      "direccion": "calle 123",
+      "fechaNacimiento": "1995-07-14",
+      "foto": "https://i.ibb.co/9HNTXhPX/UML-Salon-jpg.jpg",
+      "tipoDeMiembroId": 2,
+      "entrenadorId": 0,
+      "eliminado": false,
+      "id": 18
     }
   ],
   "entrenadors": [
@@ -211,6 +371,60 @@
       "fechaInicio": "2025-11-05T21:19:32.418Z",
       "fechaFin": "2026-11-05T21:19:32.418Z",
       "id": 1004
+    },
+    {
+      "miembroId": 11,
+      "membresiaId": 102,
+      "estadoMembresiaId": 1,
+      "pagoId": 5,
+      "fechaInicio": "2025-11-06T00:00:00.000Z",
+      "fechaFin": "2026-11-06T00:00:00.000Z",
+      "id": 1005
+    },
+    {
+      "miembroId": 12,
+      "membresiaId": 101,
+      "estadoMembresiaId": 1,
+      "pagoId": 6,
+      "fechaInicio": "2025-11-06T00:00:00.000Z",
+      "fechaFin": "2025-12-06T00:00:00.000Z",
+      "id": 1006
+    },
+    {
+      "miembroId": 13,
+      "membresiaId": 101,
+      "estadoMembresiaId": 1,
+      "pagoId": 7,
+      "fechaInicio": "2025-11-07T00:00:00.000Z",
+      "fechaFin": "2025-12-07T00:00:00.000Z",
+      "id": 1007
+    },
+    {
+      "miembroId": 15,
+      "membresiaId": 102,
+      "estadoMembresiaId": 1,
+      "pagoId": 8,
+      "fechaInicio": "2025-11-07T00:00:00.000Z",
+      "fechaFin": "2026-11-07T00:00:00.000Z",
+      "id": 1008
+    },
+    {
+      "miembroId": 16,
+      "membresiaId": 101,
+      "estadoMembresiaId": 1,
+      "pagoId": 9,
+      "fechaInicio": "2025-11-07T00:00:00.000Z",
+      "fechaFin": "2025-12-07T00:00:00.000Z",
+      "id": 1009
+    },
+    {
+      "miembroId": 17,
+      "membresiaId": 101,
+      "estadoMembresiaId": 1,
+      "pagoId": 10,
+      "fechaInicio": "2025-11-07T00:00:00.000Z",
+      "fechaFin": "2025-12-07T00:00:00.000Z",
+      "id": 1010
     }
   ],
   "pagos": [
@@ -241,6 +455,55 @@
       "metodoPago": "Tarjeta",
       "descuentoAplicado": 0,
       "id": 4
+    },
+    {
+      "monto": 45000,
+      "fechaPago": "2025-11-06T22:26:26.580Z",
+      "metodoPago": "QR",
+      "descuentoAplicado": 5000,
+      "id": 5
+    },
+    {
+      "monto": 4500,
+      "fechaPago": "2025-11-06T22:39:37.331Z",
+      "metodoPago": "QR",
+      "descuentoAplicado": 500,
+      "id": 6
+    },
+    {
+      "monto": 4500,
+      "fechaPago": "2025-11-07T12:17:23.536Z",
+      "metodoPago": "QR",
+      "descuentoAplicado": 500,
+      "id": 7
+    },
+    {
+      "monto": 50000,
+      "fechaPago": "2025-11-07T12:30:18.158Z",
+      "metodoPago": "Efectivo",
+      "descuentoAplicado": 0,
+      "id": 8
+    },
+    {
+      "monto": 4500,
+      "fechaPago": "2025-11-07T12:39:22.360Z",
+      "metodoPago": "QR",
+      "descuentoAplicado": 500,
+      "id": 9
+    },
+    {
+      "monto": 4500,
+      "fechaPago": "2025-11-07T12:46:52.264Z",
+      "metodoPago": "Efectivo",
+      "descuentoAplicado": 500,
+      "id": 10
+    },
+    {
+      "monto": 45000,
+      "fechaPago": "2025-11-07T12:56:52.934Z",
+      "metodoPago": "Efectivo",
+      "descuentoAplicado": 5000,
+      "id": 11
     }
   ],
   "estadoMembresias": [

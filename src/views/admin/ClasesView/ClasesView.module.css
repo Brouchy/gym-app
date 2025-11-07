@@ -6,6 +6,22 @@
 
 /* ==== Contenedor Principal ==== */
 .contenedor {
+.accionIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.accionIcon:hover {
+  transform: scale(1.2);
+  fill: #D84315;
+}
   animation: fadeIn 0.3s ease-out;
   padding: 1.5rem;
   font-family: "Poppins", sans-serif;

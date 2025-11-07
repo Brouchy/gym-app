@@ -12,6 +12,198 @@ import { imprimirCredencial } from "../../utils/imprimirCredencial.js";
 import { subirImagenAImgbb } from "../../utils/subirImagen.js";
 import estilos from './MiembrosView.module.css';
 import { renderizarWizardAgregarMiembro } from "./WizardAgregarMiembro/WizardAgregarMiembro.js";
+import { apiCrearMembresiaXMiembro } from '../../api/membershipApi.js';
+import { apiCrearPago } from '../../api/apiPago.js';
+import { imprimirTicket } from '../../utils/imprimirTicket.js';
+import QRCode from 'qrcode';
+ 
+/**
+ * Muestra un modal con un código QR generado a partir de `textoQR`.
+ * Retorna una Promise que se resuelve a true si el usuario confirma, false si cancela.
+ */
+const mostrarModalQR = (textoQR) => {
+    return new Promise((resolve) => {
+        const modal = document.createElement('div');
+        modal.style.position = 'fixed';
+        modal.style.inset = '0';
+        modal.style.zIndex = '3000';
+        modal.style.display = 'flex';
+        modal.style.alignItems = 'center';
+        modal.style.justifyContent = 'center';
+        modal.style.background = 'rgba(0,0,0,0.6)';
+
+        const caja = document.createElement('div');
+        caja.style.background = '#1f1f1f';
+        caja.style.padding = '18px';
+        caja.style.borderRadius = '10px';
+        caja.style.maxWidth = '420px';
+        caja.style.width = '90%';
+        caja.style.color = 'white';
+        caja.style.textAlign = 'center';
+
+        caja.innerHTML = `<h3 style="margin-top:0;margin-bottom:8px;">Escanear QR para pagar</h3><p style="color:#ccc;margin-bottom:12px;">Escaneá este QR con la app de pago y luego confirma</p>`;
+
+        const canvas = document.createElement('canvas');
+        canvas.id = 'qr-canvas-inline';
+        canvas.style.background = 'white';
+        canvas.style.padding = '8px';
+        canvas.style.borderRadius = '8px';
+        caja.appendChild(canvas);
+
+        const botones = document.createElement('div');
+        botones.style.display = 'flex';
+        botones.style.justifyContent = 'center';
+        botones.style.gap = '8px';
+        botones.style.marginTop = '12px';
+
+        const btnCancelar = document.createElement('button');
+        btnCancelar.textContent = 'Cancelar';
+        btnCancelar.style.padding = '8px 12px';
+        btnCancelar.style.borderRadius = '6px';
+        btnCancelar.style.border = 'none';
+        btnCancelar.style.background = '#555';
+        btnCancelar.style.color = 'white';
+
+        const btnConfirmar = document.createElement('button');
+        btnConfirmar.textContent = 'Confirmar pago';
+        btnConfirmar.style.padding = '8px 12px';
+        btnConfirmar.style.borderRadius = '6px';
+        btnConfirmar.style.border = 'none';
+        btnConfirmar.style.background = '#FF6B35';
+        btnConfirmar.style.color = 'white';
+
+        botones.appendChild(btnCancelar);
+        botones.appendChild(btnConfirmar);
+        caja.appendChild(botones);
+
+        modal.appendChild(caja);
+        document.body.appendChild(modal);
+
+        // Generar QR usando la librería `qrcode` importada (fallback a texto si falla)
+        try {
+            if (QRCode && typeof QRCode.toCanvas === 'function') {
+                // Usar la función toCanvas para dibujar directamente en el canvas
+                QRCode.toCanvas(canvas, textoQR, { width: 220, margin: 2 })
+                    .catch(err => {
+                        console.warn('Error generando QR en canvas:', err);
+                        const pre = document.createElement('pre');
+                        pre.style.color = '#fff';
+                        pre.style.whiteSpace = 'pre-wrap';
+                        pre.style.textAlign = 'left';
+                        pre.textContent = textoQR;
+                        canvas.replaceWith(pre);
+                    });
+            } else {
+                throw new Error('QRCode.toCanvas no disponible');
+            }
+        } catch (e) {
+            console.warn('No se pudo generar QR en canvas, mostrando texto fallback. Error:', e);
+            const pre = document.createElement('pre');
+            pre.style.color = '#fff';
+            pre.style.whiteSpace = 'pre-wrap';
+            pre.style.textAlign = 'left';
+            pre.textContent = textoQR;
+            canvas.replaceWith(pre);
+        }
+
+        btnCancelar.addEventListener('click', () => {
+            modal.remove();
+            resolve(false);
+        });
+
+        btnConfirmar.addEventListener('click', () => {
+            modal.remove();
+            resolve(true);
+        });
+    });
+};
+
+
+/**
+ * Muestra un modal con el comprobante de pago y ofrece dos opciones:
+ * - Imprimir comprobante
+ * - Terminar registro (cerrar)
+ * Retorna una Promise que se resuelve cuando el usuario elige cualquiera de las acciones.
+ */
+const mostrarModalComprobante = (datosPago, miembro, membresia, tipoMiembro) => {
+    return new Promise((resolve) => {
+        const modal = document.createElement('div');
+        modal.style.position = 'fixed';
+        modal.style.inset = '0';
+        modal.style.zIndex = '4000';
+        modal.style.display = 'flex';
+        modal.style.alignItems = 'center';
+        modal.style.justifyContent = 'center';
+        modal.style.background = 'rgba(0,0,0,0.6)';
+
+        const caja = document.createElement('div');
+        caja.style.background = '#1f1f1f';
+        caja.style.padding = '18px';
+        caja.style.borderRadius = '10px';
+        caja.style.maxWidth = '520px';
+        caja.style.width = '92%';
+        caja.style.color = 'white';
+        caja.style.textAlign = 'left';
+
+        // Contenido del comprobante (resumen)
+        const fechaPago = new Date(datosPago.fechaPago).toLocaleString();
+        caja.innerHTML = `
+            <h3 style="margin-top:0;margin-bottom:8px;">Comprobante de Pago</h3>
+            <p style="color:#ccc;margin-bottom:12px;">Revise los datos del pago. Puede imprimir el comprobante o terminar el registro.</p>
+            <div style="background:#111;margin-bottom:12px;padding:12px;border-radius:8px;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><strong>Miembro:</strong><span>${miembro.nombre} ${miembro.apellidos || ''}</span></div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><strong>Membresía:</strong><span>${membresia.nombrePlan || 'N/A'}</span></div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><strong>Monto:</strong><span>$${Number(datosPago.monto).toFixed(2)}</span></div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><strong>Método:</strong><span>${datosPago.metodoPago || 'N/A'}</span></div>
+                <div style="display:flex;justify-content:space-between;"><strong>Fecha:</strong><span>${fechaPago}</span></div>
+            </div>
+        `;
+
+        const botones = document.createElement('div');
+        botones.style.display = 'flex';
+        botones.style.justifyContent = 'flex-end';
+        botones.style.gap = '10px';
+
+        const btnTerminar = document.createElement('button');
+        btnTerminar.textContent = 'Terminar registro';
+        btnTerminar.style.padding = '8px 12px';
+        btnTerminar.style.borderRadius = '6px';
+        btnTerminar.style.border = 'none';
+        btnTerminar.style.background = '#555';
+        btnTerminar.style.color = 'white';
+
+        const btnImprimir = document.createElement('button');
+        btnImprimir.textContent = 'Imprimir comprobante';
+        btnImprimir.style.padding = '8px 12px';
+        btnImprimir.style.borderRadius = '6px';
+        btnImprimir.style.border = 'none';
+        btnImprimir.style.background = '#FF6B35';
+        btnImprimir.style.color = 'white';
+
+        botones.appendChild(btnTerminar);
+        botones.appendChild(btnImprimir);
+        caja.appendChild(botones);
+
+        modal.appendChild(caja);
+        document.body.appendChild(modal);
+
+        btnTerminar.addEventListener('click', () => {
+            modal.remove();
+            resolve('terminar');
+        });
+
+        btnImprimir.addEventListener('click', async () => {
+            try {
+                imprimirTicket(datosPago, miembro, membresia, tipoMiembro);
+            } catch (err) {
+                console.error('Error imprimiendo ticket:', err);
+            }
+            // Después de imprimir, cerramos modal y resolvemos
+            modal.remove();
+            resolve('imprimir');
+        });
+    });
+};
 
 
 // --- Estado del Módulo (variables que guardan la información) ---
@@ -66,7 +258,7 @@ export const renderizarVistaMiembros = async (contenedor) => {
 const cargarYMostrarMiembros = async () => {
     // Mostramos un 'cargando' en la tabla
     const cuerpoTabla = contenedorVista.querySelector('#miembros-cuerpo-tabla');
-    if (cuerpoTabla) cuerpoTabla.innerHTML = '<tr><td colspan="7">Cargando...</td></tr>';
+    if (cuerpoTabla) cuerpoTabla.innerHTML = '<tr><td colspan="12">Cargando...</td></tr>';
 
     listaMiembros = await apiObtenerMiembros();
     mostrarContenido();
@@ -85,10 +277,11 @@ const mostrarContenido = () => {
     if (!cuerpoTabla) return; // Si la vista no está cargada, salir
 
     // 1. Filtrar (según el buscador)
-    const terminoBusqueda = contenedorVista.querySelector('#buscador').value.toLowerCase();
+    const terminoBusqueda = (contenedorVista.querySelector('#buscador').value || '').toLowerCase();
     const miembrosFiltrados = listaMiembros.filter(miembro => 
-        miembro.nombre.toLowerCase().includes(terminoBusqueda) ||
-        miembro.email.toLowerCase().includes(terminoBusqueda) ||
+        (miembro.nombre || '').toLowerCase().includes(terminoBusqueda) ||
+        (miembro.apellidos || '').toLowerCase().includes(terminoBusqueda) ||
+        (miembro.email || '').toLowerCase().includes(terminoBusqueda) ||
         String(miembro.id).includes(terminoBusqueda) ||
         String(miembro.dni).includes(terminoBusqueda)
     );
@@ -103,7 +296,7 @@ const mostrarContenido = () => {
 
     // 3. Renderizar Tabla
     cuerpoTabla.innerHTML = ''; // Limpiar
-    const TOTAL_COLUMNAS = 11;
+    const TOTAL_COLUMNAS = 12;
 
     if (miembrosPaginados.length === 0) {
         cuerpoTabla.innerHTML = `<tr><td colspan="${TOTAL_COLUMNAS}">No se encontraron miembros.</td></tr>`;
@@ -123,6 +316,7 @@ const mostrarContenido = () => {
             fila.innerHTML = `
                 <td>${miembro.id}</td>
                 <td>${miembro.nombre}</td>
+                <td>${miembro.apellidos || ''}</td>
                 <td>${miembro.dni || 'N/A'}</td>
                 <td>${miembro.direccion || 'N/A'}</td>
                 <td>${miembro.telefono || 'N/A'}</td>
@@ -132,9 +326,15 @@ const mostrarContenido = () => {
                 <td>${miembro.tipoDeMiembro?.descripcion || 'N/A'}</td>
                 <td>${entrenadorInfo}</td>
                 <td class="${estilos.acciones}">
-                    <button class="${estilos.botonEditar}" data-id="${miembro.id}" title="Editar">Editar</button>
-                    <button class="${estilos.botonEliminar}" data-id="${miembro.id}" title="Eliminar">Eliminar</button>
-                    <button class="${estilos.botonImprimir}" data-id="${miembro.id}" title="Imprimir">Imprimir</button>
+                                        <svg class="${estilos.botonEditar} ${estilos.accionIcon}" data-id="${miembro.id}" title="Editar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+                                            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/>
+                                        </svg>
+                                        <svg class="${estilos.botonEliminar} ${estilos.accionIcon}" data-id="${miembro.id}" title="Eliminar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+                                            <path d="M9 3h6v1h5v2H4V4h5V3zm1 4h1v10h-1V7zm4 0h1v10h-1V7zm-7 0h12v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7z"/>
+                                        </svg>
+                                        <svg class="${estilos.botonImprimir} ${estilos.accionIcon}" data-id="${miembro.id}" title="Imprimir" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+                                            <path d="M6 9V4h12v5h2a2 2 0 0 1 2 2v6h-4v4H8v-4H4v-6a2 2 0 0 1 2-2h2zm2-3v3h8V6H8zm0 10v2h8v-2H8z"/>
+                                        </svg>
                 </td>
             `;
             cuerpoTabla.appendChild(fila);
@@ -161,13 +361,15 @@ const adjuntarEventListeners = () => {
             return;
         }
 
-        // --- Botones de la Tabla ---
-        if (e.target.matches(`.${estilos.botonEditar}`)) {
-            abrirModalEditar(e.target.dataset.id);
+        // --- Botones de la Tabla (soportando clicks dentro del SVG) ---
+        const editarBtn = e.target.closest(`.${estilos.botonEditar}`);
+        if (editarBtn) {
+            abrirModalEditar(editarBtn.dataset.id);
             return;
         }
-        if (e.target.matches(`.${estilos.botonEliminar}`)) {
-            abrirModalEliminar(e.target.dataset.id);
+        const eliminarBtn = e.target.closest(`.${estilos.botonEliminar}`);
+        if (eliminarBtn) {
+            abrirModalEliminar(eliminarBtn.dataset.id);
             return;
         }
         
@@ -191,8 +393,9 @@ const adjuntarEventListeners = () => {
         if (e.target.matches(`.${estilos.modalCerrar}`) || e.target.matches(`.${estilos.modalFondo}`)) {
             cerrarModales();
         }
-        if (e.target.matches(`.${estilos.botonImprimir}`)) {
-            const id = e.target.dataset.id;
+        const imprimirBtn = e.target.closest(`.${estilos.botonImprimir}`);
+        if (imprimirBtn) {
+            const id = imprimirBtn.dataset.id;
             const miembro = listaMiembros.find(m => m.id === Number(id));
             imprimirCredencial(miembro);
         }
@@ -237,7 +440,13 @@ const adjuntarEventListeners = () => {
             
             if (!tipoMiembroId || !membresiaId) {
                 const costoCalculado = form.querySelector('#costo-calculado');
+                const costoCalculadoPago = form.querySelector('#costo-calculado-pago');
+                const fechaFin = form.querySelector('#fecha-fin-membresia');
+                const fechaFinPago = form.querySelector('#fecha-fin-membresia-pago');
                 if (costoCalculado) costoCalculado.textContent = '$0.00';
+                if (costoCalculadoPago) costoCalculadoPago.textContent = '$0.00';
+                if (fechaFin) fechaFin.textContent = '-';
+                if (fechaFinPago) fechaFinPago.textContent = '-';
                 return;
             }
             
@@ -248,11 +457,36 @@ const adjuntarEventListeners = () => {
                 const descuento = tipoMiembro.porcentajeDescuento || 0;
                 const costoBase = membresia.costoBase || 0;
                 const costoFinal = costoBase * (1 - descuento / 100);
-                
+
+                // Actualizar ambos resúmenes si existen (sección membresía y sección pago)
                 const costoCalculado = form.querySelector('#costo-calculado');
+                const costoCalculadoPago = form.querySelector('#costo-calculado-pago');
                 if (costoCalculado) {
                     costoCalculado.textContent = `$${costoFinal.toFixed(2)}`;
                 }
+                if (costoCalculadoPago) {
+                    costoCalculadoPago.textContent = `$${costoFinal.toFixed(2)}`;
+                }
+
+                // Calcular fecha fin basada en fechaInicioMembresia y duracionEnDias
+                const fechaInicioVal = form.querySelector('#fechaInicioMembresia')?.value;
+                let fechaFinTexto = '-';
+                if (fechaInicioVal) {
+                    const fechaInicioObj = new Date(fechaInicioVal);
+                    const durDias = membresia.duracionEnDias || 0;
+                    const fechaFinObj = new Date(fechaInicioObj);
+                    fechaFinObj.setDate(fechaInicioObj.getDate() + durDias);
+                    // Formatear como dd/mm/yyyy
+                    const dd = String(fechaFinObj.getDate()).padStart(2, '0');
+                    const mm = String(fechaFinObj.getMonth() + 1).padStart(2, '0');
+                    const yyyy = fechaFinObj.getFullYear();
+                    fechaFinTexto = `${dd}/${mm}/${yyyy}`;
+                }
+
+                const fechaFin = form.querySelector('#fecha-fin-membresia');
+                const fechaFinPago = form.querySelector('#fecha-fin-membresia-pago');
+                if (fechaFin) fechaFin.textContent = fechaFinTexto;
+                if (fechaFinPago) fechaFinPago.textContent = fechaFinTexto;
             }
         };
         
@@ -261,6 +495,10 @@ const adjuntarEventListeners = () => {
         }
         if (membresiaSelect) {
             membresiaSelect.addEventListener('change', calcularCosto);
+        }
+        const fechaInicioInput = form.querySelector('#fechaInicioMembresia');
+        if (fechaInicioInput) {
+            fechaInicioInput.addEventListener('change', calcularCosto);
         }
     }
 
@@ -348,6 +586,7 @@ const abrirModalEditar = async (id) => {
     const form = contenedorVista.querySelector('#modal-formulario-miembro');
     form.querySelector('#miembro-id').value = miembro.id;
     form.querySelector('#nombre').value = miembro.nombre;
+    form.querySelector('#apellidos').value = miembro.apellidos || '';
     form.querySelector('#email').value = miembro.email;
     form.querySelector('#dni').value = miembro.dni;
     form.querySelector('#telefono').value = miembro.telefono;
@@ -503,7 +742,8 @@ const manejarSubmitFormulario = async (e) => {
     : 0;
 
   const datosMiembro = {
-    nombre: form.querySelector('#nombre').value,
+        nombre: form.querySelector('#nombre').value,
+        apellidos: form.querySelector('#apellidos') ? form.querySelector('#apellidos').value : '',
     email: form.querySelector('#email').value,
     dni: form.querySelector('#dni').value,
     telefono: form.querySelector('#telefono').value,
@@ -518,38 +758,110 @@ const manejarSubmitFormulario = async (e) => {
   // Si estamos editando, todo sigue igual
   if (modoFormulario === 'editar' && id) {
     await apiActualizarMiembro(id, datosMiembro);
-    cerrarModales();
-    await cargarYMostrarMiembros();
-    return;
-  }
-
-  // Si estamos creando un nuevo miembro, abrimos el wizard
-  const miembroCreado = await apiCrearMiembro(datosMiembro);
-  cerrarModales();
-
-  // Obtener datos de membresía del formulario
-  const membresiaId = form.querySelector('#membresiaId')?.value 
-    ? parseInt(form.querySelector('#membresiaId').value, 10) 
-    : null;
-  const fechaInicioMembresia = form.querySelector('#fechaInicioMembresia')?.value || null;
-  const tipoDeMiembroSeleccionado = listaTiposMiembro.find(t => t.id === tipoDeMiembroId);
-
-  // Mostrar wizard solo si se creó correctamente
-  if (miembroCreado) {
-    renderizarWizardAgregarMiembro(
-      contenedorVista, 
-      miembroCreado, 
-      membresiaId,
-      fechaInicioMembresia,
-      tipoDeMiembroSeleccionado,
-      async () => {
-        //  Callback al cerrar wizard (éxito o cancelación)
+        cerrarModales();
         await cargarYMostrarMiembros();
-      }
-    );
-  } else {
-    await cargarYMostrarMiembros();
+        // Restaurar estado del guardado y botón
+        const botonSubmitEdit = form.querySelector('button[type="submit"]');
+        if (botonSubmitEdit) {
+            botonSubmitEdit.disabled = false;
+            botonSubmitEdit.textContent = textoOriginalBoton;
+        }
+        guardandoMiembro = false;
+        return;
   }
+
+    // Si estamos creando un nuevo miembro, procesamos el flujo completo (membresía + pago)
+    const miembroCreado = await apiCrearMiembro(datosMiembro);
+
+    // Obtener datos de membresía del formulario (no cerramos el modal todavía)
+    const membresiaId = form.querySelector('#membresiaId')?.value 
+        ? parseInt(form.querySelector('#membresiaId').value, 10) 
+        : null;
+    const fechaInicioMembresia = form.querySelector('#fechaInicioMembresia')?.value || null;
+    const tipoDeMiembroSeleccionado = listaTiposMiembro.find(t => t.id === tipoDeMiembroId);
+
+    if (miembroCreado) {
+        try {
+            if (membresiaId) {
+                // Calcular costo y descuento
+                const membresiaSeleccionada = listaMembresias.find(m => m.id === Number(membresiaId));
+                const descuento = tipoDeMiembroSeleccionado?.porcentajeDescuento || 0;
+                const costoBase = membresiaSeleccionada?.costoBase || 0;
+                const costoFinal = costoBase * (1 - descuento / 100);
+                const descuentoAplicado = costoBase - costoFinal;
+
+                // Leer el método de pago seleccionado en el formulario (por defecto Efectivo)
+                const metodoPagoSeleccionado = form?.querySelector('#metodoPago')?.value || 'Efectivo';
+
+                // Si el método es QR, mostrar modal con el QR y esperar confirmación del usuario
+                if (metodoPagoSeleccionado === 'QR') {
+                    const qrPayload = JSON.stringify({
+                        miembroId: miembroCreado.id,
+                        nombre: miembroCreado.nombre,
+                        apellidos: miembroCreado.apellidos || '',
+                        membresiaId: Number(membresiaId),
+                        monto: Number(costoFinal),
+                        fecha: new Date().toISOString()
+                    });
+
+                    const confirmado = await mostrarModalQR(qrPayload);
+                    if (!confirmado) {
+                        // Usuario canceló el pago por QR: no crear pago ni relación
+                        await cargarYMostrarMiembros();
+                        return;
+                    }
+                }
+
+                // Crear pago con el método seleccionado (Efectivo o QR)
+                const nuevoPago = await apiCrearPago({
+                    monto: Number(costoFinal),
+                    fechaPago: new Date().toISOString(),
+                    metodoPago: metodoPagoSeleccionado,
+                    descuentoAplicado: Number(descuentoAplicado || 0)
+                });
+
+                // Calcular fechas
+                const fechaInicioFinal = fechaInicioMembresia ? new Date(fechaInicioMembresia) : new Date();
+                const fechaFin = new Date(fechaInicioFinal);
+                fechaFin.setDate(fechaInicioFinal.getDate() + (membresiaSeleccionada?.duracionEnDias || 0));
+
+                // Crear relación miembro↔membresía
+                const nuevaRelacion = {
+                    miembroId: miembroCreado.id,
+                    membresiaId: Number(membresiaId),
+                    estadoMembresiaId: 1,
+                    pagoId: nuevoPago?.id || null,
+                    fechaInicio: fechaInicioFinal.toISOString(),
+                    fechaFin: fechaFin.toISOString()
+                };
+
+                await apiCrearMembresiaXMiembro(nuevaRelacion);
+                console.log('Membresía y pago creados automáticamente (miembroId:', miembroCreado.id, ', metodoPago:', metodoPagoSeleccionado, ')');
+
+                // Mostrar comprobante con opciones: imprimir o terminar
+                try {
+                    await mostrarModalComprobante(nuevoPago, miembroCreado, membresiaSeleccionada, tipoDeMiembroSeleccionado);
+                } catch (err) {
+                    console.warn('Usuario cerró el comprobante sin acción explícita.', err);
+                }
+            }
+        } catch (err) {
+            console.error('Error al asignar membresía/pago automáticamente:', err);
+        } finally {
+            // Cerrar modal y refrescar la lista de miembros
+            cerrarModales();
+            await cargarYMostrarMiembros();
+        }
+    } else {
+        await cargarYMostrarMiembros();
+    }
+
+    // Restaurar estado del guardado y botón (se hace también en paths anteriores)
+    if (botonSubmit) {
+        botonSubmit.disabled = false;
+        botonSubmit.textContent = textoOriginalBoton;
+    }
+    guardandoMiembro = false;
 };
 
 
@@ -563,12 +875,18 @@ const validarSeccionActual = () => {
     if (seccionActual === 1) {
         // Validar campos de la sección 1
         const nombre = form.querySelector('#nombre');
+        const apellidos = form.querySelector('#apellidos');
         const dni = form.querySelector('#dni');
         const direccion = form.querySelector('#direccion');
         
         if (!nombre || !nombre.value.trim()) {
             alert('Por favor, ingrese el nombre completo.');
             nombre?.focus();
+            return false;
+        }
+        if (!apellidos || !apellidos.value.trim()) {
+            alert('Por favor, ingrese los apellidos.');
+            apellidos?.focus();
             return false;
         }
         if (!dni || !dni.value || dni.value.length < 8) {
@@ -604,6 +922,15 @@ const validarSeccionActual = () => {
             return false;
         }
         return true;
+    } else if (seccionActual === 3) {
+        // Validar campos de la sección 3 (pago)
+        const metodoPago = form.querySelector('#metodoPago');
+        if (!metodoPago || !metodoPago.value) {
+            alert('Por favor, seleccione un método de pago.');
+            metodoPago?.focus();
+            return false;
+        }
+        return true;
     }
     return true;
 };
@@ -612,7 +939,7 @@ const validarSeccionActual = () => {
  * Avanza a la siguiente sección
  */
 const avanzarSeccion = () => {
-    if (seccionActual < 2) {
+    if (seccionActual < 3) {
         seccionActual++;
         actualizarNavegacionSecciones();
     }
@@ -635,19 +962,21 @@ const actualizarNavegacionSecciones = () => {
     const form = contenedorVista.querySelector('#modal-formulario-miembro');
     if (!form) return;
 
-    // Ocultar todas las secciones
+    // Ocultar/mostrar secciones
     const seccion1 = form.querySelector('[data-seccion="1"]');
     const seccion2 = form.querySelector('[data-seccion="2"]');
-    
+    const seccion3 = form.querySelector('[data-seccion="3"]');
+
     if (seccion1) seccion1.style.display = seccionActual === 1 ? 'block' : 'none';
     if (seccion2) seccion2.style.display = seccionActual === 2 ? 'block' : 'none';
+    if (seccion3) seccion3.style.display = seccionActual === 3 ? 'block' : 'none';
 
-    // Actualizar stepper
+    // Actualizar stepper (3 pasos)
     const stepper = form.querySelector(`.${estilos.stepper}`);
     if (stepper) {
         const steps = stepper.querySelectorAll(`.${estilos.step}`);
-        const stepLine = stepper.querySelector(`.${estilos.stepLine}`);
-        
+        const stepLines = stepper.querySelectorAll(`.${estilos.stepLine}`);
+
         steps.forEach((step, index) => {
             const stepNum = index + 1;
             if (stepNum === seccionActual) {
@@ -660,15 +989,17 @@ const actualizarNavegacionSecciones = () => {
                 step.classList.remove(estilos.stepActivo, estilos.stepCompletado);
             }
         });
-        
-        // Colorear la línea si estamos en la sección 2 o si la sección 1 está completada
-        if (stepLine) {
-            if (seccionActual >= 2) {
-                stepLine.classList.add('activo');
+
+        // Activar líneas según el progreso
+        stepLines.forEach((line, idx) => {
+            // line 0 = entre paso1 y 2 -> activo si seccionActual >= 2
+            // line 1 = entre paso2 y 3 -> activo si seccionActual >= 3
+            if (seccionActual >= idx + 2) {
+                line.classList.add('activo');
             } else {
-                stepLine.classList.remove('activo');
+                line.classList.remove('activo');
             }
-        }
+        });
     }
 
     // Actualizar botones de navegación
@@ -680,10 +1011,10 @@ const actualizarNavegacionSecciones = () => {
         botonAnterior.style.display = seccionActual > 1 ? 'inline-block' : 'none';
     }
     if (botonSiguiente) {
-        botonSiguiente.style.display = seccionActual < 2 ? 'inline-block' : 'none';
+        botonSiguiente.style.display = seccionActual < 3 ? 'inline-block' : 'none';
     }
     if (botonGuardar) {
-        botonGuardar.style.display = seccionActual === 2 ? 'inline-block' : 'none';
+        botonGuardar.style.display = seccionActual === 3 ? 'inline-block' : 'none';
     }
 };
 
@@ -728,6 +1059,7 @@ const renderizarEsqueleto = () => {
                            <tr>
                                 <th>ID</th>
                                 <th>Nombre</th>
+                                <th>Apellidos</th>
                                 <th>DNI</th>
                                 <th>Dirección</th>
                                 <th>Teléfono</th>
@@ -775,15 +1107,25 @@ const renderizarEsqueleto = () => {
                         <div class="${estilos.stepNumber}">2</div>
                         <div class="${estilos.stepLabel}">Membresía</div>
                     </div>
+                    <div class="${estilos.stepLine}"></div>
+                    <div class="${estilos.step}" data-step="3">
+                        <div class="${estilos.stepNumber}">3</div>
+                        <div class="${estilos.stepLabel}">Pago</div>
+                    </div>
                 </div>
 
                 <!-- Sección 1: Registro de Datos -->
-                <div class="${estilos.seccionFormulario} ${estilos.seccionActiva}" data-seccion="1">
+                <div class="${estilos.seccionFormulario} ${estilos.seccionActiva} ${estilos.seccionCompacta}" data-seccion="1">
                     <h4 class="${estilos.tituloSeccion}">📋 Sección 1: Registro de Datos</h4>
                     
                     <div class="${estilos.grupoInput}">
-                        <label for="nombre">Nombres Completos</label>
-                        <input type="text" id="nombre" name="nombre" placeholder="Ingrese nombres" required>
+                        <label for="nombre">Nombres</label>
+                        <input type="text" id="nombre" name="nombre" placeholder="Ingrese nombre" required>
+                    </div>
+
+                    <div class="${estilos.grupoInput}">
+                        <label for="apellidos">Apellidos</label>
+                        <input type="text" id="apellidos" name="apellidos" placeholder="Ingrese apellidos" required>
                     </div>
 
                     <div class="${estilos.grupoInput}">
@@ -826,7 +1168,7 @@ const renderizarEsqueleto = () => {
                 </div>
 
                 <!-- Sección 2: Membresía -->
-                <div class="${estilos.seccionFormulario} campo-membresia" data-seccion="2" style="display: none;">
+                <div class="${estilos.seccionFormulario} ${estilos.seccionCompacta} campo-membresia" data-seccion="2" style="display: none;">
                     <h4 class="${estilos.tituloSeccion}">💳 Sección 2: Membresía</h4>
                     
                     <div class="${estilos.grupoInput}">
@@ -844,6 +1186,13 @@ const renderizarEsqueleto = () => {
                     </div>
 
                     <div class="${estilos.grupoInput}">
+                        <label>Fecha fin estimada</label>
+                        <div id="fecha-fin-membresia" style="color:#fff; padding:6px; background:#222; border-radius:6px;">-</div>
+                    </div>
+
+                    <!-- Método de pago movido a la Sección 3 (Pago) -->
+
+                    <div class="${estilos.grupoInput}">
                         <label for="fechaInicioMembresia">Fecha de Inicio de la Membresía</label>
                         <input type="date" id="fechaInicioMembresia" name="fechaInicioMembresia" required>
                     </div>
@@ -853,6 +1202,36 @@ const renderizarEsqueleto = () => {
                         <div id="costo-calculado" style="font-size: 1.2em; font-weight: bold; color: #ff6600; padding: 8px; background-color: #f5f5f5; border-radius: 4px;">
                             $0.00
                         </div>
+                    </div>
+                </div>
+
+                <!-- Sección 3: Pago -->
+                <div class="${estilos.seccionFormulario} ${estilos.seccionCompacta} campo-membresia" data-seccion="3" style="display: none;">
+                    <h4 class="${estilos.tituloSeccion}">💸 Sección 3: Pago</h4>
+
+                    <div class="${estilos.grupoInput}">
+                        <label for="metodoPago">Método de pago</label>
+                        <select id="metodoPago" name="metodoPago" required>
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="QR">QR</option>
+                        </select>
+                    </div>
+
+                    <div class="${estilos.grupoInput}">
+                        <label>Resumen de monto a pagar</label>
+                        <div id="costo-calculado-pago" style="font-size: 1.05em; font-weight: bold; color: #ff6600; padding: 6px; background-color: #f5f5f5; border-radius: 4px;">
+                            $0.00
+                        </div>
+                    </div>
+
+                    <div class="${estilos.grupoInput}">
+                        <label>Fecha fin estimada</label>
+                        <div id="fecha-fin-membresia-pago" style="color:#fff; padding:6px; background:#222; border-radius:6px;">-</div>
+                    </div>
+
+                    <div class="${estilos.grupoInput}">
+                        <label for="notaPago">Observaciones (opcional)</label>
+                        <input type="text" id="notaPago" name="notaPago" placeholder="Ej: Pago en efectivo en caja">
                     </div>
                 </div>
 

@@ -45,19 +45,22 @@ const handleCrudClick = async (e) => {
     return;
   }
 
-  if (e.target.matches(`.${estilos.botonEditar}`)) {
-    const id = e.target.dataset.id;
+  const botonEditar = e.target.closest(`.${estilos.botonEditar}`);
+  if (botonEditar) {
+    const id = botonEditar.dataset.id;
     const clase = listaClases.find((c) => c.id == id || c.claseId == id);
     abrirModal(contenedor, clase);
     return;
   }
 
-  if (e.target.matches(`.${estilos.botonEliminar}`)) {
+  const botonEliminar = e.target.closest(`.${estilos.botonEliminar}`);
+  if (botonEliminar) {
     if (confirm("¿Eliminar clase?")) {
-      await apiEliminarClase(e.target.dataset.id);
+      await apiEliminarClase(botonEliminar.dataset.id);
       listaClases = await apiObtenerClases();
       renderizarTabla(contenedor);
     }
+    return;
   }
 };
 
@@ -144,8 +147,12 @@ const renderizarTabla = (contenedor) => {
           <td>${c.horaInicio} - ${c.horaFin}</td>
           <td>${c.cupo}</td>
           <td class="${estilos.acciones}">
-            <button class="${estilos.botonEditar}" data-id="${c.id ?? c.claseId}">Editar</button>
-            <button class="${estilos.botonEliminar}" data-id="${c.id ?? c.claseId}">Eliminar</button>
+            <svg class="${estilos.botonEditar} ${estilos.accionIcon}" data-id="${c.id ?? c.claseId}" title="Editar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/>
+            </svg>
+            <svg class="${estilos.botonEliminar} ${estilos.accionIcon}" data-id="${c.id ?? c.claseId}" title="Eliminar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+              <path d="M9 3h6v1h5v2H4V4h5V3zm1 4h1v10h-1V7zm4 0h1v10h-1V7zm-7 0h12v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7z"/>
+            </svg>
           </td>
         </tr>`
           )

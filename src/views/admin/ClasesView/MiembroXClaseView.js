@@ -112,7 +112,9 @@ lista.forEach(m => {
     <td>${m.clase?.entrenador?.nombre || "-"}</td>
     <td>${new Date(m.fechaInscripcion).toLocaleDateString()}</td>
     <td class="${estilos.acciones}">
-      <button class="${estilos.botonEliminar}" data-id="${m.id}">Eliminar</button>
+      <svg class="${estilos.botonEliminar} ${estilos.accionIcon}" data-id="${m.id}" title="Eliminar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+        <path d="M9 3h6v1h5v2H4V4h5V3zm1 4h1v10h-1V7zm4 0h1v10h-1V7zm-7 0h12v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7z"/>
+      </svg>
     </td>
   `;
   cuerpo.appendChild(fila);
@@ -121,7 +123,7 @@ lista.forEach(m => {
 // Listener eliminar
 cuerpo.querySelectorAll(`.${estilos.botonEliminar}`).forEach(btn => {
   btn.addEventListener("click", async (e) => {
-    const id = e.target.dataset.id;
+    const id = btn.dataset.id;
     if (confirm("¿Eliminar asignación?")) {
       await apiEliminarMiembroXClase(id);
       const nuevaLista = lista.filter(m => m.id != id);
