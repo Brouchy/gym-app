@@ -281,8 +281,6 @@ const mostrarContenido = () => {
     const miembrosFiltrados = listaMiembros.filter(miembro => 
         (miembro.nombre || '').toLowerCase().includes(terminoBusqueda) ||
         (miembro.apellidos || '').toLowerCase().includes(terminoBusqueda) ||
-        (miembro.email || '').toLowerCase().includes(terminoBusqueda) ||
-        String(miembro.id).includes(terminoBusqueda) ||
         String(miembro.dni).includes(terminoBusqueda)
     );
 
@@ -1047,7 +1045,7 @@ const renderizarEsqueleto = () => {
             </div>
             <div id="zona-dinamica">
                 <div class="${estilos.cabecera}">
-                    <input type="search" id="buscador" class="${estilos.buscador}" placeholder="Buscar por ID, DNI, nombre, email...">
+                    <input type="search" id="buscador" class="${estilos.buscador}" placeholder="Buscar por DNI, nombre...">
                     <button id="boton-agregar-miembro" class="${estilos.botonAgregar}">
                         + Agregar Miembro
                     </button>
