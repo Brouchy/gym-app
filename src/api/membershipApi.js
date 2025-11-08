@@ -74,9 +74,10 @@ export const apiObtenerMembresiasXMiembros = async () => {
 
   try {
     const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`);
+
     if (!respuesta.ok) {
-      console.error(`Error HTTP: ${respuesta.status}`);
-      return null;
+      console.error(`❌ Error HTTP ${respuesta.status} al obtener membresías por miembros.`);
+      return []; // 🔄 Devolvemos un array vacío en lugar de null
     }
 
     const membresias = await respuesta.json();
@@ -84,18 +85,24 @@ export const apiObtenerMembresiasXMiembros = async () => {
     // Expand manual del tipoDeMembresia (anidado dentro de membresia)
     for (const m of membresias) {
       if (m.membresia?.tipoDeMembresiaId) {
-        const tipoRes = await fetch(`${URL_BASE}/tipoDeMembresias/${m.membresia.tipoDeMembresiaId}`);
-        if (tipoRes.ok) {
-          const tipo = await tipoRes.json();
-          m.membresia.tipoDeMembresia = tipo;
+        try {
+          const tipoRes = await fetch(`${URL_BASE}/tipoDeMembresias/${m.membresia.tipoDeMembresiaId}`);
+          if (tipoRes.ok) {
+            const tipo = await tipoRes.json();
+            m.membresia.tipoDeMembresia = tipo;
+          } else {
+            console.warn(`⚠️ No se pudo obtener tipoDeMembresia con ID ${m.membresia.tipoDeMembresiaId}`);
+          }
+        } catch (error) {
+          console.warn(`⚠️ Error al expandir tipoDeMembresia:`, error);
         }
       }
     }
 
     return membresias;
   } catch (error) {
-    console.error(`Error en apiObtenerMembresiasXMiembros:`, error);
-    return null;
+    console.error(`💥 Error en apiObtenerMembresiasXMiembros:`, error);
+    return []; // 🔄 Array vacío si algo sale mal
   }
 };
 

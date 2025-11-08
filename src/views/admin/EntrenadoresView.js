@@ -1,10 +1,15 @@
-// src/views/admin/EntrenadoresView.js
+/* ===============================
+   👥 MÓDULO DE GESTIÓN DE ENTRENADORES
+================================= */
+
 import estilos from "./EntrenadoresView.module.css";
 import {
   apiObtenerEntrenadores,
   apiCrearEntrenador,
   apiActualizarEntrenador,
   apiEliminarEntrenador,
+  apiObtenerClasesConNombre,
+  apiObtenerMiembrosPorEntrenador
 } from "../../api/trainersApi.js";
 
 let listaEntrenadores = [];
@@ -13,14 +18,15 @@ const FILAS_POR_PAGINA = 5;
 let modoFormulario = "crear";
 
 export const renderizarVistaEntrenadores = async (contenedor) => {
-  // Limpia cualquier modal residual al cambiar de vista
+  // Limpia cualquier modal previo
   document.querySelectorAll('[class*="modal"]').forEach((el) => el.remove());
 
   contenedor.innerHTML = `
     <div class="${estilos.contenedor}">
-    <div class="${estilos.tituloModulo}">
-         <h2>Módulo de Gestión de Entrenadores</h2>
-    </div>
+      <div class="${estilos.tituloModulo}">
+        <h2>Módulo de Gestión de Entrenadores</h2>
+      </div>
+
       <div class="${estilos.cabecera}">
         <input type="search" id="buscador" class="${estilos.buscador}" placeholder="Buscar por nombre, DNI o email...">
         <button id="boton-agregar" class="${estilos.botonAgregar}">+ Nuevo Entrenador</button>
@@ -52,7 +58,7 @@ export const renderizarVistaEntrenadores = async (contenedor) => {
       </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Modal Entrenador -->
     <div id="modal-entrenador" class="${estilos.modal}">
       <div class="${estilos.modalFondo} modal-cerrar"></div>
       <div class="${estilos.modalContenido}">
@@ -68,13 +74,10 @@ export const renderizarVistaEntrenadores = async (contenedor) => {
             <div>
               <label>Nombre</label>
               <input type="text" id="nombre" required>
-
               <label>DNI</label>
               <input type="number" id="dni" required>
-
               <label>Teléfono</label>
               <input type="text" id="telefono" required>
-
               <label>Activo</label>
               <select id="activo">
                 <option value="true">Sí</option>
@@ -85,15 +88,12 @@ export const renderizarVistaEntrenadores = async (contenedor) => {
             <div>
               <label>Fecha Nacimiento</label>
               <input type="date" id="fechaNacimiento" required>
-
               <label>Dirección</label>
               <input type="text" id="direccion" required>
-
               <label>Email</label>
               <input type="email" id="email" required>
-
               <label>Certificación</label>
-              <input type="text" id="certificacion">
+              <input type="file" id="certificado" accept=".pdf,.jpg,.jpeg,.png">
             </div>
           </div>
 
@@ -104,11 +104,39 @@ export const renderizarVistaEntrenadores = async (contenedor) => {
         </form>
       </div>
     </div>
+
+    <!-- Modal Cargos -->
+    <div id="modal-cargos" class="${estilos.modal}">
+      <div class="${estilos.modalFondo} modal-cerrar"></div>
+      <div class="${estilos.modalContenido}">
+        <div class="${estilos.modalCabecera}">
+          <h3 id="modal-cargos-titulo">Cargos del Entrenador</h3>
+          <span class="${estilos.modalCerrar} modal-cerrar">&times;</span>
+        </div>
+        <div id="contenido-cargos"></div>
+      </div>
+    </div>
+
+    <!-- Modal Certificado -->
+    <div id="modal-certificado" class="${estilos.modal}">
+      <div class="${estilos.modalFondo} modal-cerrar"></div>
+      <div class="${estilos.modalContenido}">
+        <div class="${estilos.modalCabecera}">
+          <h3>Certificado</h3>
+          <span class="${estilos.modalCerrar} modal-cerrar">&times;</span>
+        </div>
+        <div id="contenido-certificado"></div>
+      </div>
+    </div>
   `;
 
   await cargarYMostrarEntrenadores(contenedor);
   adjuntarEventos(contenedor);
 };
+
+/* ==========================================
+   📄 Renderizado y filtrado de tabla
+========================================== */
 
 const cargarYMostrarEntrenadores = async (contenedor) => {
   listaEntrenadores = await apiObtenerEntrenadores();
@@ -147,24 +175,26 @@ const renderizarTabla = (contenedor) => {
           <td>${e.telefono}</td>
           <td>${e.direccion}</td>
           <td>${e.email}</td>
-          <td>${e.certificacion || "-"}</td>
+          <td>${e.certificacion ? "✅ " + e.certificacion.split("/").pop() : "-"}</td>
           <td>${e.activo ? "✅" : "❌"}</td>
           <td class="${estilos.acciones}">
-            <button class="${estilos.botonEditar}" data-id="${e.id}">Editar</button>
-            <button class="${estilos.botonEliminar}" data-id="${e.id}">Eliminar</button>
+            <button data-accion="editar" data-id="${e.id}" class="${estilos.botonEditar}">Editar</button>
+            <button data-accion="eliminar" data-id="${e.id}" class="${estilos.botonEliminar}">Eliminar</button>
+            <button data-accion="cargos" data-id="${e.id}" class="${estilos.botonAgregar}">⚡ Cargos</button>
+            <button data-accion="certificado" data-id="${e.id}" class="${estilos.botonSecundario}">📄 Certificado</button>
           </td>
         </tr>`
           )
           .join("");
 
   indicador.textContent = `Página ${paginaActual} de ${totalPaginas}`;
-
-  // Habilitar/Deshabilitar paginación
-  const btnPrev = contenedor.querySelector("#boton-prev");
-  const btnNext = contenedor.querySelector("#boton-next");
-  btnPrev.disabled = paginaActual === 1;
-  btnNext.disabled = paginaActual === totalPaginas;
+  contenedor.querySelector("#boton-prev").disabled = paginaActual === 1;
+  contenedor.querySelector("#boton-next").disabled = paginaActual === totalPaginas;
 };
+
+/* ==========================================
+   ⚙️ Eventos y acciones principales
+========================================== */
 
 const adjuntarEventos = (contenedor) => {
   const buscador = contenedor.querySelector("#buscador");
@@ -175,6 +205,7 @@ const adjuntarEventos = (contenedor) => {
 
   contenedor.addEventListener("click", async (e) => {
     const id = e.target.dataset.id;
+    const accion = e.target.dataset.accion;
 
     if (e.target.matches("#boton-prev")) {
       paginaActual--;
@@ -193,13 +224,13 @@ const adjuntarEventos = (contenedor) => {
       return;
     }
 
-    if (e.target.matches(`.${estilos.botonEditar}`)) {
-      const entrenador = listaEntrenadores.find((ent) => ent.id == id);
+    if (accion === "editar") {
+      const entrenador = listaEntrenadores.find(ent => ent.id == id);
       abrirModal(entrenador);
       return;
     }
 
-    if (e.target.matches(`.${estilos.botonEliminar}`)) {
+    if (accion === "eliminar") {
       if (confirm("¿Eliminar entrenador?")) {
         await apiEliminarEntrenador(id);
         await cargarYMostrarEntrenadores(contenedor);
@@ -207,15 +238,28 @@ const adjuntarEventos = (contenedor) => {
       return;
     }
 
-    // Cerrar modal al clickear overlay o la X
-    if (
-      e.target.classList.contains("modal-cerrar") &&
-      document.querySelector("#modal-entrenador")
-    ) {
-      document.querySelector("#modal-entrenador").classList.remove(estilos.activo);
+    if (accion === "cargos") {
+      const entrenador = listaEntrenadores.find(ent => ent.id == id);
+      abrirModalCargos(entrenador);
+      return;
+    }
+
+    if (accion === "certificado") {
+      const entrenador = listaEntrenadores.find(ent => ent.id == id);
+      abrirModalCertificado(entrenador);
+      return;
+    }
+
+    // Cierre de modales
+    if (e.target.classList.contains(estilos.modalCerrar) || e.target.classList.contains("modal-cerrar")) {
+      document.querySelectorAll(`.${estilos.modal}`).forEach(m => m.classList.remove(estilos.activo));
     }
   });
 };
+
+/* ==========================================
+   🧩 Funciones de modales
+========================================== */
 
 const abrirModal = (entrenador = null) => {
   const modal = document.querySelector("#modal-entrenador");
@@ -230,49 +274,144 @@ const abrirModal = (entrenador = null) => {
     form.querySelector("#entrenador-id").value = entrenador.id;
     form.querySelector("#nombre").value = entrenador.nombre || "";
     form.querySelector("#dni").value = entrenador.dni || "";
-    form.querySelector("#fechaNacimiento").value = entrenador.fechaNacimiento
-      ? entrenador.fechaNacimiento.split("T")[0]
-      : "";
+    form.querySelector("#fechaNacimiento").value = entrenador.fechaNacimiento ? entrenador.fechaNacimiento.split("T")[0] : "";
     form.querySelector("#telefono").value = entrenador.telefono || "";
     form.querySelector("#direccion").value = entrenador.direccion || "";
     form.querySelector("#email").value = entrenador.email || "";
-    form.querySelector("#certificacion").value = entrenador.certificacion || "";
     form.querySelector("#activo").value = entrenador.activo ? "true" : "false";
   }
 
   modal.classList.add(estilos.activo);
 
-  // Cancelar
   modal.querySelector("#cancelar").onclick = (ev) => {
     ev.stopPropagation();
     modal.classList.remove(estilos.activo);
   };
 
-  // Submit
   form.onsubmit = async (e) => {
     e.preventDefault();
+    const certificadoInput = form.querySelector("#certificado");
+    let certificadoValor = entrenador ? entrenador.certificacion : "";
 
-    const datos = {
-      nombre: form.querySelector("#nombre").value.trim(),
-      dni: parseInt(form.querySelector("#dni").value, 10),
-      fechaNacimiento: new Date(
-        form.querySelector("#fechaNacimiento").value
-      ).toISOString(),
-      telefono: form.querySelector("#telefono").value,
-      direccion: form.querySelector("#direccion").value,
-      email: form.querySelector("#email").value,
-      certificacion: form.querySelector("#certificacion").value,
-      activo: form.querySelector("#activo").value === "true",
-    };
-
-    if (modoFormulario === "editar") {
-      const id = form.querySelector("#entrenador-id").value;
-      await apiActualizarEntrenador(id, datos);
+    if (certificadoInput.files.length > 0) {
+      const archivo = certificadoInput.files[0];
+      const lector = new FileReader();
+      lector.onload = async (event) => {
+        certificadoValor = event.target.result;
+        await guardarEntrenador(form, certificadoValor);
+      };
+      lector.readAsDataURL(archivo);
     } else {
-      await apiCrearEntrenador(datos);
+      await guardarEntrenador(form, certificadoValor);
     }
-
-    modal.classList.remove(estilos.activo);
-    await cargarYMostrarEntrenadores(document.querySelector(`.${estilos.contenedor}`));
   };
+};
+
+const guardarEntrenador = async (form, certificadoValor) => {
+  const datos = {
+    nombre: form.querySelector("#nombre").value.trim(),
+    dni: parseInt(form.querySelector("#dni").value, 10),
+    fechaNacimiento: new Date(form.querySelector("#fechaNacimiento").value).toISOString(),
+    telefono: form.querySelector("#telefono").value,
+    direccion: form.querySelector("#direccion").value,
+    email: form.querySelector("#email").value,
+    certificacion: certificadoValor,
+    activo: form.querySelector("#activo").value === "true",
+  };
+
+  if (modoFormulario === "editar") {
+    const id = form.querySelector("#entrenador-id").value;
+    await apiActualizarEntrenador(id, datos);
+    const index = listaEntrenadores.findIndex(ent => ent.id == id);
+    if (index >= 0) listaEntrenadores[index] = { ...listaEntrenadores[index], ...datos };
+  } else {
+    const nuevo = await apiCrearEntrenador(datos);
+    listaEntrenadores.push(nuevo);
+  }
+
+  document.querySelector("#modal-entrenador").classList.remove(estilos.activo);
+  renderizarTabla(document.querySelector(`.${estilos.contenedor}`));
+};
+
+const abrirModalCargos = async (entrenador) => {
+  const modal = document.querySelector("#modal-cargos");
+  const contenido = document.querySelector("#contenido-cargos");
+  contenido.innerHTML = "<p>Cargando...</p>";
+  modal.classList.add(estilos.activo);
+
+  try {
+    const clases = await apiObtenerClasesConNombre(entrenador.id);
+    const miembros = await apiObtenerMiembrosPorEntrenador(entrenador.id);
+
+    let html = "<h4>Clases a cargo:</h4>";
+    html += clases.length
+      ? `<ul>${clases.map(c => `<li>${c.nombre} - ${c.horaInicio} a ${c.horaFin}</li>`).join("")}</ul>`
+      : "<p>No tiene clases a cargo.</p>";
+
+    html += "<h4>Miembros a cargo (premium):</h4>";
+    html += miembros.length
+      ? `<ul>${miembros.map(m => `<li>${m.nombre}</li>`).join("")}</ul>`
+      : "<p>No tiene miembros premium a cargo.</p>";
+
+    contenido.innerHTML = html;
+  } catch {
+    contenido.innerHTML = "<p>Error al cargar cargos.</p>";
+  }
+};
+
+const abrirModalCertificado = (entrenador) => {
+  const modal = document.querySelector("#modal-certificado");
+  const contenido = document.querySelector("#contenido-certificado");
+
+  modal.classList.add(estilos.activo);
+
+  if (!entrenador.certificacion) {
+    contenido.innerHTML = `<p>No se ha cargado certificado.</p>`;
+    return;
+  }
+
+  const esImagen = entrenador.certificacion.startsWith("data:image");
+  const esPDF = entrenador.certificacion.startsWith("data:application/pdf");
+
+  const botonesHTML = `
+    <div class="${estilos.botonesCertificado}">
+      <button id="imprimir-certificado" class="${estilos.botonSecundario}">🖨 Imprimir</button>
+      <button id="descargar-certificado" class="${estilos.botonAgregar}">⬇ Descargar</button>
+    </div>
+  `;
+
+  if (esImagen) {
+    contenido.innerHTML = `
+      <img src="${entrenador.certificacion}" alt="Certificado" class="${estilos.imagenCertificado}"/>
+      ${botonesHTML}
+    `;
+  } else if (esPDF) {
+    contenido.innerHTML = `
+      <iframe src="${entrenador.certificacion}" class="${estilos.iframeCertificado}"></iframe>
+      ${botonesHTML}
+    `;
+  } else {
+    contenido.innerHTML = `
+      <p>Certificado cargado, pero el formato no es compatible para vista previa.</p>
+      ${botonesHTML}
+    `;
+  }
+
+  contenido.querySelector("#imprimir-certificado")?.addEventListener("click", () => {
+    const nuevaVentana = window.open("", "_blank");
+    if (esImagen) {
+      nuevaVentana.document.write(`<html><body><img src="${entrenador.certificacion}" style="width:100%;"/></body></html>`);
+    } else if (esPDF) {
+      nuevaVentana.document.write(`<html><body><embed src="${entrenador.certificacion}" type="application/pdf" width="100%" height="100%"/></body></html>`);
+    }
+    nuevaVentana.document.close();
+    nuevaVentana.print();
+  });
+
+  contenido.querySelector("#descargar-certificado")?.addEventListener("click", () => {
+    const enlace = document.createElement("a");
+    enlace.href = entrenador.certificacion;
+    enlace.download = `Certificado-${entrenador.nombre || "entrenador"}.${esPDF ? "pdf" : "png"}`;
+    enlace.click();
+  });
 };
