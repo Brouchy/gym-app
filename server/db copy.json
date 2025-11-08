@@ -150,7 +150,16 @@
     {
       "id": 2,
       "descripcion": "Anual"
+    },
+    {
+      "id": 3,
+      "descripcion": "Trimestral"
+    },
+    {
+      "id": 4,
+      "descripcion": "Dia"
     }
+
   ],
   "membresiaXMiembros": [
     {

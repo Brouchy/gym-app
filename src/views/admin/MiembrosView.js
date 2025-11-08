@@ -7,7 +7,7 @@ import {
     apiObtenerTiposDeMiembro
 } from "../../api/membersApi";
 import { apiObtenerEntrenadores } from '../../api/trainersApi.js';
-import { apiObtenerMembresias } from '../../api/membershipApi.js';
+import { apiObtenerMembresias, apiObtenerMembresiasXMiembros } from '../../api/membershipApi.js';
 import { imprimirCredencial } from "../../utils/imprimirCredencial.js";
 import { subirImagenAImgbb } from "../../utils/subirImagen.js";
 import estilos from './MiembrosView.module.css';
@@ -16,7 +16,7 @@ import { apiCrearMembresiaXMiembro } from '../../api/membershipApi.js';
 import { apiCrearPago } from '../../api/apiPago.js';
 import { imprimirTicket } from '../../utils/imprimirTicket.js';
 import QRCode from 'qrcode';
- 
+
 /**
  * Muestra un modal con un código QR generado a partir de `textoQR`.
  * Retorna una Promise que se resuelve a true si el usuario confirma, false si cancela.
@@ -119,6 +119,104 @@ const mostrarModalQR = (textoQR) => {
 };
 
 
+// Modal simple para mostrar datos de contacto del miembro
+const mostrarModalContacto = (miembro) => {
+    const modal = document.createElement('div');
+    modal.style.position = 'fixed';
+    modal.style.inset = '0';
+    modal.style.zIndex = '3000';
+    modal.style.display = 'flex';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+    modal.style.background = 'rgba(0,0,0,0.6)';
+
+    const caja = document.createElement('div');
+    caja.style.background = '#1f1f1f';
+    caja.style.padding = '18px';
+    caja.style.borderRadius = '10px';
+    caja.style.maxWidth = '420px';
+    caja.style.width = '90%';
+    caja.style.color = 'white';
+
+    const fotoUrl = miembro.foto || 'https://via.placeholder.com/64?text=👤';
+    caja.innerHTML = `
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+            <div style="width:48px;height:48px;border-radius:50%;overflow:hidden;background:#333;flex:0 0 auto;display:flex;align-items:center;justify-content:center;">
+                <img src="${fotoUrl}" alt="${miembro.nombre}" style="width:100%;height:100%;object-fit:cover;"/>
+            </div>
+            <div style="font-size:16px;">${miembro.nombre} ${miembro.apellidos || ''}</div>
+        </div>
+        <div style="background:#111;margin-bottom:12px;padding:12px;border-radius:8px;display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;gap:8px;justify-content:space-between;">
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <strong>Teléfono:</strong><span id="dato-telefono">${miembro.telefono || 'N/A'}</span>
+                </div>
+                <button class="btn-copy" data-copy="telefono" style="padding:6px 10px;border:none;border-radius:6px;background:#2d6cdf;color:#fff;cursor:pointer;">Copiar</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;justify-content:space-between;">
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <strong>Dirección:</strong><span>${miembro.direccion || 'N/A'}</span>
+                </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;justify-content:space-between;">
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <strong>Email:</strong><span id="dato-email">${miembro.email || 'N/A'}</span>
+                </div>
+                <button class="btn-copy" data-copy="email" style="padding:6px 10px;border:none;border-radius:6px;background:#2d6cdf;color:#fff;cursor:pointer;">Copiar</button>
+            </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:10px;">
+            <button id="cerrar-contacto" style="padding:8px 12px;border-radius:6px;border:none;background:#FF6B35;color:white;">Cerrar</button>
+        </div>
+    `;
+
+    modal.appendChild(caja);
+    document.body.appendChild(modal);
+    modal.addEventListener('click', (e) => {
+        if (e.target.id === 'cerrar-contacto' || e.target === modal) {
+            modal.remove();
+        }
+    });
+
+    // Copiar al portapapeles
+    const tryCopy = async (text, btn) => {
+        try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                await navigator.clipboard.writeText(text);
+            } else {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                ta.remove();
+            }
+            const original = btn.textContent;
+            btn.textContent = 'Copiado';
+            btn.disabled = true;
+            setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 1500);
+        } catch (err) {
+            console.warn('No se pudo copiar al portapapeles', err);
+            alert('No se pudo copiar al portapapeles.');
+        }
+    };
+
+    const buttons = caja.querySelectorAll('.btn-copy');
+    buttons.forEach(btn => {
+        const tipo = btn.getAttribute('data-copy');
+        const valor = tipo === 'telefono' ? (miembro.telefono || '') : tipo === 'email' ? (miembro.email || '') : '';
+        if (!valor) {
+            btn.disabled = true;
+            btn.style.opacity = '0.6';
+        } else {
+            btn.addEventListener('click', (ev) => {
+                ev.stopPropagation();
+                tryCopy(valor, btn);
+            });
+        }
+    });
+};
+
 /**
  * Muestra un modal con el comprobante de pago y ofrece dos opciones:
  * - Imprimir comprobante
@@ -211,11 +309,13 @@ let listaMiembros = [];       // Cache de todos los miembros
 let listaEntrenadores = [];   // Cache para el <select>
 let listaTiposMiembro = []; // Cache para el <select>
 let listaMembresias = []; // Cache para el <select> de membresías
+let listaMembresiasXMiembros = []; // Registros de membresía por miembro
 let paginaActual = 1;
 const FILAS_POR_PAGINA = 5;
 let modoFormulario = 'crear';
 let guardandoMiembro = false;
 let seccionActual = 1; // Control de sección actual del formulario
+let eliminandoMiembro = false; // Evita eliminaciones dobles
 
 // --- Contenedor Principal ---
 let contenedorVista; // El 'div' donde se renderiza este módulo
@@ -237,11 +337,13 @@ export const renderizarVistaMiembros = async (contenedor) => {
     Promise.all([
         apiObtenerEntrenadores(),
         apiObtenerTiposDeMiembro(),
-        apiObtenerMembresias()
-    ]).then(([entrenadores, tipos, membresias]) => {
+        apiObtenerMembresias(),
+        apiObtenerMembresiasXMiembros()
+    ]).then(([entrenadores, tipos, membresias, mxm]) => {
         listaEntrenadores = entrenadores;
         listaTiposMiembro = tipos;
         listaMembresias = membresias;
+        listaMembresiasXMiembros = Array.isArray(mxm) ? mxm : [];
         // Cargar los selects del formulario si ya existe
         cargarSelectsFormulario();
     });
@@ -258,9 +360,12 @@ export const renderizarVistaMiembros = async (contenedor) => {
 const cargarYMostrarMiembros = async () => {
     // Mostramos un 'cargando' en la tabla
     const cuerpoTabla = contenedorVista.querySelector('#miembros-cuerpo-tabla');
-    if (cuerpoTabla) cuerpoTabla.innerHTML = '<tr><td colspan="11">Cargando...</td></tr>';
+    if (cuerpoTabla) cuerpoTabla.innerHTML = '<tr><td colspan="10">Cargando...</td></tr>';
 
     listaMiembros = await apiObtenerMiembros();
+    // Siempre refrescamos las membresías por miembro para tener datos actualizados
+    const mxm = await apiObtenerMembresiasXMiembros();
+    listaMembresiasXMiembros = Array.isArray(mxm) ? mxm : [];
     mostrarContenido();
 }
 
@@ -294,7 +399,7 @@ const mostrarContenido = () => {
 
     // 3. Renderizar Tabla
     cuerpoTabla.innerHTML = ''; // Limpiar
-    const TOTAL_COLUMNAS = 11;
+    const TOTAL_COLUMNAS = 10;
 
     if (miembrosPaginados.length === 0) {
         cuerpoTabla.innerHTML = `<tr><td colspan="${TOTAL_COLUMNAS}">No se encontraron miembros.</td></tr>`;
@@ -306,33 +411,63 @@ const mostrarContenido = () => {
                 ? new Date(miembro.fechaNacimiento).toLocaleDateString()
                 : 'N/A';
             const fotoUrl = miembro.foto || 'https://via.placeholder.com/40?text=-';
-            // Combinar entrenador y certificación
-           // const entrenadorInfo = miembro.entrenador
-            //    ? `${miembro.entrenador.nombre} (${miembro.entrenador.certificacion || 'N/A'})`
-            //    : 'N/A';
-
+            // Determinar última membresía y estado activo
+            const registros = (listaMembresiasXMiembros || []).filter(r => Number(r.miembroId) === Number(miembro.id));
+            let ultimo = null;
+            if (registros.length > 0) {
+                ultimo = registros.reduce((acc, cur) => {
+                    const fAcc = acc?.fechaFin ? new Date(acc.fechaFin).getTime() : 0;
+                    const fCur = cur?.fechaFin ? new Date(cur.fechaFin).getTime() : 0;
+                    return fCur >= fAcc ? cur : acc;
+                }, registros[0]);
+            }
+            const ahora = Date.now();
+            const inicio = ultimo?.fechaInicio ? new Date(ultimo.fechaInicio).getTime() : null;
+            const fin = ultimo?.fechaFin ? new Date(ultimo.fechaFin).getTime() : null;
+            // Considerar el fin como inclusivo hasta el final del día
+            const finInclusivo = fin != null ? (fin + 24*60*60*1000 - 1) : null;
+            const activaPorFecha = (inicio != null && finInclusivo != null) ? (ahora >= inicio && ahora <= finInclusivo) : false;
+            const puntoColor = activaPorFecha ? '#16a34a' : '#dc2626';
+            const puntoHtml = `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${puntoColor};margin-right:6px;vertical-align:middle"></span>`;
+            let textoMembresia = 'N/A';
+            if (ultimo) {
+                let planName = ultimo?.membresia?.nombrePlan || null;
+                let typeName = ultimo?.membresia?.tipoDeMembresia?.descripcion || null;
+                if (!planName || !typeName) {
+                    const targetId = Number(ultimo.membresiaId || ultimo.membresia?.id);
+                    const mem = listaMembresias.find(m => Number(m.id) === targetId);
+                    if (mem) {
+                        planName = planName || mem?.nombrePlan || null;
+                        typeName = typeName || mem?.tipoDeMembresia?.descripcion || null;
+                    }
+                }
+                if (planName && typeName) textoMembresia = `${planName} (${typeName})`;
+                else textoMembresia = planName || typeName || 'N/A';
+            }
+            
             fila.innerHTML = `
                 <td>${miembro.id}</td>
                 <td>${miembro.nombre}</td>
                 <td>${miembro.apellidos || ''}</td>
                 <td>${miembro.dni || 'N/A'}</td>
-                <td>${miembro.direccion || 'N/A'}</td>
-                <td>${miembro.telefono || 'N/A'}</td>
                 <td>${fechaNac}</td>
                 <td>${miembro.email}</td>
                 <td><img src="${fotoUrl}" alt="${miembro.nombre}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"></td>
-                <td>${miembro.tipoDeMiembro?.descripcion || 'N/A'}</td>
-               
+                <td>${textoMembresia}</td>
+                <td>${puntoHtml}${activaPorFecha ? 'Activa' : 'Vencida'}</td>
                 <td class="${estilos.acciones}">
-                                        <svg class="${estilos.botonEditar} ${estilos.accionIcon}" data-id="${miembro.id}" title="Editar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
-                                            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/>
-                                        </svg>
-                                        <svg class="${estilos.botonEliminar} ${estilos.accionIcon}" data-id="${miembro.id}" title="Eliminar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
-                                            <path d="M9 3h6v1h5v2H4V4h5V3zm1 4h1v10h-1V7zm4 0h1v10h-1V7zm-7 0h12v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7z"/>
-                                        </svg>
-                                        <svg class="${estilos.botonImprimir} ${estilos.accionIcon}" data-id="${miembro.id}" title="Imprimir" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
-                                            <path d="M6 9V4h12v5h2a2 2 0 0 1 2 2v6h-4v4H8v-4H4v-6a2 2 0 0 1 2-2h2zm2-3v3h8V6H8zm0 10v2h8v-2H8z"/>
-                                        </svg>
+                    <svg class="${estilos.botonEditar} ${estilos.accionIcon}" data-id="${miembro.id}" title="Editar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/>
+                    </svg>
+                    <svg class="${estilos.botonEliminar} ${estilos.accionIcon}" data-id="${miembro.id}" title="Eliminar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+                        <path d="M9 3h6v1h5v2H4V4h5V3zm1 4h1v10h-1V7zm4 0h1v10h-1V7zm-7 0h12v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7z"/>
+                    </svg>
+                    <svg class="${estilos.botonImprimir} ${estilos.accionIcon}" data-id="${miembro.id}" title="Imprimir" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+                        <path d="M6 9V4h12v5h2a2 2 0 0 1 2 2v6h-4v4H8v-4H4v-6a2 2 0 0 1 2-2h2zm2-3v3h8V6H8zm0 10v2h8v-2H8z"/>
+                    </svg>
+                    <svg class="boton-contacto ${estilos.accionIcon}" data-id="${miembro.id}" title="Contacto" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+                        <path d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5zm0 2c-4.418 0-8 2.239-8 5v3h16v-3c0-2.761-3.582-5-8-5z"/>
+                    </svg>
                 </td>
             `;
             cuerpoTabla.appendChild(fila);
@@ -352,10 +487,13 @@ const adjuntarEventListeners = () => {
     // Usamos delegación de eventos en el contenedor de la vista
     contenedorVista.addEventListener('click', async (e) => {
         if (e.target.matches('#boton-confirmar-eliminar')) {
+            if (eliminandoMiembro) return;
+            eliminandoMiembro = true;
             const { id } = e.target.dataset;
             if (id) {
                 await manejarConfirmarEliminar(id);
             }
+            eliminandoMiembro = false;
             return;
         }
 
@@ -396,6 +534,16 @@ const adjuntarEventListeners = () => {
             const id = imprimirBtn.dataset.id;
             const miembro = listaMiembros.find(m => m.id === Number(id));
             imprimirCredencial(miembro);
+        }
+
+        const contactoBtn = e.target.closest('.boton-contacto');
+        if (contactoBtn) {
+            const id = Number(contactoBtn.dataset.id);
+            const m = listaMiembros.find(x => x.id === id);
+            if (m) {
+                mostrarModalContacto(m);
+            }
+            return;
         }
     });
 
@@ -513,6 +661,7 @@ const adjuntarEventListeners = () => {
     const botonSiguiente = contenedorVista.querySelector('#boton-siguiente');
     const botonAnterior = contenedorVista.querySelector('#boton-anterior');
     const botonGuardar = contenedorVista.querySelector('#boton-guardar');
+    
 
     if (botonSiguiente) {
         botonSiguiente.addEventListener('click', () => {
@@ -804,8 +953,16 @@ const manejarSubmitFormulario = async (e) => {
 
                     const confirmado = await mostrarModalQR(qrPayload);
                     if (!confirmado) {
-                        // Usuario canceló el pago por QR: no crear pago ni relación
-                        await cargarYMostrarMiembros();
+                        // Usuario canceló el pago por QR: revertimos el miembro creado para evitar huérfanos
+                        try {
+                            await apiEliminarMiembro(miembroCreado.id);
+                        } catch {}
+                        // Restaurar estado de UI (botón y flag) y mantener modal abierto para que el usuario cambie método
+                        if (botonSubmit) {
+                            botonSubmit.disabled = false;
+                            botonSubmit.textContent = textoOriginalBoton;
+                        }
+                        guardandoMiembro = false;
                         return;
                     }
                 }
@@ -1041,7 +1198,7 @@ const renderizarEsqueleto = () => {
         </div>
         <div class="${estilos.tituloModulo}">
             <div class="${estilos.tabs}">
-                <button id="tab-gestion" class="${estilos.tab} ${estilos.activa}">Gestión de Miembros</button>
+                <button id="tab-gestion" class="${estilos.tab} ${estilos.activa}">Asignar entrenador personal</button>
             </div>
             <div id="zona-dinamica">
                 <div class="${estilos.cabecera}">
@@ -1059,13 +1216,11 @@ const renderizarEsqueleto = () => {
                                 <th>Nombre</th>
                                 <th>Apellidos</th>
                                 <th>DNI</th>
-                                <th>Dirección</th>
-                                <th>Teléfono</th>
                                 <th>F. Nac.</th>
                                 <th>Email</th>
-                                 <th>Foto</th>
-                                <th>Tipo</th>
-                               
+                                <th>Foto</th>
+                                <th>Membresía</th>
+                                <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -1234,7 +1389,7 @@ const renderizarEsqueleto = () => {
                 </div>
 
                 <div class="${estilos.modalAcciones}">
-                    <button type="button" class="${estilos.botonPagina} ${estilos.botonSecundario} modal-cerrar">Cancelar</button>
+                    <button type="button" id="cancelar" class="${estilos.botonPagina} ${estilos.botonSecundario} modal-cerrar">Cancelar</button>
                     <button type="button" id="boton-anterior" class="${estilos.botonPagina} ${estilos.botonSecundario}" style="display: none;">Anterior</button>
                     <button type="button" id="boton-siguiente" class="${estilos.botonAgregar}">Siguiente</button>
                     <button type="submit" id="boton-guardar" class="${estilos.botonAgregar}" style="display: none;">Guardar</button>
@@ -1254,8 +1409,11 @@ const renderizarEsqueleto = () => {
                 <div class="${estilos.modalAcciones}">
                     <button type="button" class="${estilos.botonPagina} ${estilos.botonSecundario} modal-cerrar">Cancelar</button>
                     <button id="boton-confirmar-eliminar" class="${estilos.botonEliminar}">Eliminar</button>
+                    
                 </div>
             </div>
         </div>
     `;
+    
 }
+
