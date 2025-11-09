@@ -35,10 +35,14 @@ export const imprimirTicket = (datosPago, miembro, membresia, tipoMiembro) => {
           body {
             background: #f3f4f6;
             display: flex;
-            align-items: center;
+            /* Alineamos horizontalmente al centro pero posicionamos
+               el contenido hacia el inicio vertical para que la
+               parte superior del ticket siempre sea visible en la
+               vista previa/impresión. */
+            align-items: flex-start;
             justify-content: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 30px 20px 20px 20px; /* más espacio arriba */
             font-family: 'Arial', sans-serif;
           }
           .ticket {
@@ -48,6 +52,10 @@ export const imprimirTicket = (datosPago, miembro, membresia, tipoMiembro) => {
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            /* Reducir tamaño visual del ticket al 60% (40% más pequeño) */
+            transform: scale(0.6);
+            transform-origin: top center;
+            margin: 0 auto; /* centrar horizontalmente */
           }
           .encabezado {
             text-align: center;
@@ -122,14 +130,27 @@ export const imprimirTicket = (datosPago, miembro, membresia, tipoMiembro) => {
             color: #666;
             font-size: 0.85rem;
           }
+          /* Reducir márgenes de página para evitar recortes en la vista
+             previa de impresión y asegurar que la parte superior se vea. */
+          @page {
+            margin: 10mm;
+          }
+
           @media print {
             body {
-              padding: 0;
+              padding: 10mm; /* espacio seguro para la impresión */
               background: white;
+              display: block; /* evitar centrado flex en impresión */
             }
             .ticket {
               box-shadow: none;
               border: none;
+              /* Al imprimir, evitamos el transform para que la impresora
+                 respete dimensiones y márgenes correctamente. */
+              transform: none;
+              width: 60%;
+              max-width: 320px;
+              margin: 0 auto;
             }
           }
         </style>

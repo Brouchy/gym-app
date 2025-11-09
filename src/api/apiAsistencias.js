@@ -1,21 +1,59 @@
+// apiAsistencias.js
 const URL_BASE = import.meta.env.VITE_URL_BASE || "http://localhost:3001";
 
-
+// Endpoints
 const ENDPOINT_ASISTENCIAS = "asistencias";
-const ENDPOINT_MIEMBROS_X_CLASE = "miembrosXClase";
+const ENDPOINT_TIPOS_ASISTENCIA = "tiposDeAsistencia";
 const ENDPOINT_MIEMBROS = "miembros";
+const ENDPOINT_MIEMBROS_X_CLASE = "miembrosXClase";
 const ENDPOINT_CLASES = "clases";
 const ENDPOINT_ENTRENADORES = "entrenadors";
 const ENDPOINT_ACTIVIDADES = "actividads";
-const ENDPOINT_TIPOS_ASISTENCIA = "tiposDeAsistencia";
 const ENDPOINT_MEMBRESIAS_X_MIEMBRO = "membresiaXMiembros";
 const ENDPOINT_MEMBRESIAS = "membresias";
 const ENDPOINT_TIPOS_MEMBRESIA = "tipoDeMembresias";
 const ENDPOINT_ESTADOS_MEMBRESIA = "estadoMembresias";
 const ENDPOINT_PAGOS = "pagos";
 
+// ==========================
+// 1️⃣ Asistencia general (entrada al gym)
+// ==========================
+export const apiCrearAsistenciaGeneral = async (asistencia) => {
+  try {
+    const nueva = {
+      miembroId: asistencia.miembroId,
+      tipoDeAsistenciaId: asistencia.tipoDeAsistenciaId || 1,
+      fecha: asistencia.fecha || new Date().toISOString()
+    };
 
+    const respuesta = await fetch(`${URL_BASE}/${ENDPOINT_ASISTENCIAS}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(nueva)
+    });
 
+    if (!respuesta.ok) throw new Error(`Error HTTP ${respuesta.status}`);
+    return await respuesta.json();
+  } catch (error) {
+    console.error("❌ Error en apiCrearAsistenciaGeneral:", error);
+    return null;
+  }
+};
+
+export const apiObtenerAsistenciasGenerales = async () => {
+  try {
+    const respuesta = await fetch(`${URL_BASE}/${ENDPOINT_ASISTENCIAS}`);
+    if (!respuesta.ok) throw new Error(`Error HTTP ${respuesta.status}`);
+    return await respuesta.json();
+  } catch (error) {
+    console.error("❌ Error en apiObtenerAsistenciasGenerales:", error);
+    return [];
+  }
+};
+
+// ==========================
+// 2️⃣ Asistencia a clases (completa)
+// ==========================
 export const apiObtenerAsistenciasCompletas = async () => {
   try {
     const [
@@ -47,6 +85,7 @@ export const apiObtenerAsistenciasCompletas = async () => {
     ]);
 
     const map = (arr, key = "id") => Object.fromEntries(arr.map(i => [i[key], i]));
+
     const mapMiembros = map(miembros);
     const mapClases = map(clases);
     const mapEntrenadores = map(entrenadores);
@@ -59,7 +98,7 @@ export const apiObtenerAsistenciasCompletas = async () => {
     const mapEstadosMembresia = map(estadosMembresia);
     const mapPagos = map(pagos);
 
-    const resultado = asistencias.map(a => {
+    return asistencias.map(a => {
       const miembroXClase = mapMiembrosXClase[a.miembroXClaseId];
       const miembro = miembroXClase ? mapMiembros[miembroXClase.miembroId] : null;
       const clase = miembroXClase ? mapClases[miembroXClase.claseId] : null;
@@ -134,15 +173,15 @@ export const apiObtenerAsistenciasCompletas = async () => {
           : null
       };
     });
-
-    return resultado;
   } catch (error) {
     console.error("❌ Error en apiObtenerAsistenciasCompletas:", error);
     return [];
   }
 };
 
-
+// ==========================
+// 3️⃣ Métodos CRUD de asistencia a clases
+// ==========================
 export const apiCrearAsistencia = async (asistencia) => {
   try {
     const nueva = {
@@ -166,9 +205,6 @@ export const apiCrearAsistencia = async (asistencia) => {
   }
 };
 
-/* ===================================================
-   ✏️ 3. ACTUALIZAR ASISTENCIA (PUT)
-   =================================================== */
 export const apiActualizarAsistencia = async (id, datosActualizados) => {
   try {
     const respuesta = await fetch(`${URL_BASE}/${ENDPOINT_ASISTENCIAS}/${id}`, {
@@ -184,9 +220,6 @@ export const apiActualizarAsistencia = async (id, datosActualizados) => {
   }
 };
 
-/* ===================================================
-   ❌ 4. ELIMINAR ASISTENCIA (DELETE)
-   =================================================== */
 export const apiEliminarAsistencia = async (id) => {
   try {
     const respuesta = await fetch(`${URL_BASE}/${ENDPOINT_ASISTENCIAS}/${id}`, {
@@ -200,9 +233,6 @@ export const apiEliminarAsistencia = async (id) => {
   }
 };
 
-/* ===================================================
-   🔍 5. OBTENER ASISTENCIA POR ID (GET)
-   =================================================== */
 export const apiObtenerAsistenciaPorId = async (id) => {
   try {
     const respuesta = await fetch(`${URL_BASE}/${ENDPOINT_ASISTENCIAS}/${id}`);
@@ -214,9 +244,6 @@ export const apiObtenerAsistenciaPorId = async (id) => {
   }
 };
 
-/* ===================================================
-   📋 6. OBTENER TIPOS DE ASISTENCIA
-   =================================================== */
 export const apiObtenerTiposDeAsistencia = async () => {
   try {
     const respuesta = await fetch(`${URL_BASE}/${ENDPOINT_TIPOS_ASISTENCIA}`);

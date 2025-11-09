@@ -2,12 +2,12 @@
   📊 MÓDULO DE REPORTES COMPLETO
 ================================= */
 import estilos from "./ReportesView.module.css";
-import { apiObtenerMiembros } from "../../api/membersApi.js";
+import { apiObtenerPagos } from "../../api/apiPago.js";
 import { apiObtenerClases } from "../../api/apiClases.js";
+import { apiObtenerMiembros } from "../../api/membersApi.js";
 import { apiObtenerMiembrosXClase } from "../../api/apiMiembroxClase.js";
 import { apiObtenerAsistenciasCompletas } from "../../api/apiAsistencias.js";
-import { apiObtenerPagos } from "../../api/apiPago.js";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 
 /* ===============================
   🧩 MENÚ PRINCIPAL DE REPORTES
@@ -26,15 +26,16 @@ export const renderizarVistaReportes = async (contenedor) => {
 
   const contenedorReporte = contenedor.querySelector("#contenedor-reporte");
 
-  // Eventos de los botones
   contenedor.querySelector("#reporte-ingresos")
     .addEventListener("click", () => renderizarReporteIngresos(contenedorReporte));
+
   contenedor.querySelector("#reporte-asistencia-gimnasio")
     .addEventListener("click", () => renderizarReporteAsistenciaGimnasio(contenedorReporte));
+
   contenedor.querySelector("#reporte-asistencia-clases")
     .addEventListener("click", () => renderizarReporteAsistenciaClases(contenedorReporte));
 
-  // Abrir por defecto el primer reporte
+  // mostrar por defecto el reporte de ingresos
   renderizarReporteIngresos(contenedorReporte);
 };
 
@@ -45,7 +46,6 @@ async function renderizarReporteIngresos(contenedor) {
   contenedor.innerHTML = `
     <div class="${estilos.contenedor}">
       <h2>💰 Reporte de ingresos por membresías</h2>
-
       <div class="${estilos.filtros}">
         <label>Desde:</label>
         <input type="date" id="filtro-desde" class="${estilos.inputFecha}">
@@ -54,138 +54,124 @@ async function renderizarReporteIngresos(contenedor) {
         <label>Método:</label>
         <select id="filtro-metodo" class="${estilos.selectInput}">
           <option value="">Todos</option>
-          <option value="Efectivo">Efectivo</option>
-          <option value="Tarjeta">Tarjeta</option>
-          <option value="Transferencia">Transferencia</option>
         </select>
-
         <button id="boton-filtrar" class="${estilos.botonFiltrar}">🔍 Ver Registro</button>
         <button id="boton-imprimir" class="${estilos.botonImprimir}">🖨️ Imprimir</button>
         <button id="boton-excel" class="${estilos.botonImprimir}">📥 Exportar Excel</button>
       </div>
-
       <div class="${estilos.tablaWrapper}">
         <table class="${estilos.tabla}">
           <thead>
             <tr>
-              <th>Fecha</th>
-              <th>Método</th>
+              <th>N° Transacción</th>
+              <th>N° Documento</th>
+              <th>Miembro</th>
+              <th>Plan</th>
               <th>Monto</th>
-              <th>Descuento</th>
-              <th>Total</th>
+              <th>Descuento aplicado</th>
+              <th>Fecha de cobro</th>
+              <th>Pago total</th>
+              <th>Método de pago</th>
             </tr>
           </thead>
           <tbody id="cuerpo-tabla-reportes">
-            <tr><td colspan="5">Cargando pagos...</td></tr>
+            <tr><td colspan="9">Cargando pagos...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
   `;
 
+  const cuerpoTabla = contenedor.querySelector("#cuerpo-tabla-reportes");
   const filtroDesde = contenedor.querySelector("#filtro-desde");
   const filtroHasta = contenedor.querySelector("#filtro-hasta");
   const filtroMetodo = contenedor.querySelector("#filtro-metodo");
-  const botonFiltrar = contenedor.querySelector("#boton-filtrar");
-  const botonImprimir = contenedor.querySelector("#boton-imprimir");
-  const botonExcel = contenedor.querySelector("#boton-excel");
-  const cuerpoTabla = contenedor.querySelector("#cuerpo-tabla-reportes");
 
-  let pagos = await apiObtenerPagos();
+  let pagos = [];
+  try {
+    pagos = await apiObtenerPagos();
+  } catch (err) {
+    console.error("Error obteniendo pagos:", err);
+    cuerpoTabla.innerHTML = `<tr><td colspan="9">Error al cargar datos.</td></tr>`;
+    return;
+  }
 
-  function renderizarTabla(lista) {
-    if (!lista.length) {
-      cuerpoTabla.innerHTML = `<tr><td colspan="5">No se encontraron pagos</td></tr>`;
+  const metodosUnicos = [...new Set(pagos.map(p => p.metodoDescripcion).filter(Boolean))];
+  metodosUnicos.forEach(m => {
+    const opt = document.createElement("option");
+    opt.value = m;
+    opt.textContent = m;
+    filtroMetodo.appendChild(opt);
+  });
+
+  const datosCombinados = pagos.map(p => ({
+    numeroTransaccion: p.numeroTransaccion ?? `T-${String(p.id).padStart(4, "0")}`,
+    documento: p.miembroDocumento ?? "-",
+    miembro: p.miembroNombre ?? "-",
+    plan: p.planNombre ?? "-",
+    monto: Number(p.monto ?? 0),
+    descuento: Number(p.descuentoAplicado ?? 0),
+    fechaObj: p.fechaPago ? new Date(p.fechaPago) : null,
+    fecha: p.fechaPago ? new Date(p.fechaPago).toLocaleDateString("es-AR") : "-",
+    total: Number(p.pagoTotal ?? (p.monto - (p.descuentoAplicado ?? 0))),
+    metodo: p.metodoDescripcion ?? "No definido"
+  }));  
+
+  const renderizarTabla = () => {
+    const desde = filtroDesde.value ? new Date(filtroDesde.value) : null;
+    const hasta = filtroHasta.value ? new Date(filtroHasta.value) : null;
+    const metodo = filtroMetodo.value;
+
+    const filtrados = datosCombinados.filter(d => {
+      const fechaOk = d.fechaObj ? (!desde || d.fechaObj >= desde) && (!hasta || d.fechaObj <= hasta) : true;
+      const metodoOk = metodo ? d.metodo === metodo : true;
+      return fechaOk && metodoOk;
+    });
+
+    if (!filtrados.length) {
+      cuerpoTabla.innerHTML = `<tr><td colspan="9">No hay pagos para mostrar</td></tr>`;
       return;
     }
 
-    cuerpoTabla.innerHTML = lista.map(p => {
-      const total = (p.monto - p.descuentoAplicado).toFixed(2);
-      return `
-        <tr>
-          <td>${new Date(p.fechaPago).toLocaleDateString("es-AR")}</td>
-          <td>${p.metodoPago || "-"}</td>
-          <td>$${p.monto.toFixed(2)}</td>
-          <td>$${p.descuentoAplicado.toFixed(2)}</td>
-          <td>$${total}</td>
-        </tr>`;
-    }).join("");
-  }
+    cuerpoTabla.innerHTML = filtrados.map(d => `
+      <tr>
+        <td>${d.numeroTransaccion}</td>
+        <td>${d.documento}</td>
+        <td>${d.miembro}</td>
+        <td>${d.plan}</td>
+        <td>$${d.monto.toLocaleString()}</td>
+        <td>${d.descuento ? `$${d.descuento.toLocaleString()}` : "No aplica"}</td>
+        <td>${d.fecha}</td>
+        <td>$${d.total.toLocaleString()}</td>
+        <td>${d.metodo}</td>
+      </tr>
+    `).join("");
+  };
 
-  renderizarTabla(pagos);
+  renderizarTabla();
+  contenedor.querySelector("#boton-filtrar").addEventListener("click", renderizarTabla);
 
-  botonFiltrar.addEventListener("click", () => {
-    const desde = filtroDesde.value ? new Date(filtroDesde.value) : null;
-    const hasta = filtroHasta.value ? new Date(filtroHasta.value + "T23:59:59") : null;
-    const metodo = filtroMetodo.value;
-
-    const filtrados = pagos.filter(p => {
-      const fechaPago = new Date(p.fechaPago);
-      const okFecha = (!desde || fechaPago >= desde) && (!hasta || fechaPago <= hasta);
-      const okMetodo = !metodo || p.metodoPago === metodo;
-      return okFecha && okMetodo;
-    });
-
-    renderizarTabla(filtrados);
+  contenedor.querySelector("#boton-excel").addEventListener("click", async () => {
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet("Pagos");
+    sheet.addRow(["N° Transacción", "N° Documento", "Miembro", "Plan", "Monto", "Descuento aplicado", "Fecha de cobro", "Pago total", "Método de pago"]);
+    datosCombinados.forEach(d => sheet.addRow([d.numeroTransaccion, d.documento, d.miembro, d.plan, d.monto, d.descuento, d.fecha, d.total, d.metodo]));
+    const buf = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "reporte_pagos.xlsx";
+    link.click();
   });
 
-  botonImprimir.addEventListener("click", () => {
-    const metodoFiltro = filtroMetodo.value;
-    const tituloReporte = "Reporte de Ingresos por Membresías";
-    const subtitulo = metodoFiltro ? `Pagos con método: ${metodoFiltro}` : "Reporte general";
-    const fechaImpresion = new Date().toLocaleDateString("es-AR");
-
-    const tablaHTML = contenedor.querySelector("table").outerHTML;
-
-    let total = 0;
-    contenedor.querySelectorAll("tbody tr").forEach(fila => {
-      const celdaTotal = fila.querySelector("td:last-child");
-      if (celdaTotal) {
-        const valor = parseFloat(celdaTotal.textContent.replace(/[^0-9.-]+/g, ""));
-        if (!isNaN(valor)) total += valor;
-      }
-    });
-
-    const printWindow = window.open("", "_blank");
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>${tituloReporte}</title>
-          <style>
-            body { font-family: Arial, sans-serif; padding: 40px; color: #333; }
-            h1, h2 { text-align: center; }
-            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-            th, td { border: 1px solid #999; padding: 8px; text-align: center; }
-            th { background-color: #f2f2f2; }
-            .total { margin-top: 20px; font-weight: bold; text-align: right; }
-          </style>
-        </head>
-        <body>
-          <h1>${tituloReporte}</h1>
-          <h2>${subtitulo}</h2>
-          <p><strong>Fecha de impresión:</strong> ${fechaImpresion}</p>
-          ${tablaHTML}
-          <p class="total">Monto total: $${total.toLocaleString("es-AR")}</p>
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-    printWindow.close();
-  });
-
-  botonExcel.addEventListener("click", () => {
-    const tablaHTML = contenedor.querySelector("table").outerHTML;
-    const blob = new Blob([tablaHTML], { type: "application/vnd.ms-excel" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "reporte_ingresos.xls";
-    a.click();
+  contenedor.querySelector("#boton-imprimir").addEventListener("click", () => {
+    const tablaHtml = contenedor.querySelector("table").outerHTML;
+    const win = window.open("", "_blank");
+    win.document.write(`<html><head><title>Reporte de Pagos</title></head><body><h2>💰 Reporte de ingresos por membresías</h2>${tablaHtml}</body></html>`);
+    win.document.close();
+    win.print();
   });
 }
-
-
 
 /* ===============================
   🏋️ ASISTENCIA AL GIMNASIO
@@ -202,35 +188,30 @@ async function renderizarReporteAsistenciaGimnasio(contenedor) {
 }
 
 /* ===============================
-📅 REPORTE DE ASISTENCIA A CLASES (corregido)
+📅 REPORTE DE ASISTENCIA A CLASES
 ================================= */
 async function renderizarReporteAsistenciaClases(contenedor) {
   contenedor.innerHTML = `
     <div class="${estilos.contenedor}">
       <button id="volver" class="${estilos.botonVolver}">⬅️ Volver</button>
       <h2>📅 Reporte de Asistencia a Clases</h2>
-
       <div class="${estilos.filtros}">
         <label>Clase:</label>
         <select id="filtro-clase" class="${estilos.selectInput}">
           <option value="">Seleccione una clase</option>
         </select>
-
         <label>Miembro:</label>
         <select id="filtro-miembro" class="${estilos.selectInput}">
           <option value="">Todos</option>
         </select>
-
         <label>Desde:</label>
         <input type="date" id="filtro-desde" class="${estilos.inputFecha}">
         <label>Hasta:</label>
         <input type="date" id="filtro-hasta" class="${estilos.inputFecha}">
-
         <button id="boton-filtrar" class="${estilos.botonFiltrar}">🔍 Filtrar</button>
         <button id="boton-imprimir" class="${estilos.botonImprimir}">🖨️ Imprimir</button>
         <button id="boton-excel" class="${estilos.botonImprimir}">📥 Exportar Excel</button>
       </div>
-
       <div class="${estilos.tablaWrapper}">
         <table class="${estilos.tabla}">
           <thead>
@@ -251,7 +232,6 @@ async function renderizarReporteAsistenciaClases(contenedor) {
     </div>
   `;
 
-  // referencias DOM
   const volverBtn = contenedor.querySelector("#volver");
   const selectClase = contenedor.querySelector("#filtro-clase");
   const selectMiembro = contenedor.querySelector("#filtro-miembro");
@@ -264,32 +244,26 @@ async function renderizarReporteAsistenciaClases(contenedor) {
 
   volverBtn.addEventListener("click", () => renderizarVistaReportes(contenedor));
 
-  // traer todos los datos necesarios
   const [clasesFull, miembrosXClase, asistenciasFull, miembrosFull] = await Promise.all([
-    apiObtenerClases(),          // clases con actividad y entrenador si tu api lo devuelve
-    apiObtenerMiembrosXClase(),  // relaciones miembro<->clase (expandidas por api)
-    apiObtenerAsistenciasCompletas(), // asistencias ya enriquecidas
+    apiObtenerClases(),
+    apiObtenerMiembrosXClase(),
+    apiObtenerAsistenciasCompletas(),
     apiObtenerMiembros()
   ]);
 
-  // --- map de clases por id para asegurarnos de tener actividad.nombre y entrenador.nombre
   const mapClases = Object.fromEntries(clasesFull.map(c => [c.id, c]));
-
-  // llenar select miembro con todos los miembros (opcional para filtrar por nombre)
   selectMiembro.innerHTML += miembrosFull.map(m => `<option value="${m.id}">${m.nombre}</option>`).join("");
 
-  // llenar select de clases con actividad + hora (usa actividad si está disponible)
   clasesFull.forEach(c => {
-    const actividadNombre = c.actividad?.nombre ?? (c.actividadId ? `Actividad ${c.actividadId}` : "Sin actividad");
-    const entrenadorNombre = c.entrenador?.nombre ?? (c.entrenadorId ? `Entrenador ${c.entrenadorId}` : "Sin entrenador");
+    const actividadNombre = c.actividad?.nombre ?? `Actividad ${c.actividadId ?? "?"}`;
+    const entrenadorNombre = c.entrenador?.nombre ?? `Entrenador ${c.entrenadorId ?? "?"}`;
     const opcion = document.createElement("option");
     opcion.value = c.id;
     opcion.textContent = `${actividadNombre} - ${entrenadorNombre} (${c.horaInicio || "?"}hs)`;
     selectClase.appendChild(opcion);
   });
 
-  // función util: obtener asistencias (array) para un miembroXClase dado
-  const asistenciasPorMiembroXClase = {}; // cache map
+  const asistenciasPorMiembroXClase = {};
   asistenciasFull.forEach(a => {
     const key = a.miembroXClase?.miembroXClaseId;
     if (!key) return;
@@ -297,42 +271,29 @@ async function renderizarReporteAsistenciaClases(contenedor) {
     asistenciasPorMiembroXClase[key].push(a);
   });
 
-  // helper: elegir la asistencia más reciente (por fecha) de un array
-  const elegirMasReciente = arr => {
-    if (!arr || !arr.length) return null;
-    return arr.slice().sort((A, B) => new Date(B.fecha) - new Date(A.fecha))[0];
-  };
+  const elegirMasReciente = arr => arr?.length ? arr.slice().sort((A,B)=>new Date(B.fecha)-new Date(A.fecha))[0] : null;
 
-  // renderizar tabla aplicando filtros
   function renderTablaFiltrada() {
     const claseSel = selectClase.value;
     const miembroSel = selectMiembro.value;
     const desdeVal = inputDesde.value ? new Date(inputDesde.value) : null;
     const hastaVal = inputHasta.value ? new Date(inputHasta.value + "T23:59:59") : null;
 
-    // tomar sólo miembrosXClase que coincidan con la clase seleccionada (si hay)
     let filas = miembrosXClase.slice();
     if (claseSel) filas = filas.filter(mx => String(mx.claseId ?? mx.clase?.id) === String(claseSel));
     if (miembroSel) filas = filas.filter(mx => String(mx.miembroId ?? mx.miembro?.id) === String(miembroSel));
 
-    // construir filas
     if (!filas.length) {
       cuerpo.innerHTML = `<tr><td colspan="6">No hay registros que coincidan con los filtros.</td></tr>`;
       return;
     }
 
     cuerpo.innerHTML = filas.map(mx => {
-      // asegurarnos de usar datos reales del mapa de clases/miembros si faltan en mx
       const claseObj = mapClases[mx.claseId] ?? mx.clase ?? null;
       const miembroObj = miembrosFull.find(m => m.id === (mx.miembroId ?? mx.miembro?.id)) ?? mx.miembro ?? null;
 
-      // buscar asistencias (posible array). elegir la más reciente.
       const asistArray = asistenciasPorMiembroXClase[mx.id] ?? asistenciasFull.filter(a => {
-        // fallback matching robusto: comparar por miembroXClaseId, o por miembro+clase si hace falta
-        if (a.miembroXClase?.miembroXClaseId && mx.id) {
-          return Number(a.miembroXClase.miembroXClaseId) === Number(mx.id);
-        }
-        // fallback: intentar emparejar por miembro id y clase id
+        if (a.miembroXClase?.miembroXClaseId && mx.id) return Number(a.miembroXClase.miembroXClaseId) === Number(mx.id);
         const aMiembroId = a.miembroXClase?.miembro?.id ?? a.miembroXClase?.miembroId;
         const aClaseId = a.miembroXClase?.clase?.claseId ?? a.miembroXClase?.claseId;
         const mxMiembroId = mx.miembroId ?? mx.miembro?.id;
@@ -341,17 +302,15 @@ async function renderizarReporteAsistenciaClases(contenedor) {
       });
 
       const masReciente = elegirMasReciente(asistArray);
-      // si hay fechas, chequeamos rango de filtros
       if (masReciente) {
         const f = new Date(masReciente.fecha);
-        if (desdeVal && f < desdeVal) return ""; // eliminar fila (vía empty string) — será filtrada fuera
+        if (desdeVal && f < desdeVal) return "";
         if (hastaVal && f > hastaVal) return "";
       }
 
       const fechaStr = masReciente?.fecha ? new Date(masReciente.fecha).toLocaleDateString("es-AR") : "-";
       const asistenciaDesc = masReciente?.tipoDeAsistencia?.descripcion ?? "-";
-
-      const actividadNombre = claseObj?.actividad?.nombre ?? claseObj?.actividad?.nombre ?? (claseObj?.actividadId ? `Actividad ${claseObj.actividadId}` : "Sin actividad");
+      const actividadNombre = claseObj?.actividad?.nombre ?? (claseObj?.actividadId ? `Actividad ${claseObj.actividadId}` : "Sin actividad");
       const entrenadorNombre = claseObj?.entrenador?.nombre ?? (claseObj?.entrenadorId ? `Entrenador ${claseObj.entrenadorId}` : "-");
 
       return `
@@ -366,22 +325,15 @@ async function renderizarReporteAsistenciaClases(contenedor) {
       `;
     }).filter(Boolean).join("");
 
-    // si el map devolvió filas vacías o todas filtradas por fecha -> mostrar mensaje
     if (!cuerpo.innerHTML) {
       cuerpo.innerHTML = `<tr><td colspan="6">No hay asistencias que coincidan con los filtros de fecha.</td></tr>`;
-    } else {
-      // deja el HTML como quedó
-      cuerpo.innerHTML = cuerpo.innerHTML;
     }
   }
 
-  // primer render (sin filtros)
   renderTablaFiltrada();
 
-  // eventos
   botonFiltrar.addEventListener("click", renderTablaFiltrada);
 
-  // Exportar Excel (con lo visible actualmente)
   botonExcel.addEventListener("click", () => {
     const tablaHTML = contenedor.querySelector("table").outerHTML;
     const blob = new Blob([tablaHTML], { type: "application/vnd.ms-excel" });
@@ -391,50 +343,44 @@ async function renderizarReporteAsistenciaClases(contenedor) {
     a.click();
   });
 
-// ✅ Imprimir en la misma pestaña (sin abrir nueva ventana)
-botonImprimir.addEventListener("click", () => {
-  const claseId = selectClase.value;
-  if (!claseId) {
-    alert("⚠️ Seleccioná una clase antes de imprimir.");
-    return;
-  }
+  botonImprimir.addEventListener("click", () => {
+    const claseId = selectClase.value;
+    if (!claseId) {
+      alert("⚠️ Seleccioná una clase antes de imprimir.");
+      return;
+    }
+    const clase = clasesFull.find(c => c.id === Number(claseId));
+    const actividadNombre = clase?.actividad?.nombre || "Clase sin nombre";
+    const fechaImpresion = new Date().toLocaleDateString("es-AR");
+    const horaInicio = clase?.horaInicio || "-";
+    const horaFin = clase?.horaFin || "-";
+    const tablaHTML = contenedor.querySelector("table").outerHTML;
 
-  // Buscar datos de la clase seleccionada
-  const clase = clasesFull.find(c => c.id === Number(claseId));
-  const actividadNombre = clase?.actividad?.nombre || "Clase sin nombre";
-  const fechaImpresion = new Date().toLocaleDateString("es-AR");
-  const horaInicio = clase?.horaInicio || "-";
-  const horaFin = clase?.horaFin || "-";
-
-  // Clonamos la tabla para imprimirla sin perder los estilos del resto del sistema
-  const tablaHTML = contenedor.querySelector("table").outerHTML;
-
-  // Crear ventana temporal para imprimir
-  const printWindow = window.open("", "_blank");
-  printWindow.document.write(`
-    <html>
-      <head>
-        <title>Reporte de Asistencia</title>
-        <style>
-          body { font-family: Arial, sans-serif; padding: 40px; color: #333; }
-          h1, h2 { text-align: center; }
-          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-          th, td { border: 1px solid #999; padding: 8px; text-align: left; }
-          th { background-color: #f2f2f2; }
-        </style>
-      </head>
-      <body>
-        <h1>Reporte de Asistencia a Clases</h1>
-        <h2>${actividadNombre}</h2>
-        <p><strong>Horario:</strong> ${horaInicio} a ${horaFin}</p>
-        <p><strong>Fecha de impresión:</strong> ${fechaImpresion}</p>
-        ${tablaHTML}
-      </body>
-    </html>
-  `);
-  printWindow.document.close();
-  printWindow.focus();
-  printWindow.print();
-  printWindow.close();
-});
+    const printWindow = window.open("", "_blank");
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Reporte de Asistencia</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 40px; color: #333; }
+            h1, h2 { text-align: center; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #999; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+          </style>
+        </head>
+        <body>
+          <h1>Reporte de Asistencia a Clases</h1>
+          <h2>${actividadNombre}</h2>
+          <p><strong>Horario:</strong> ${horaInicio} a ${horaFin}</p>
+          <p><strong>Fecha de impresión:</strong> ${fechaImpresion}</p>
+          ${tablaHTML}
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+  });
 }

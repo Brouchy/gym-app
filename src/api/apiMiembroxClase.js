@@ -2,23 +2,36 @@ const URL_BASE = import.meta.env.VITE_URL_BASE;
 
 export const apiObtenerMiembrosXClase = async () => {
   const ENDPOINT = "miembrosXClase?_expand=miembro&_expand=clase";
+
   try {
-    // 1️⃣ Primero traemos las relaciones base
+    // 1️⃣ Traer las relaciones base (miembro y clase)
     const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`);
     if (!respuesta.ok) throw new Error(`Error HTTP ${respuesta.status}`);
     const miembrosXClase = await respuesta.json();
 
-    // 2️⃣ Traemos todos los entrenadores para resolverlos localmente
+    // 2️⃣ Traer los entrenadores (para expandirlos manualmente)
     const respEntrenadores = await fetch(`${URL_BASE}/entrenadors`);
     const entrenadores = await respEntrenadores.json();
 
-    // 3️⃣ Hacemos el “expand” manual
+    // 3️⃣ Expandir y normalizar datos
     const resultadoFinal = miembrosXClase.map(mx => {
+      // Expandir entrenador de la clase
       if (mx.clase && mx.clase.entrenadorId) {
-        mx.clase.entrenador = entrenadores.find(
-          e => e.id === mx.clase.entrenadorId
-        ) || null;
+        mx.clase.entrenador =
+          entrenadores.find(e => e.id === mx.clase.entrenadorId) || null;
       }
+
+      // 🧩 Normalizar campos del miembro
+      if (mx.miembro) {
+        // Unificar nombre del campo de apellido
+        if (mx.miembro.apellidos && !mx.miembro.apellido) {
+          mx.miembro.apellido = mx.miembro.apellidos;
+        }
+
+        // Crear nombre completo (más legible)
+        mx.miembro.nombreCompleto = `${mx.miembro.nombre ?? ""} ${mx.miembro.apellido ?? ""}`.trim();
+      }
+
       return mx;
     });
 
@@ -37,15 +50,13 @@ export const apiObtenerMiembrosXClasePorId = async (id) => {
     if (!respuesta.ok) throw new Error(`Error HTTP ${respuesta.status}`);
     return await respuesta.json();
   } catch (error) {
-    console.error("❌ Error en apiObtenermiembrosXClasePorId:", error);
+    console.error("❌ Error en apiObtenerMiembrosXClasePorId:", error);
     return null;
   }
 };
 
-
 // ✅ Crear una nueva relación Miembro ↔ Clase
 export const apiCrearMiembroXClase = async (datos) => {
-    console.log(datos);
   const ENDPOINT = "miembrosXClase";
   try {
     const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`, {
@@ -57,11 +68,10 @@ export const apiCrearMiembroXClase = async (datos) => {
     if (!respuesta.ok) throw new Error(`Error HTTP ${respuesta.status}`);
     return await respuesta.json();
   } catch (error) {
-    console.error("❌ Error en apiCrearmiembrosXClase:", error);
+    console.error("❌ Error en apiCrearMiembroXClase:", error);
     return null;
   }
 };
-
 
 // ✅ Actualizar una relación existente
 export const apiActualizarMiembrosXClase = async (id, datos) => {
@@ -76,20 +86,16 @@ export const apiActualizarMiembrosXClase = async (id, datos) => {
     if (!respuesta.ok) throw new Error(`Error HTTP ${respuesta.status}`);
     return await respuesta.json();
   } catch (error) {
-    console.error("❌ Error en apiActualizarmiembrosXClase:", error);
+    console.error("❌ Error en apiActualizarMiembrosXClase:", error);
     return null;
   }
 };
 
+// ✅ Eliminar una relación Miembro ↔ Clase
 export const apiEliminarMiembroXClase = async (id) => {
-  console.log("borrar",id);
   const ENDPOINT = `miembrosXClase/${id}`;
-
   try {
-    const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`, {
-      method: "DELETE"
-    });
-
+    const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`, { method: "DELETE" });
     if (!respuesta.ok) throw new Error(`Error HTTP ${respuesta.status}`);
     return { exito: true };
   } catch (error) {

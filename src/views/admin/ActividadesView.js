@@ -68,8 +68,12 @@ export const renderizarVistaActividades = async (contenedor) => {
           <td>${a.nombre}</td>
           <td>${a.descripcion}</td>
           <td>
-            <button class="${estilos.botonEditar}" data-id="${a.id}">Editar</button>
-            <button class="${estilos.botonEliminar}" data-id="${a.id}">Eliminar</button>
+            <svg class="${estilos.botonEditar} ${estilos.accionIcon}" data-id="${a.id}" title="Editar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/>
+            </svg>
+            <svg class="${estilos.botonEliminar} ${estilos.accionIcon}" data-id="${a.id}" title="Eliminar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+              <path d="M9 3h6v1h5v2H4V4h5V3zm1 4h1v10h-1V7zm4 0h1v10h-1V7zm-7 0h12v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7z"/>
+            </svg>
           </td>
         `;
         cuerpo.appendChild(fila);
@@ -101,18 +105,22 @@ export const renderizarVistaActividades = async (contenedor) => {
   contenedor.querySelector('#boton-agregar').addEventListener('click', () => abrirModal(null, contenedor));
 
   contenedor.addEventListener('click', async e => {
-    if (e.target.classList.contains(estilos.botonEditar)) {
-      const id = parseInt(e.target.dataset.id);
+    const editar = e.target.closest(`.${estilos.botonEditar}`);
+    if (editar) {
+      const id = parseInt(editar.dataset.id);
       const actividad = listaActividades.find(a => a.id === id);
       abrirModal(actividad, contenedor);
+      return;
     }
-    if (e.target.classList.contains(estilos.botonEliminar)) {
-      const id = parseInt(e.target.dataset.id);
+    const eliminar = e.target.closest(`.${estilos.botonEliminar}`);
+    if (eliminar) {
+      const id = parseInt(eliminar.dataset.id);
       if (confirm('¿Eliminar esta actividad?')) {
         await apiEliminarActividad(id);
         listaActividades = await apiObtenerActividades();
         renderizarTabla();
       }
+      return;
     }
   });
 };

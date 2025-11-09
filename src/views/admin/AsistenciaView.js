@@ -8,6 +8,7 @@ import {
   apiActualizarAsistencia,
   apiObtenerTiposDeAsistencia,
 } from "../../api/apiAsistencias.js";
+import { apiObtenerMiembros } from "../../api/membersApi.js"; // Para asistencia al gym
 
 let listaAsistencias = [];
 let listaClases = [];
@@ -16,53 +17,93 @@ let claseSeleccionada = null;
 let paginaActual = 1;
 const FILAS_POR_PAGINA = 6;
 
+let bloqueActual = "clases"; // "clases" | "gym"
+
+// ========================================================
+// 🔹 Render principal
+// ========================================================
 export const renderizarVistaAsistencia = async (contenedor) => {
-  // Limpia contenedor
   contenedor.innerHTML = `
     <div class="${estilos.contenedor}">
-        <div class="${estilos.tituloModulo}">
-            <h2>Registro de Asistencias</h2>
-        </div>
-      <div class="${estilos.cabecera}">
-        <div class="${estilos.filtros}">
-          <label>Seleccionar Clase:</label>
-          <select id="selectClase" class="${estilos.selectInput}">
-            <option value="">-- Seleccioná una clase --</option>
-          </select>
-          <button id="boton-agregar" class="${estilos.botonAgregar}">+ Registrar Asistencia</button>
-        </div>
+      <div class="${estilos.tituloModulo}">
+        <h2>Registro de Asistencias</h2>
       </div>
 
-      <div class="${estilos.tablaWrapper}">
-        <table class="${estilos.tabla}">
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Miembro</th>
-              <th>Actividad</th>
-              <th>Entrenador</th>
-              <th>Tipo</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="cuerpo-asistencias">
-            <tr><td colspan="6">Seleccioná una clase para ver asistencias</td></tr>
-          </tbody>
-        </table>
+      <div class="${estilos.bloquesSelector}">
+        <button id="btn-clases" class="${estilos.botonBloque}">Asistencia a Clases</button>
+        <button id="btn-gym" class="${estilos.botonBloque}">Asistencia al Gimnasio</button>
       </div>
 
-      <div class="${estilos.paginacion}">
-        <button id="boton-prev" class="${estilos.botonPagina}" disabled>Anterior</button>
-        <span id="indicador-pagina">Página 1 de 1</span>
-        <button id="boton-next" class="${estilos.botonPagina}" disabled>Siguiente</button>
-      </div>
+      <div id="bloque-clases"></div>
+      <div id="bloque-gym" style="display:none;"></div>
     </div>
   `;
 
-  // Cargar datos base
+  const btnClases = contenedor.querySelector("#btn-clases");
+  const btnGym = contenedor.querySelector("#btn-gym");
+  const divClases = contenedor.querySelector("#bloque-clases");
+  const divGym = contenedor.querySelector("#bloque-gym");
+
+  // Bloque clases
+  btnClases.addEventListener("click", async () => {
+    bloqueActual = "clases";
+    divClases.style.display = "block";
+    divGym.style.display = "none";
+  });
+  await renderBloqueClases(divClases, contenedor);
+
+  // Bloque gym
+  btnGym.addEventListener("click", async () => {
+    bloqueActual = "gym";
+    divClases.style.display = "none";
+    divGym.style.display = "block";
+    await renderBloqueGym(divGym);
+  });
+};
+
+// ========================================================
+// 🔹 Bloque de asistencia a clases
+// ========================================================
+async function renderBloqueClases(divClases, contenedorPadre) {
+  divClases.innerHTML = `
+    <div class="${estilos.cabecera}">
+      <div class="${estilos.filtros}">
+        <label>Seleccionar Clase:</label>
+        <select id="selectClase" class="${estilos.selectInput}">
+          <option value="">-- Seleccioná una clase --</option>
+        </select>
+        <button id="boton-agregar" class="${estilos.botonAgregar}">+ Registrar Asistencia</button>
+      </div>
+    </div>
+
+    <div class="${estilos.tablaWrapper}">
+      <table class="${estilos.tabla}">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Miembro</th>
+            <th>Actividad</th>
+            <th>Entrenador</th>
+            <th>Tipo</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="cuerpo-asistencias">
+          <tr><td colspan="6">Seleccioná una clase para ver asistencias</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="${estilos.paginacion}">
+      <button id="boton-prev" class="${estilos.botonPagina}" disabled>Anterior</button>
+      <span id="indicador-pagina">Página 1 de 1</span>
+      <button id="boton-next" class="${estilos.botonPagina}" disabled>Siguiente</button>
+    </div>
+  `;
+
   listaClases = await apiObtenerClases();
   listaTiposAsistencia = await apiObtenerTiposDeAsistencia();
-  const selectClase = contenedor.querySelector("#selectClase");
+  const selectClase = divClases.querySelector("#selectClase");
 
   listaClases.forEach((c) => {
     const opt = document.createElement("option");
@@ -71,31 +112,24 @@ export const renderizarVistaAsistencia = async (contenedor) => {
     selectClase.appendChild(opt);
   });
 
-  // Eventos
   selectClase.addEventListener("change", async () => {
     const id = selectClase.value;
     if (!id) {
-      renderTabla([], contenedor);
+      renderTabla([], divClases);
       return;
     }
-
-    claseSeleccionada = listaClases.find(
-      (c) => c.id == id || c.claseId == id
-    );
-    await cargarYMostrarAsistencias(contenedor);
+    claseSeleccionada = listaClases.find((c) => c.id == id || c.claseId == id);
+    await cargarYMostrarAsistencias(divClases);
   });
 
-  contenedor.querySelector("#boton-agregar").addEventListener("click", () => {
-    if (!claseSeleccionada) {
-      alert("⚠️ Primero seleccioná una clase.");
-      return;
-    }
-    abrirModalAsistencia(contenedor);
+  divClases.querySelector("#boton-agregar").addEventListener("click", () => {
+    if (!claseSeleccionada) return alert("⚠️ Primero seleccioná una clase.");
+    abrirModalAsistencia(divClases);
   });
-};
+}
 
 // ========================================================
-// 🔹 Cargar asistencias filtradas por clase seleccionada
+// 🔹 Cargar y mostrar asistencias
 // ========================================================
 const cargarYMostrarAsistencias = async (contenedor) => {
   const todas = await apiObtenerAsistenciasCompletas();
@@ -162,21 +196,19 @@ function renderTabla(lista, contenedor) {
   };
 
   cuerpo.querySelectorAll(`.${estilos.botonEliminar}`).forEach((btn) =>
-    btn.addEventListener("click", async (e) => {
-      const id = e.target.dataset.id;
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.id;
       if (confirm("¿Eliminar asistencia?")) {
         await apiEliminarAsistencia(id);
-        listaAsistencias = listaAsistencias.filter(
-          (a) => a.asistenciaId != id
-        );
+        listaAsistencias = listaAsistencias.filter((a) => a.asistenciaId != id);
         renderTabla(listaAsistencias, contenedor);
       }
     })
   );
 
   cuerpo.querySelectorAll(`.${estilos.botonEditar}`).forEach((btn) =>
-    btn.addEventListener("click", (e) => {
-      const id = e.target.dataset.id;
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.id;
       const asistencia = listaAsistencias.find((a) => a.asistenciaId == id);
       abrirModalAsistencia(contenedor, asistencia);
     })
@@ -184,17 +216,19 @@ function renderTabla(lista, contenedor) {
 }
 
 // ========================================================
-// 🔹 Modal para agregar o editar asistencia
+// 🔹 Modal de asistencia (orden alfabético + DNI)
 // ========================================================
-async function abrirModalAsistencia(contenedor, asistencia = null) {
+async function abrirModalAsistencia(divClases, asistencia = null) {
   const modal = document.createElement("div");
   modal.className = estilos.modalFondo;
 
   const miembrosDeClase = await apiObtenerMiembrosXClase();
   const miembrosFiltrados = miembrosDeClase.filter(
-    (m) =>
-      m.claseId == claseSeleccionada.id ||
-      m.clase?.id == claseSeleccionada.id
+    (m) => m.claseId == claseSeleccionada.id || m.clase?.id == claseSeleccionada.id
+  );
+
+  miembrosFiltrados.sort((a, b) =>
+    (a.miembro?.nombre || "").localeCompare(b.miembro?.nombre || "", "es", { sensitivity: "base" })
   );
 
   modal.innerHTML = `
@@ -205,14 +239,14 @@ async function abrirModalAsistencia(contenedor, asistencia = null) {
         <select id="miembroXClaseId" required>
           <option value="">-- Seleccioná un miembro --</option>
           ${miembrosFiltrados
-            .map(
-              (m) =>
-                `<option value="${m.id}" ${
-                  asistencia?.miembroXClase?.miembroXClaseId == m.id
-                    ? "selected"
-                    : ""
-                }>${m.miembro?.nombre || "Miembro sin nombre"}</option>`
-            )
+            .map((m) => {
+              const nombre = m.miembro?.nombre || "Sin nombre";
+              const apellido = m.miembro?.apellido ? ` ${m.miembro.apellido}` : "";
+              const dni = m.miembro?.dni ? ` (${m.miembro.dni})` : "";
+              return `<option value="${m.id}" ${
+                asistencia?.miembroXClase?.miembroXClaseId == m.id ? "selected" : ""
+              }>${nombre}${apellido}${dni}</option>`;
+            })
             .join("")}
         </select>
 
@@ -230,11 +264,16 @@ async function abrirModalAsistencia(contenedor, asistencia = null) {
         </select>
 
         <label>Fecha:</label>
-        <input type="date" id="fecha" value="${
-          asistencia
-            ? new Date(asistencia.fecha).toISOString().split("T")[0]
-            : new Date().toISOString().split("T")[0]
-        }" required>
+        <input
+          type="date"
+          id="fecha"
+          value="${
+            asistencia
+              ? new Date(asistencia.fecha).toISOString().split("T")[0]
+              : new Date().toISOString().split("T")[0]
+          }"
+          required
+        >
 
         <div class="${estilos.modalAcciones}">
           <button type="button" id="cancelar">Cancelar</button>
@@ -246,36 +285,151 @@ async function abrirModalAsistencia(contenedor, asistencia = null) {
 
   document.body.appendChild(modal);
 
-  const form = modal.querySelector("#form-asistencia");
-  const btnCancelar = modal.querySelector("#cancelar");
+  modal.querySelector("#cancelar").addEventListener("click", () => modal.remove());
 
-  btnCancelar.addEventListener("click", () => modal.remove());
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) modal.remove();
+  modal.querySelector("#form-asistencia").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const nueva = {
+      miembroXClaseId: parseInt(modal.querySelector("#miembroXClaseId").value),
+      tipoDeAsistenciaId: parseInt(modal.querySelector("#tipoDeAsistenciaId").value),
+      fecha: modal.querySelector("#fecha").value,
+    };
+    if (asistencia) await apiActualizarAsistencia(asistencia.asistenciaId, nueva);
+    else await apiCrearAsistencia(nueva);
+    modal.remove();
+    await cargarYMostrarAsistencias(divClases);
+  });
+}
+
+// ========================================================
+// 🔹 Bloque de asistencia al gimnasio
+// ========================================================
+async function renderBloqueGym(divGym) {
+  const miembros = await apiObtenerMiembros();
+
+  divGym.innerHTML = `
+    <div class="${estilos.cabecera}" style="flex-wrap:wrap; gap:20px; align-items:flex-start;">
+      <div style="flex:1; position:relative;">
+        <label>Buscar miembro por nombre o DNI:</label>
+        <input type="text" id="inputBuscarMiembro" class="${estilos.inputBuscar}" placeholder="Escribí nombre o DNI..." autocomplete="off"/>
+        <div id="sugerenciasMiembro" class="${estilos.sugerencias}"></div>
+        <button id="boton-registrar-gym" class="${estilos.botonAgregar}" disabled>Registrar Asistencia</button>
+      </div>
+      <div id="cardMiembroSeleccionado" class="${estilos.cardMiembro}" style="flex:1; display:none; color:#000;"></div>
+    </div>
+
+    <div class="${estilos.tablaWrapper}">
+      <table class="${estilos.tabla}">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Miembro</th>
+            <th>Membresía</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="cuerpo-asistencias-gym">
+          <tr><td colspan="4">No hay asistencias registradas.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  const inputBuscar = divGym.querySelector("#inputBuscarMiembro");
+  const divSugerencias = divGym.querySelector("#sugerenciasMiembro");
+  const btnRegistrar = divGym.querySelector("#boton-registrar-gym");
+  const cardMiembro = divGym.querySelector("#cardMiembroSeleccionado");
+  const cuerpoTabla = divGym.querySelector("#cuerpo-asistencias-gym");
+
+  let miembroSeleccionado = null;
+  let listaAsistenciasGym = await apiObtenerAsistenciasCompletas();
+  listaAsistenciasGym = listaAsistenciasGym.filter((a) => !a.miembroXClase);
+
+  const mostrarTabla = () => {
+    if (listaAsistenciasGym.length === 0) {
+      cuerpoTabla.innerHTML = `<tr><td colspan="4">No hay asistencias registradas.</td></tr>`;
+      return;
+    }
+    cuerpoTabla.innerHTML = listaAsistenciasGym
+      .map(
+        (a) => `
+      <tr>
+        <td>${new Date(a.fecha).toLocaleString()}</td>
+        <td>${a.miembro?.nombre || "-"}</td>
+        <td>${a.membresiaXMiembro?.membresia?.nombrePlan || "-"}</td>
+        <td>
+          <button class="${estilos.botonEliminar}" data-id="${a.asistenciaId}">Eliminar</button>
+        </td>
+      </tr>
+    `
+      )
+      .join("");
+
+    cuerpoTabla.querySelectorAll(`.${estilos.botonEliminar}`).forEach((btn) =>
+      btn.addEventListener("click", async () => {
+        const id = parseInt(btn.dataset.id);
+        const ok = await apiEliminarAsistencia(id);
+        if (ok) {
+          listaAsistenciasGym = listaAsistenciasGym.filter((a) => a.asistenciaId !== id);
+          mostrarTabla();
+        }
+      })
+    );
+  };
+  mostrarTabla();
+
+  inputBuscar.addEventListener("input", () => {
+    const texto = inputBuscar.value.toLowerCase().trim();
+    divSugerencias.innerHTML = "";
+    miembroSeleccionado = null;
+    btnRegistrar.disabled = true;
+    cardMiembro.style.display = "none";
+
+    if (!texto) return;
+
+    const coincidencias = miembros.filter(
+      (m) => m.nombre.toLowerCase().includes(texto) || String(m.dni).includes(texto)
+    );
+
+    coincidencias.forEach((m) => {
+      const div = document.createElement("div");
+      div.classList.add(estilos.sugerenciaItem);
+      div.innerHTML = `<b>${m.nombre}</b> (${m.dni})`;
+
+      div.addEventListener("click", () => {
+        miembroSeleccionado = m;
+        inputBuscar.value = `${m.nombre} (${m.dni})`;
+        divSugerencias.innerHTML = "";
+        btnRegistrar.disabled = false;
+
+        cardMiembro.innerHTML = `
+          <div><strong>Nombre:</strong> ${m.nombre}</div>
+          <div><strong>DNI:</strong> ${m.dni}</div>
+          <div><strong>Email:</strong> ${m.email || "-"}</div>
+          <div><strong>Teléfono:</strong> ${m.telefono || "-"}</div>
+        `;
+        cardMiembro.style.display = "block";
+      });
+
+      divSugerencias.appendChild(div);
+    });
   });
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  document.addEventListener("click", (e) => {
+    if (!divGym.contains(e.target)) divSugerencias.innerHTML = "";
+  });
 
-    const miembroXClaseId = parseInt(e.target.miembroXClaseId.value);
-    const tipoDeAsistenciaId = parseInt(e.target.tipoDeAsistenciaId.value);
-    const fecha = new Date(e.target.fecha.value).toISOString();
-
-    const datos = {
-      miembroXClaseId,
-      tipoDeAsistenciaId,
-      fecha,
-      membresiaXMiembroId: 1001 // 🔧 Valor temporal para test (se puede ajustar luego)
+  btnRegistrar.addEventListener("click", async () => {
+    if (!miembroSeleccionado) return alert("⚠️ Seleccioná un miembro de la lista.");
+    const asistencia = {
+      miembroId: miembroSeleccionado.id,
+      fecha: new Date().toISOString(),
     };
-
-    if (asistencia) {
-      await apiActualizarAsistencia(asistencia.asistenciaId, datos);
-    } else {
-      await apiCrearAsistencia(datos);
-    }
-
-    alert("✅ Asistencia guardada correctamente");
-    modal.remove();
-    await cargarYMostrarAsistencias(contenedor);
+    const nueva = await apiCrearAsistencia(asistencia);
+    listaAsistenciasGym.push(nueva);
+    mostrarTabla();
+    inputBuscar.value = "";
+    cardMiembro.style.display = "none";
+    btnRegistrar.disabled = true;
   });
 }

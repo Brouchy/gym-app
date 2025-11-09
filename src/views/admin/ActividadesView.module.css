@@ -108,6 +108,23 @@
   background-color: #ff4d4d;
 }
 
+.accionIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.accionIcon:hover {
+  transform: scale(1.2);
+  fill: #D84315;
+}
+
 /* Modal */
 .modalFondo {
   position: fixed;
@@ -412,12 +429,10 @@
     .botonEliminar {
         width: 100%;
         font-size: 0.8rem;
-    }
-
-    .paginacion {
-        flex-wrap: wrap;
         gap: 8px;
     }
+
+    
 
     .modalContenido {
         width: 90%;
