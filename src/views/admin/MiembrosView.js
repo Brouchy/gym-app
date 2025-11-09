@@ -316,6 +316,7 @@ let modoFormulario = 'crear';
 let guardandoMiembro = false;
 let seccionActual = 1; // Control de sección actual del formulario
 let eliminandoMiembro = false; // Evita eliminaciones dobles
+let permiteEliminarMiembros = true;
 
 // --- Contenedor Principal ---
 let contenedorVista; // El 'div' donde se renderiza este módulo
@@ -323,8 +324,9 @@ let contenedorVista; // El 'div' donde se renderiza este módulo
 /**
  * Función principal que renderiza la vista
  */
-export const renderizarVistaMiembros = async (contenedor) => {
+export const renderizarVistaMiembros = async (contenedor, opciones = {}) => {
     contenedorVista = contenedor; // Guardamos el contenedor principal
+    permiteEliminarMiembros = opciones.permitirEliminar !== undefined ? opciones.permitirEliminar : true;
     
     // 1. Renderizamos el "esqueleto" (controles, tabla vacía, modales ocultos)
     renderizarEsqueleto();
@@ -449,6 +451,29 @@ const mostrarContenido = () => {
                 else textoMembresia = planName || typeName || 'N/A';
             }
             
+            const acciones = [
+                `
+                    <svg class="${estilos.botonEditar} ${estilos.accionIcon}" data-id="${miembro.id}" title="Editar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/>
+                    </svg>
+                `
+            ];
+            if (permiteEliminarMiembros) {
+                acciones.push(`
+                    <svg class="${estilos.botonEliminar} ${estilos.accionIcon}" data-id="${miembro.id}" title="Eliminar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+                        <path d="M9 3h6v1h5v2H4V4h5V3zm1 4h1v10h-1V7zm4 0h1v10h-1V7zm-7 0h12v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7z"/>
+                    </svg>
+                `);
+            }
+            acciones.push(`
+                <svg class="${estilos.botonImprimir} ${estilos.accionIcon}" data-id="${miembro.id}" title="Imprimir" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+                    <path d="M6 9V4h12v5h2a2 2 0 0 1 2 2v6h-4v4H8v-4H4v-6a2 2 0 0 1 2-2h2zm2-3v3h8V6H8zm0 10v2h8v-2H8z"/>
+                </svg>
+                <svg class="boton-contacto ${estilos.accionIcon}" data-id="${miembro.id}" title="Contacto" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+                    <path d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5zm0 2c-4.418 0-8 2.239-8 5v3h16v-3c0-2.761-3.582-5-8-5z"/>
+                </svg>
+            `);
+
             fila.innerHTML = `
                 <td>${miembro.id}</td>
                 <td>${miembro.nombre}</td>
@@ -459,20 +484,7 @@ const mostrarContenido = () => {
                 <td><img src="${fotoUrl}" alt="${miembro.nombre}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"></td>
                 <td>${textoMembresia}</td>
                 <td>${puntoHtml}${activaPorFecha ? 'Activa' : 'Vencida'}</td>
-                <td class="${estilos.acciones}">
-                    <svg class="${estilos.botonEditar} ${estilos.accionIcon}" data-id="${miembro.id}" title="Editar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
-                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/>
-                    </svg>
-                    <svg class="${estilos.botonEliminar} ${estilos.accionIcon}" data-id="${miembro.id}" title="Eliminar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
-                        <path d="M9 3h6v1h5v2H4V4h5V3zm1 4h1v10h-1V7zm4 0h1v10h-1V7zm-7 0h12v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7z"/>
-                    </svg>
-                    <svg class="${estilos.botonImprimir} ${estilos.accionIcon}" data-id="${miembro.id}" title="Imprimir" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
-                        <path d="M6 9V4h12v5h2a2 2 0 0 1 2 2v6h-4v4H8v-4H4v-6a2 2 0 0 1 2-2h2zm2-3v3h8V6H8zm0 10v2h8v-2H8z"/>
-                    </svg>
-                    <svg class="boton-contacto ${estilos.accionIcon}" data-id="${miembro.id}" title="Contacto" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
-                        <path d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5zm0 2c-4.418 0-8 2.239-8 5v3h16v-3c0-2.761-3.582-5-8-5z"/>
-                    </svg>
-                </td>
+                <td class="${estilos.acciones}">${acciones.join('')}</td>
             `;
             cuerpoTabla.appendChild(fila);
         });
@@ -700,6 +712,7 @@ const adjuntarEventListeners = () => {
         }
         const eliminarBtn = e.target.closest(`.${estilos.botonEliminar}`);
         if (eliminarBtn) {
+            if (!permiteEliminarMiembros) return;
             abrirModalEliminar(eliminarBtn.dataset.id);
             return;
         }

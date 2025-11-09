@@ -2,7 +2,7 @@
 import { obtenerSesionUsuario } from "./auth";
 import { renderizarBarraNavegacion } from "../components/Navbar/Navbar";
 import { renderizarVistaLogin } from "../views/login/LoginView";
-import { renderizarPanelEntrenador } from "../views/trainer/TrainerDashboard";
+import { renderizarPanelRecepcion } from "../views/recepcion/RecepcionDashboard";
 import { renderizarPanelAdmin } from "../views/admin/AdminDashboard";
 
 //TODO:adminddashboard 
@@ -22,8 +22,8 @@ export const navegar=(contenedor)=>{
         renderizarVistaLogin(contenedor);
     } else if(usuario.role==='admin'){
         renderizarPanelAdmin(contenedor);
-    } else if(usuario.role==='trainer'){
-        renderizarPanelEntrenador(contenedor,usuario);
+    } else if(usuario.role==='recepcion' || usuario.role==='trainer'){
+        renderizarPanelRecepcion(contenedor,usuario);
     }
 
     }
