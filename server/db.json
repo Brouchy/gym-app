@@ -41,6 +41,34 @@
       "entrenadorId": 2,
       "eliminado": false,
       "id": 3
+    },
+    {
+      "nombre": "Ana",
+      "apellidos": "Gómez",
+      "email": "ana.gomez@example.com",
+      "dni": "33555111",
+      "telefono": "1133344455",
+      "direccion": "Calle 12 #345",
+      "fechaNacimiento": "1992-05-14",
+      "foto": "https://i.ibb.co/7z1Tq1H/avatar.png",
+      "tipoDeMiembroId": 1,
+      "entrenadorId": 0,
+      "eliminado": false,
+      "id": 4
+    },
+    {
+      "nombre": "Omar",
+      "apellidos": "Castro",
+      "email": "castro15@gmail.com",
+      "dni": "45789963",
+      "telefono": "1145856532",
+      "direccion": "calle bs as",
+      "fechaNacimiento": "1998-02-05",
+      "foto": "https://i.ibb.co/MkVz78mR/imagen-2025-11-08-231753020-png.png",
+      "tipoDeMiembroId": 3,
+      "entrenadorId": 0,
+      "eliminado": false,
+      "id": 5
     }
   ],
   "entrenadors": [
@@ -181,10 +209,35 @@
       "fechaInicio": "2025-11-09T00:00:00.000Z",
       "fechaFin": "2026-11-09T00:00:00.000Z",
       "id": 3
+    },
+    {
+      "miembroId": 4,
+      "membresiaId": 103,
+      "estadoMembresiaId": 2,
+      "pagoId": 17,
+      "fechaInicio": "2025-07-01T00:00:00.000Z",
+      "fechaFin": "2025-09-29T00:00:00.000Z",
+      "id": 4
+    },
+    {
+      "miembroId": 5,
+      "membresiaId": 104,
+      "estadoMembresiaId": 1,
+      "pagoId": 18,
+      "fechaInicio": "2025-11-09T00:00:00.000Z",
+      "fechaFin": "2025-11-10T00:00:00.000Z",
+      "id": 5
+    },
+    {
+      "miembroId": 4,
+      "membresiaId": 104,
+      "pagoId": 19,
+      "fechaInicio": "2025-11-09T02:43:38.426Z",
+      "fechaFin": "2025-11-10T02:43:38.426Z",
+      "id": 6
     }
   ],
   "pagos": [
-    
     {
       "monto": 33250,
       "fechaPago": "2025-11-08T23:44:38.806Z",
@@ -205,6 +258,27 @@
       "metodoPago": "Efectivo",
       "descuentoAplicado": 0,
       "id": 16
+    },
+    {
+      "monto": 90000,
+      "fechaPago": "2025-07-01T10:00:00.000Z",
+      "metodoPago": "Tarjeta",
+      "descuentoAplicado": 0,
+      "id": 17
+    },
+    {
+      "monto": 7600,
+      "fechaPago": "2025-11-09T02:19:25.433Z",
+      "metodoPago": "QR",
+      "descuentoAplicado": 400,
+      "id": 18
+    },
+    {
+      "monto": 8000,
+      "fechaPago": "2025-11-09T02:43:38.392Z",
+      "metodoPago": "QR",
+      "descuentoAplicado": 0,
+      "id": 19
     }
   ],
   "estadoMembresias": [

@@ -8,6 +8,13 @@
   margin-bottom: 1rem;
 }
 
+.grupoBotones {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .buscador {
     padding: 0.65rem 1rem;
     border: 1px solid #E2E8F0;

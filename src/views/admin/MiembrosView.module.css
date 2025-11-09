@@ -68,6 +68,15 @@
     gap: 1rem;
 }
 
+.accionesHeader {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
 .buscador {
     padding: 0.65rem 1rem;
     border: 1px solid #E2E8F0;

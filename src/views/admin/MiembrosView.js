@@ -343,7 +343,9 @@ export const renderizarVistaMiembros = async (contenedor) => {
         listaEntrenadores = entrenadores;
         listaTiposMiembro = tipos;
         listaMembresias = membresias;
-        listaMembresiasXMiembros = Array.isArray(mxm) ? mxm : [];
+        if (Array.isArray(mxm)) {
+            listaMembresiasXMiembros = mxm;
+        }
         // Cargar los selects del formulario si ya existe
         cargarSelectsFormulario();
     });
@@ -354,18 +356,38 @@ export const renderizarVistaMiembros = async (contenedor) => {
     // console.log('Membresias por Miembros:', membresiasXMiembros);
 }
 
+// Actualizar cuando otras vistas cambian las asignaciones
+try {
+    window.removeEventListener('mxm:changed', cargarYMostrarMiembros);
+    window.addEventListener('mxm:changed', cargarYMostrarMiembros);
+} catch (_) {}
+
 /**
  * Carga los miembros desde la API y actualiza la vista
  */
 const cargarYMostrarMiembros = async () => {
     // Mostramos un 'cargando' en la tabla
     const cuerpoTabla = contenedorVista.querySelector('#miembros-cuerpo-tabla');
-    if (cuerpoTabla) cuerpoTabla.innerHTML = '<tr><td colspan="10">Cargando...</td></tr>';
+    if (cuerpoTabla) cuerpoTabla.innerHTML = '<tr><td colspan="9">Cargando...</td></tr>';
 
     listaMiembros = await apiObtenerMiembros();
+    // Asegurar que la lista de planes esté disponible antes de renderizar
+    if (!Array.isArray(listaMembresias) || listaMembresias.length === 0) {
+        try {
+            const mems = await apiObtenerMembresias();
+            if (Array.isArray(mems)) listaMembresias = mems;
+        } catch (e) {
+            console.warn('No se pudieron cargar las membresías para la tabla de miembros.');
+        }
+    }
     // Siempre refrescamos las membresías por miembro para tener datos actualizados
     const mxm = await apiObtenerMembresiasXMiembros();
-    listaMembresiasXMiembros = Array.isArray(mxm) ? mxm : [];
+    // Solo reemplazar el cache si la respuesta es un arreglo válido.
+    if (Array.isArray(mxm)) {
+        listaMembresiasXMiembros = mxm;
+    } else {
+        console.warn('apiObtenerMembresiasXMiembros no devolvió un arreglo; se conserva el cache existente.');
+    }
     mostrarContenido();
     if (contenedorVista) {
         const filtroActual = contenedorVista.querySelector('#filtro-premium')?.value || '';
@@ -403,7 +425,7 @@ const mostrarContenido = () => {
 
     // 3. Renderizar Tabla
     cuerpoTabla.innerHTML = ''; // Limpiar
-    const TOTAL_COLUMNAS = 10;
+    const TOTAL_COLUMNAS = 9;
 
     if (miembrosPaginados.length === 0) {
         cuerpoTabla.innerHTML = `<tr><td colspan="${TOTAL_COLUMNAS}">No se encontraron miembros.</td></tr>`;
@@ -455,7 +477,6 @@ const mostrarContenido = () => {
                 <td>${miembro.apellidos || ''}</td>
                 <td>${miembro.dni || 'N/A'}</td>
                 <td>${fechaNac}</td>
-                <td>${miembro.email}</td>
                 <td><img src="${fotoUrl}" alt="${miembro.nombre}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"></td>
                 <td>${textoMembresia}</td>
                 <td>${puntoHtml}${activaPorFecha ? 'Activa' : 'Vencida'}</td>
@@ -721,11 +742,14 @@ const adjuntarEventListeners = () => {
             abrirModalAgregar();
             return;
         }
-        if (
-            e.target.matches(`.${estilos.modalCerrar}`) ||
-            e.target.matches(`.${estilos.modalFondo}`) ||
-            e.target.matches('.modal-cerrar')
-        ) {
+        if (e.target.matches(`.${estilos.modalCerrar}`) || e.target.matches(`.${estilos.modalFondo}`)) {
+            cerrarModales();
+        }
+        if (e.target.matches('#cancelar')) {
+            cerrarModales();
+            return;
+        }
+        if (e.target.matches('.modal-cerrar')) {
             const modalAsignar = e.target.closest('#modal-asignar-entrenador');
             if (modalAsignar) {
                 modalAsignar.classList.remove(estilos.activo);
@@ -1422,15 +1446,13 @@ const renderizarEsqueleto = () => {
             <h2>Módulo de Gestión de Miembros</h2>
         </div>
         <div class="${estilos.tituloModulo}">
-            <div class="${estilos.tabs}">
-                <button id="tab-gestion" class="${estilos.tab} ${estilos.activa}">Asignar entrenador personal</button>
-            </div>
             <div id="zona-dinamica">
                 <div class="${estilos.cabecera}">
                     <input type="search" id="buscador" class="${estilos.buscador}" placeholder="Buscar por DNI, nombre...">
-                    <button id="boton-agregar-miembro" class="${estilos.botonAgregar}">
-                        + Agregar Miembro
-                    </button>
+                </div>
+                <div class="${estilos.accionesHeader}">
+                    <button id="tab-gestion" class="${estilos.botonAgregar}">Asignar entrenador personal</button>
+                    <button id="boton-agregar-miembro" class="${estilos.botonAgregar}">+ Agregar Miembro</button>
                 </div>
 
                 <div class="${estilos.tablaWrapper}">
@@ -1442,7 +1464,7 @@ const renderizarEsqueleto = () => {
                                 <th>Apellidos</th>
                                 <th>DNI</th>
                                 <th>F. Nac.</th>
-                                <th>Email</th>
+                               
                                 <th>Foto</th>
                                 <th>Membresía</th>
                                 <th>Estado</th>
