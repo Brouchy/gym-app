@@ -367,6 +367,10 @@ const cargarYMostrarMiembros = async () => {
     const mxm = await apiObtenerMembresiasXMiembros();
     listaMembresiasXMiembros = Array.isArray(mxm) ? mxm : [];
     mostrarContenido();
+    if (contenedorVista) {
+        const filtroActual = contenedorVista.querySelector('#filtro-premium')?.value || '';
+        renderizarListaPremiumModal(filtroActual);
+    }
 }
 
 /**
@@ -480,6 +484,192 @@ const mostrarContenido = () => {
     botonNext.disabled = (paginaActual === totalPaginas || totalPaginas === 0);
 }
 
+const membresiaEstaActiva = (registro) => {
+    if (!registro) return false;
+    const estado = (registro.estadoMembresia?.descripcion || '').toLowerCase();
+    if (estado === 'activa') return true;
+    const inicio = registro.fechaInicio ? new Date(registro.fechaInicio).getTime() : null;
+    const fin = registro.fechaFin ? new Date(registro.fechaFin).getTime() : null;
+    if (inicio == null || fin == null) return false;
+    const ahora = Date.now();
+    const finInclusivo = fin + (24 * 60 * 60 * 1000 - 1);
+    return ahora >= inicio && ahora <= finInclusivo;
+};
+
+const registroEsPremium = (registro) => {
+    const descripcion = (registro?.membresia?.tipoDeMembresia?.descripcion || '').toLowerCase();
+    const plan = (registro?.membresia?.nombrePlan || '').toLowerCase();
+    return descripcion.includes('premium') || plan.includes('premium');
+};
+
+const obtenerMiembrosPremiumActivos = () => {
+    if (!Array.isArray(listaMembresiasXMiembros) || listaMembresiasXMiembros.length === 0) return [];
+    const premiumPorMiembro = new Map();
+    listaMembresiasXMiembros.forEach(registro => {
+        if (!registro?.miembro) return;
+        if (!registroEsPremium(registro)) return;
+        if (!membresiaEstaActiva(registro)) return;
+        const anterior = premiumPorMiembro.get(registro.miembroId);
+        const fechaAnterior = anterior?.fechaFin ? new Date(anterior.fechaFin).getTime() : 0;
+        const fechaActual = registro.fechaFin ? new Date(registro.fechaFin).getTime() : 0;
+        if (!anterior || fechaActual >= fechaAnterior) {
+            premiumPorMiembro.set(registro.miembroId, registro);
+        }
+    });
+    return Array.from(premiumPorMiembro.values());
+};
+
+const renderizarListaPremiumModal = (terminoBusqueda = '') => {
+    if (!contenedorVista) return;
+    const cuerpo = contenedorVista.querySelector('#lista-premium-cuerpo');
+    const resumen = contenedorVista.querySelector('#premium-resumen');
+    const alertaEntrenadores = contenedorVista.querySelector('#alerta-entrenadores');
+    if (!cuerpo) return;
+
+    const registros = obtenerMiembrosPremiumActivos();
+    const termino = terminoBusqueda.trim().toLowerCase();
+    const filtrados = termino
+        ? registros.filter(registro => {
+            const miembro = registro.miembro || {};
+            const texto = `${miembro.nombre || ''} ${miembro.apellidos || ''} ${miembro.dni || ''}`.toLowerCase();
+            return texto.includes(termino);
+        })
+        : registros;
+
+    const entrenadoresActivos = (listaEntrenadores || []).filter(ent => ent.activo);
+    if (alertaEntrenadores) {
+        alertaEntrenadores.textContent = entrenadoresActivos.length
+            ? `Entrenadores activos disponibles: ${entrenadoresActivos.length}`
+            : 'No hay entrenadores activos cargados. Agrega o activa alguno para asignarlos.';
+    }
+
+    if (resumen) {
+        if (!registros.length) resumen.textContent = 'No hay miembros premium con membresías activas.';
+        else resumen.textContent = `${filtrados.length} de ${registros.length} miembros listados.`;
+    }
+
+    if (!filtrados.length) {
+        cuerpo.innerHTML = `<tr><td colspan="5">No se encontraron miembros que coincidan.</td></tr>`;
+        return;
+    }
+
+    const optionsHTML = (miembro) => {
+        const actualId = miembro.entrenadorId || miembro.entrenador?.id || '';
+        const placeholder = '<option value="">Elegir entrenador</option>';
+        if (!entrenadoresActivos.length) return '<option value="">Sin entrenadores activos</option>';
+        const options = entrenadoresActivos.map(ent => {
+            const selected = Number(actualId) === Number(ent.id) ? 'selected' : '';
+            return `<option value="${ent.id}" ${selected}>${ent.nombre}</option>`;
+        }).join('');
+        return `${placeholder}${options}`;
+    };
+
+    cuerpo.innerHTML = filtrados.map(registro => {
+        const miembro = registro.miembro || {};
+        const miembroGlobal = listaMiembros.find(m => Number(m.id) === Number(registro.miembroId)) || miembro;
+        const plan = registro.membresia?.nombrePlan || 'Sin plan';
+        const tipo = registro.membresia?.tipoDeMembresia?.descripcion || 'Premium';
+        const vence = registro.fechaFin ? new Date(registro.fechaFin).toLocaleDateString() : 'Sin fecha';
+        const entrenadorActual = miembroGlobal?.entrenador?.nombre || 'Sin asignar';
+        const miembroId = miembro.id || registro.miembroId;
+        return `
+            <tr>
+                <td>
+                    <div class="${estilos.premiumInfo}">
+                        <span class="${estilos.premiumNombre}">${miembro.nombre || 'Sin nombre'} ${miembro.apellidos || ''}</span>
+                        <span class="${estilos.premiumDni}">DNI: ${miembro.dni || 'N/A'}</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="${estilos.premiumPlan}">
+                        <strong>${plan}</strong>
+                        <small>${tipo}</small>
+                    </div>
+                </td>
+                <td>
+                    <div class="${estilos.premiumEstado}">
+                        <span class="${estilos.estadoBadge}">Activa</span>
+                        <small>Hasta ${vence}</small>
+                    </div>
+                </td>
+                <td>${entrenadorActual}</td>
+                <td>
+                    <div class="${estilos.asignarAccion}">
+                        <select class="${estilos.selectAsignar}" data-select-miembro="${miembroId}" ${entrenadoresActivos.length ? '' : 'disabled'}>
+                            ${optionsHTML(miembroGlobal)}
+                        </select>
+                        <button type="button" class="${estilos.botonAsignarEntrenador}" data-accion="asignar-entrenador" data-miembro-id="${miembroId}" ${entrenadoresActivos.length ? '' : 'disabled'}>
+                            Asignar
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+};
+
+const abrirModalAsignarEntrenador = async () => {
+    if (!contenedorVista) return;
+    if (!Array.isArray(listaEntrenadores) || listaEntrenadores.length === 0) {
+        try {
+            listaEntrenadores = await apiObtenerEntrenadores();
+        } catch (err) {
+            console.error('Error al cargar entrenadores:', err);
+        }
+    }
+    if (!Array.isArray(listaMembresiasXMiembros) || listaMembresiasXMiembros.length === 0) {
+        try {
+            const mxm = await apiObtenerMembresiasXMiembros();
+            listaMembresiasXMiembros = Array.isArray(mxm) ? mxm : [];
+        } catch (err) {
+            console.error('Error al cargar membresiaXMiembros:', err);
+        }
+    }
+    const filtroActual = contenedorVista.querySelector('#filtro-premium')?.value || '';
+    renderizarListaPremiumModal(filtroActual);
+    const modal = contenedorVista.querySelector('#modal-asignar-entrenador');
+    if (modal) modal.classList.add(estilos.activo);
+};
+
+const manejarAsignacionEntrenador = async (miembroId) => {
+    if (!miembroId) return;
+    const select = contenedorVista.querySelector(`select[data-select-miembro="${miembroId}"]`);
+    if (!select) return;
+    const entrenadorId = Number(select.value);
+    if (!entrenadorId) {
+        alert('Selecciona un entrenador activo para continuar.');
+        return;
+    }
+    const miembro = listaMiembros.find(m => Number(m.id) === Number(miembroId));
+    if (!miembro) {
+        alert('No se pudo encontrar al miembro seleccionado.');
+        return;
+    }
+    const payload = {
+        nombre: miembro.nombre,
+        apellidos: miembro.apellidos || '',
+        email: miembro.email || '',
+        dni: miembro.dni || '',
+        telefono: miembro.telefono || '',
+        direccion: miembro.direccion || '',
+        fechaNacimiento: miembro.fechaNacimiento || '',
+        foto: miembro.foto || '',
+        tipoDeMiembroId: miembro.tipoDeMiembroId || miembro.tipoDeMiembro?.id || 0,
+        entrenadorId,
+        eliminado: miembro.eliminado ?? false
+    };
+    try {
+        await apiActualizarMiembro(miembro.id, payload);
+        await cargarYMostrarMiembros();
+        const filtroActual = contenedorVista.querySelector('#filtro-premium')?.value || '';
+        renderizarListaPremiumModal(filtroActual);
+        alert('Entrenador asignado correctamente.');
+    } catch (err) {
+        console.error('Error asignando entrenador:', err);
+        alert('No se pudo asignar el entrenador. Intenta nuevamente.');
+    }
+};
+
 /**
  * Conecta todos los listeners de la vista (solo se llama una vez)
  */
@@ -494,6 +684,11 @@ const adjuntarEventListeners = () => {
                 await manejarConfirmarEliminar(id);
             }
             eliminandoMiembro = false;
+            return;
+        }
+
+        if (e.target.matches('#tab-gestion')) {
+            await abrirModalAsignarEntrenador();
             return;
         }
 
@@ -526,14 +721,33 @@ const adjuntarEventListeners = () => {
             abrirModalAgregar();
             return;
         }
-        if (e.target.matches(`.${estilos.modalCerrar}`) || e.target.matches(`.${estilos.modalFondo}`)) {
+        if (
+            e.target.matches(`.${estilos.modalCerrar}`) ||
+            e.target.matches(`.${estilos.modalFondo}`) ||
+            e.target.matches('.modal-cerrar')
+        ) {
+            const modalAsignar = e.target.closest('#modal-asignar-entrenador');
+            if (modalAsignar) {
+                modalAsignar.classList.remove(estilos.activo);
+                return;
+            }
             cerrarModales();
+            return;
         }
         const imprimirBtn = e.target.closest(`.${estilos.botonImprimir}`);
         if (imprimirBtn) {
             const id = imprimirBtn.dataset.id;
             const miembro = listaMiembros.find(m => m.id === Number(id));
             imprimirCredencial(miembro);
+        }
+
+        const asignarBtn = e.target.closest('[data-accion="asignar-entrenador"]');
+        if (asignarBtn) {
+            const miembroId = Number(asignarBtn.dataset.miembroId);
+            if (miembroId) {
+                await manejarAsignacionEntrenador(miembroId);
+            }
+            return;
         }
 
         const contactoBtn = e.target.closest('.boton-contacto');
@@ -653,6 +867,13 @@ const adjuntarEventListeners = () => {
         paginaActual = 1; // Resetear a pág 1 al buscar
         mostrarContenido();
     });
+
+    const filtroPremium = contenedorVista.querySelector('#filtro-premium');
+    if (filtroPremium) {
+        filtroPremium.addEventListener('input', (event) => {
+            renderizarListaPremiumModal(event.target.value);
+        });
+    }
     
     // --- Formulario (evento 'submit') ---
     contenedorVista.querySelector('#modal-formulario-miembro').addEventListener('submit', manejarSubmitFormulario);
@@ -796,6 +1017,10 @@ const abrirModalEliminar = (id) => {
 const cerrarModales = () => {
     contenedorVista.querySelector('#modal-miembro').classList.remove(estilos.activo);
     contenedorVista.querySelector('#modal-eliminar').classList.remove(estilos.activo);
+    const modalAsignar = contenedorVista.querySelector('#modal-asignar-entrenador');
+    if (modalAsignar) {
+        modalAsignar.classList.remove(estilos.activo);
+    }
     const form = contenedorVista.querySelector('#modal-formulario-miembro');
     if (form) {
         form.reset();
@@ -1397,6 +1622,39 @@ const renderizarEsqueleto = () => {
                 </form>
             </div>
             </div>
+
+        <div id="modal-asignar-entrenador" class="${estilos.modal}">
+            <div class="${estilos.modalFondo} modal-cerrar"></div>
+            <div class="${estilos.modalContenido} ${estilos.modalAsignar}">
+                <div class="${estilos.modalCabecera}">
+                    <h3>Asignar entrenador personal</h3>
+                    <span class="${estilos.modalCerrar} modal-cerrar">&times;</span>
+                </div>
+                <div class="${estilos.modalAsignarBody}">
+                    <div class="${estilos.asignarHeader}">
+                        <input type="search" id="filtro-premium" class="${estilos.buscadorAsignar}" placeholder="Buscar miembro premium por nombre o DNI">
+                        <p id="premium-resumen" class="${estilos.resumenPremium}">Cargando miembros premium...</p>
+                    </div>
+                    <p id="alerta-entrenadores" class="${estilos.textoAyuda}"></p>
+                    <div class="${estilos.tablaWrapper}">
+                        <table class="${estilos.tabla}">
+                            <thead>
+                                <tr>
+                                    <th>Miembro</th>
+                                    <th>Membresía</th>
+                                    <th>Estado</th>
+                                    <th>Entrenador actual</th>
+                                    <th>Asignación</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lista-premium-cuerpo">
+                                <tr><td colspan="5">Cargando miembros premium...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div id="modal-eliminar" class="${estilos.modal}">
             <div class="${estilos.modalFondo} modal-cerrar"></div>
