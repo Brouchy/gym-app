@@ -458,6 +458,7 @@ const mostrarContenido = () => {
             let textoMembresia = 'N/A';
             if (ultimo) {
                 let planName = ultimo?.membresia?.nombrePlan || null;
+                console.log("miembro",planName);
                 let typeName = ultimo?.membresia?.tipoDeMembresia?.descripcion || null;
                 if (!planName || !typeName) {
                     const targetId = Number(ultimo.membresiaId || ultimo.membresia?.id);
