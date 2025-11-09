@@ -70,23 +70,39 @@ export const apiEliminarMembresia = async (id) => {
 
 
 export const apiObtenerMembresiasXMiembros = async () => {
-  const ENDPOINT = `membresiaXMiembros?_expand=miembro&_expand=membresia&_expand=estadoMembresia&_expand=pago`;
+  const ENDPOINT = `membresiaXMiembros?_expand=miembro&_expand=membresia&_expand=pago`;
 
   try {
-    const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`);
-    if (!respuesta.ok) {
-      console.error(`Error HTTP: ${respuesta.status}`);
+    const [membresiasRes, estadosRes, tiposRes] = await Promise.all([
+      fetch(`${URL_BASE}/${ENDPOINT}`),
+      fetch(`${URL_BASE}/estadoMembresias`),
+      fetch(`${URL_BASE}/tipoDeMembresias`)
+    ]);
+
+    if (!membresiasRes.ok) {
+      console.error(`Error HTTP: ${membresiasRes.status}`);
       return null;
     }
 
-    const membresias = await respuesta.json();
+    const membresias = await membresiasRes.json();
+    const estados = estadosRes.ok ? await estadosRes.json() : [];
+    const tipos = tiposRes.ok ? await tiposRes.json() : [];
+
+    const estadosMap = new Map(estados.map((estado) => [estado.id, estado]));
+    const tiposMap = new Map(tipos.map((tipo) => [tipo.id, tipo]));
 
     // Expand manual del tipoDeMembresia (anidado dentro de membresia)
     for (const m of membresias) {
+      if (!m.estadoMembresia && m.estadoMembresiaId) {
+        const estado = estadosMap.get(m.estadoMembresiaId);
+        if (estado) {
+          m.estadoMembresia = estado;
+        }
+      }
+
       if (m.membresia?.tipoDeMembresiaId) {
-        const tipoRes = await fetch(`${URL_BASE}/tipoDeMembresias/${m.membresia.tipoDeMembresiaId}`);
-        if (tipoRes.ok) {
-          const tipo = await tipoRes.json();
+        const tipo = tiposMap.get(m.membresia.tipoDeMembresiaId);
+        if (tipo) {
           m.membresia.tipoDeMembresia = tipo;
         }
       }
