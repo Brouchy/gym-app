@@ -27,6 +27,20 @@
       "entrenadorId": 0,
       "eliminado": false,
       "id": 2
+    },
+    {
+      "nombre": "Carlos",
+      "apellidos": "Llanos",
+      "email": "carlos.19@gmail.com",
+      "dni": "78452102",
+      "telefono": "1122448578",
+      "direccion": "calle 543",
+      "fechaNacimiento": "1885-06-10",
+      "foto": "https://i.ibb.co/5x1Jz9rQ/Unaj-jpg.jpg",
+      "tipoDeMiembroId": 1,
+      "entrenadorId": 2,
+      "eliminado": false,
+      "id": 3
     }
   ],
   "entrenadors": [
@@ -158,6 +172,15 @@
       "fechaInicio": "2025-11-08T00:00:00.000Z",
       "fechaFin": "2025-11-09T00:00:00.000Z",
       "id": 2
+    },
+    {
+      "miembroId": 3,
+      "membresiaId": 102,
+      "estadoMembresiaId": 1,
+      "pagoId": 16,
+      "fechaInicio": "2025-11-09T00:00:00.000Z",
+      "fechaFin": "2026-11-09T00:00:00.000Z",
+      "id": 3
     }
   ],
   "pagos": [
@@ -265,6 +288,13 @@
       "metodoPago": "QR",
       "descuentoAplicado": 800,
       "id": 15
+    },
+    {
+      "monto": 360000,
+      "fechaPago": "2025-11-09T00:55:18.086Z",
+      "metodoPago": "Efectivo",
+      "descuentoAplicado": 0,
+      "id": 16
     }
   ],
   "estadoMembresias": [
