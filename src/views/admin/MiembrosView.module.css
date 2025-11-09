@@ -269,6 +269,137 @@
   font-weight: 600;
 }
 
+.modalAsignar {
+  max-width: 900px;
+}
+
+.modalAsignarBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.asignarHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.buscadorAsignar {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background: #2c2c2c;
+  color: #ffffff;
+  font-size: 0.95rem;
+}
+
+.buscadorAsignar:focus {
+  outline: none;
+  border-color: #FF6B35;
+  box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.25);
+}
+
+.resumenPremium {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #cbd5f5;
+}
+
+.textoAyuda {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #fbbf24;
+}
+
+.premiumInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.premiumNombre {
+  font-weight: 600;
+  color: #fff;
+}
+
+.premiumDni {
+  font-size: 0.85rem;
+  color: #cbd5f5;
+}
+
+.premiumPlan {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  color: #fff;
+}
+
+.premiumPlan small {
+  color: #94a3b8;
+}
+
+.premiumEstado {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.estadoBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.1rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #14532d;
+  color: #4ade80;
+  width: fit-content;
+}
+
+.asignarAccion {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.selectAsignar {
+  flex: 1;
+  min-width: 150px;
+  padding: 0.45rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #2c2c2c;
+  background: #121212;
+  color: #ffffff;
+}
+
+.selectAsignar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.botonAsignarEntrenador {
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  border: none;
+  background: #FF6B35;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.botonAsignarEntrenador:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.botonAsignarEntrenador:not(:disabled):hover {
+  background: #ff5c1f;
+}
+
 @keyframes aparecerModal {
   from {
     transform: translateY(30px) scale(0.95);
@@ -695,6 +826,11 @@
     .botonSecundario,
     .botonAgregar {
         width: 100%;
+    }
+
+    .asignarAccion {
+        flex-direction: column;
+        align-items: stretch;
     }
 }
 
