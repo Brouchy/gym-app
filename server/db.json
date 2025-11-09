@@ -41,6 +41,7 @@
       "entrenadorId": 2,
       "eliminado": false,
       "id": 3
+<<<<<<< HEAD
     },
     {
       "nombre": "Ana",
@@ -69,6 +70,8 @@
       "entrenadorId": 0,
       "eliminado": false,
       "id": 5
+=======
+>>>>>>> 2fda2c4 (Merge branch 'asignarEntrenador' of https://github.com/Brouchy/gym-app into asignarEntrenador)
     }
   ],
   "entrenadors": [
@@ -200,6 +203,27 @@
       "fechaInicio": "2025-11-08T00:00:00.000Z",
       "fechaFin": "2025-11-09T00:00:00.000Z",
       "id": 2
+<<<<<<< HEAD
+=======
+    },
+    {
+      "miembroId": 3,
+      "membresiaId": 102,
+      "estadoMembresiaId": 1,
+      "pagoId": 16,
+      "fechaInicio": "2025-11-09T00:00:00.000Z",
+      "fechaFin": "2026-11-09T00:00:00.000Z",
+      "id": 3
+    }
+  ],
+  "pagos": [
+    {
+      "id": 1,
+      "monto": 5000,
+      "fechaPago": "2025-10-01T10:00:00Z",
+      "metodoPago": "Tarjeta",
+      "descuentoAplicado": 0
+>>>>>>> 2fda2c4 (Merge branch 'asignarEntrenador' of https://github.com/Brouchy/gym-app into asignarEntrenador)
     },
     {
       "miembroId": 3,
@@ -258,6 +282,7 @@
       "metodoPago": "Efectivo",
       "descuentoAplicado": 0,
       "id": 16
+<<<<<<< HEAD
     },
     {
       "monto": 90000,
@@ -279,6 +304,8 @@
       "metodoPago": "QR",
       "descuentoAplicado": 0,
       "id": 19
+=======
+>>>>>>> 2fda2c4 (Merge branch 'asignarEntrenador' of https://github.com/Brouchy/gym-app into asignarEntrenador)
     }
   ],
   "estadoMembresias": [
