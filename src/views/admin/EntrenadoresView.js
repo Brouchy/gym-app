@@ -1,4 +1,5 @@
 import estilos from "./EntrenadoresView.module.css";
+import { subirImagenAImgbb } from "../../utils/subirImagen.js";
 import {
   apiObtenerEntrenadores,
   apiCrearEntrenador,
@@ -34,6 +35,7 @@ export const renderizarVistaEntrenadores = async (contenedor) => {
               <th>Teléfono</th>
               <th>Dirección</th>
               <th>Email</th>
+              <th>Certificado</th>
               <th>Activo</th>
               <th>Acciones</th>
             </tr>
@@ -86,6 +88,16 @@ export const renderizarVistaEntrenadores = async (contenedor) => {
             </div>
           </div>
 
+          <div>
+            <label>Certificado (imagen)</label>
+            <div class="${estilos.fileInput}">
+              <input type="file" id="certificado" accept="image/*">
+              <button type="button" id="btn-cert-select" class="${estilos.fileButton}">Seleccionar archivo</button>
+              <span id="certificado-nombre" class="${estilos.fileName}">Ningún archivo seleccionado</span>
+            </div>
+            <input type="hidden" id="certificado-actual" value="">
+          </div>
+
           <div class="${estilos.modalAcciones}">
             <button type="button" id="cancelar" class="${estilos.botonSecundario}">Cancelar</button>
             <button type="submit" class="${estilos.botonAgregar}">Guardar</button>
@@ -129,7 +141,7 @@ const renderizarTabla = (contenedor) => {
 
   cuerpo.innerHTML =
     pagina.length === 0
-      ? `<tr><td colspan="8">No se encontraron entrenadores.</td></tr>`
+      ? `<tr><td colspan="9">No se encontraron entrenadores.</td></tr>`
       : pagina
           .map(
             (e) => `
@@ -140,6 +152,11 @@ const renderizarTabla = (contenedor) => {
           <td>${e.telefono}</td>
           <td>${e.direccion}</td>
           <td>${e.email}</td>
+          <td>
+            ${e.certificado
+              ? `<a href="${e.certificado}" target="_blank" rel="noopener" class="${estilos.certLink}">Ver</a>`
+              : `<span class="${estilos.certBadge}">No cargado</span>`}
+          </td>
           <td>
             <span class="${estilos.toggleActivo}" data-accion="toggle-activo" data-id="${e.id}" data-valor="${e.activo ? "true" : "false"}" style="cursor:pointer;">
               <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${e.activo ? '#16a34a' : '#dc2626'};margin-right:6px;vertical-align:middle"></span>
@@ -253,15 +270,50 @@ const abrirModal = (entrenador = null) => {
     form.direccion.value = entrenador.direccion || "";
     form.email.value = entrenador.email || "";
     form.activo.value = entrenador.activo ? "true" : "false";
+    form["certificado-actual"].value = entrenador.certificado || "";
     form["entrenador-id"].value = entrenador.id;
+    // certificado no obligatorio si ya existe
+    const certInput = form.querySelector('#certificado');
+    if (certInput) certInput.required = !Boolean(entrenador.certificado);
+    // actualizar label con nombre actual
+    const certNombre = modal.querySelector('#certificado-nombre');
+    if (certNombre) certNombre.textContent = entrenador.certificado ? (new URL(entrenador.certificado)).pathname.split('/').pop() : 'Ningún archivo seleccionado';
   } else {
     modal.querySelector("#modal-titulo").textContent = "Agregar Entrenador";
     form.reset();
     form["entrenador-id"].value = "";
+    form["certificado-actual"].value = "";
+    // certificado obligatorio al crear
+    const certInput = form.querySelector('#certificado');
+    if (certInput) certInput.required = true;
+    const certNombre = modal.querySelector('#certificado-nombre');
+    if (certNombre) certNombre.textContent = 'Ningún archivo seleccionado';
   }
 
   form.onsubmit = async (e) => {
     e.preventDefault();
+    // Manejo de certificado como en miembros (ImgBB)
+    const fileCert = form.querySelector('#certificado')?.files?.[0] || null;
+    const certificadoActual = form.querySelector('#certificado-actual')?.value || "";
+    let urlCertificado = certificadoActual;
+    if (fileCert) {
+      const subida = await subirImagenAImgbb(fileCert);
+      if (subida) {
+        urlCertificado = subida;
+      } else if (!certificadoActual) {
+        alert("No se pudo subir el certificado. Se guardará sin certificado.");
+      } else {
+        alert("No se pudo subir el nuevo certificado. Se conservará el anterior.");
+      }
+    }
+
+    // Validación: en alta, exigir certificado
+    const id = form["entrenador-id"].value;
+    if (!id && !urlCertificado) {
+      alert("Debes subir un certificado para dar de alta al entrenador.");
+      return;
+    }
+
     const data = {
       nombre: form.nombre.value,
       dni: form.dni.value,
@@ -269,9 +321,21 @@ const abrirModal = (entrenador = null) => {
       fechaNacimiento: form.fechaNacimiento.value,
       direccion: form.direccion.value,
       email: form.email.value,
-      activo: form.activo.value === "true"
+      activo: form.activo.value === "true",
+      certificado: urlCertificado || ""
     };
-    const id = form["entrenador-id"].value;
+
+  // wiring del botón personalizado y nombre
+  const btnSeleccionar = modal.querySelector('#btn-cert-select');
+  const inputFile = modal.querySelector('#certificado');
+  const labelNombre = modal.querySelector('#certificado-nombre');
+  if (btnSeleccionar && inputFile) {
+    btnSeleccionar.onclick = () => inputFile.click();
+    inputFile.onchange = () => {
+      const file = inputFile.files?.[0];
+      if (file && labelNombre) labelNombre.textContent = file.name;
+    };
+  }
     if (id) {
       await apiActualizarEntrenador(id, data);
     } else {

@@ -120,22 +120,24 @@ export const imprimirCredencial = (miembro) => {
         <strong style="font-size:1rem;">Credencial de ${nombre}</strong>
         <div style="font-size:0.85rem;color:#6b7280">${new Date().toLocaleString()}</div>
       </div>
-      <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;">
-        <img src="${foto}" alt="${nombre}" style="width:84px;height:84px;border-radius:6px;object-fit:cover;border:1px solid #d1d5db;" />
-        <div style="flex:1">
-          <div style="font-weight:600">${nombre}</div>
-          <div style="color:#374151">DNI: ${dni}</div>
-          <div style="color:#374151">Dirección: ${direccion}</div>
-          <div style="color:#374151">N° Socio: ${idSocio}</div>
+      <div style="background:#fff8ef;border-radius:12px;padding:12px;box-shadow:0 0 0 3px rgba(255,153,0,0.45), 0 0 22px rgba(255,140,0,0.55);">
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;">
+          <img src="${foto}" alt="${nombre}" style="width:84px;height:84px;border-radius:6px;object-fit:cover;border:1px solid #d1d5db;" />
+          <div style="flex:1">
+            <div style="font-weight:600">${nombre}</div>
+            <div style="color:#374151">DNI: ${dni}</div>
+            <div style="color:#374151">Dirección: ${direccion}</div>
+            <div style="color:#374151">N° Socio: ${idSocio}</div>
+          </div>
+        </div>
+        <hr style="border:none;border-top:1px solid #e5e7eb;margin:8px 0;" />
+        <div style="text-align:center;margin-bottom:4px">
+          <div style="width:100%;max-width:480px;margin:0 auto;">
+            ${dataUrl ? `<img id="cred-png" src="${dataUrl}" alt="codigo" style="width:100%;height:auto;display:block;"/>` : `<div style=\"padding:28px 0;color:#111827\">${paddedValue}</div>`}
+          </div>
         </div>
       </div>
-      <hr style="border:none;border-top:1px solid #e5e7eb;margin:8px 0;" />
-      <div style="text-align:center;margin-bottom:12px">
-  <div style="width:100%;max-width:480px;margin:0 auto;">
-          ${dataUrl ? `<img id="cred-png" src="${dataUrl}" alt="codigo" style="width:100%;height:auto;display:block;"/>` : `<div style="padding:28px 0;color:#111827">${paddedValue}</div>`}
-        </div>
-      </div>
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px;">
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px;">
         <button id="cred-cancel" style="background:#efefef;border:1px solid #ddd;padding:8px 12px;border-radius:6px;cursor:pointer">Cancelar</button>
         <button id="cred-print" style="background:#111827;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">Imprimir</button>
       </div>
@@ -176,13 +178,15 @@ export const imprimirCredencial = (miembro) => {
           <head>
             <title>Credencial de ${nombre}</title>
             <style>
-              body{background:white;color:#111827;margin:8px;font-family:'Poppins',Arial,sans-serif}
-              .credencial{width:9.5cm;height:6cm;border:1px solid #d1d5db;padding:8px;box-sizing:border-box}
+              @page { size: A4 portrait; margin: 10mm; }
+              html, body{height:100%}
+              body{background:white;color:#111827;margin:0;font-family:'Poppins',Arial,sans-serif;display:flex;align-items:center;justify-content:center}
+              .credencial{width:12cm;height:7cm;border:1px solid #d1d5db;border-radius:10px;padding:8px;box-sizing:border-box;background:#ffffff}
               .enc{font-weight:600;text-align:center;margin-bottom:6px}
               .cuerpo{display:flex;gap:8px;align-items:center}
               .foto{width:100px;height:100px;object-fit:cover;border-radius:6px;border:1px solid #d1d5db}
               .barcode{margin-top:8px;text-align:center}
-              @media print{body{margin:0}.credencial{border:none}}
+              @media print{body{margin:0}.credencial{border:none;}}
             </style>
           </head>
           <body>

@@ -365,6 +365,34 @@
       "horaFin": "21:00",
       "cupo": 10,
       "id": 3
+    },
+    {
+      "actividadId": 2,
+      "entrenadorId": 1,
+      "fecha": "2025-11-11T00:00:00.000Z",
+      "horaInicio": "17:00",
+      "horaFin": "18:00",
+      "cupo": 7,
+      "dias": [
+        "Martes",
+        "Viernes"
+      ],
+      "id": 4,
+      "actividad": {
+        "id": 2,
+        "nombre": "Zumba",
+        "descripcion": "Cardio y ritmo"
+      },
+      "entrenador": {
+        "nombre": "Karen Pérez",
+        "dni": "94325420",
+        "telefono": "11456781",
+        "fechaNacimiento": "2000-10-12",
+        "direccion": "calle 1444",
+        "email": "karenPerez@example.com",
+        "activo": true,
+        "id": 1
+      }
     }
   ],
   "actividads": [
@@ -394,6 +422,21 @@
       "miembroId": 1,
       "claseId": 1,
       "id": 3
+    },
+    {
+      "miembroId": 1,
+      "claseId": 4,
+      "id": 4
+    },
+    {
+      "miembroId": 3,
+      "claseId": 4,
+      "id": 5
+    },
+    {
+      "miembroId": 6,
+      "claseId": 4,
+      "id": 6
     }
   ],
   "tiposDeAsistencia": [
