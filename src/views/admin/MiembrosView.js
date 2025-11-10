@@ -310,6 +310,8 @@ let listaEntrenadores = [];   // Cache para el <select>
 let listaTiposMiembro = []; // Cache para el <select>
 let listaMembresias = []; // Cache para el <select> de membresías
 let listaMembresiasXMiembros = []; // Registros de membresía por miembro
+let autoRefreshTimer = null; // Intervalo de auto-refresco
+const AUTO_REFRESH_MINUTOS = 5; // Cambia este valor para configurar X minutos
 let paginaActual = 1;
 const FILAS_POR_PAGINA = 5;
 let modoFormulario = 'crear';
@@ -352,8 +354,17 @@ export const renderizarVistaMiembros = async (contenedor) => {
 
     // 4. Cargamos los datos de los miembros y los mostramos
     await cargarYMostrarMiembros();
-    // const membresiasXMiembros = await apiObtenerMembresiasXMiembros();
-    // console.log('Membresias por Miembros:', membresiasXMiembros);
+    // Auto-refresco del estado sin recargar la página
+    try { if (autoRefreshTimer) clearInterval(autoRefreshTimer); } catch (_) {}
+    autoRefreshTimer = setInterval(async () => {
+        // Si la vista ya no está en el DOM, limpiar el timer
+        if (!contenedorVista || !contenedorVista.isConnected) {
+            try { clearInterval(autoRefreshTimer); } catch (_) {}
+            autoRefreshTimer = null;
+            return;
+        }
+        await cargarYMostrarMiembros();
+    }, AUTO_REFRESH_MINUTOS * 60 * 1000);
 }
 
 // Actualizar cuando otras vistas cambian las asignaciones
@@ -366,6 +377,14 @@ try {
  * Carga los miembros desde la API y actualiza la vista
  */
 const cargarYMostrarMiembros = async () => {
+    // Si la vista no existe, detener intervalos pendientes
+    if (!contenedorVista || !document.body.contains(contenedorVista)) {
+        if (autoRefreshTimer) {
+            try { clearInterval(autoRefreshTimer); } catch (_) {}
+            autoRefreshTimer = null;
+        }
+        return;
+    }
     // Mostramos un 'cargando' en la tabla
     const cuerpoTabla = contenedorVista.querySelector('#miembros-cuerpo-tabla');
     if (cuerpoTabla) cuerpoTabla.innerHTML = '<tr><td colspan="9">Cargando...</td></tr>';
@@ -449,9 +468,14 @@ const mostrarContenido = () => {
             }
             const ahora = Date.now();
             const inicio = ultimo?.fechaInicio ? new Date(ultimo.fechaInicio).getTime() : null;
-            const fin = ultimo?.fechaFin ? new Date(ultimo.fechaFin).getTime() : null;
-            // Considerar el fin como inclusivo hasta el final del día
-            const finInclusivo = fin != null ? (fin + 24*60*60*1000 - 1) : null;
+            const finDate = ultimo?.fechaFin ? new Date(ultimo.fechaFin) : null;
+            // Fin de día LOCAL para la fecha de vencimiento
+            const finInclusivo = finDate ? new Date(
+                finDate.getFullYear(),
+                finDate.getMonth(),
+                finDate.getDate(),
+                23, 59, 59, 999
+            ).getTime() : null;
             const activaPorFecha = (inicio != null && finInclusivo != null) ? (ahora >= inicio && ahora <= finInclusivo) : false;
             const puntoColor = activaPorFecha ? '#16a34a' : '#dc2626';
             const puntoHtml = `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${puntoColor};margin-right:6px;vertical-align:middle"></span>`;
@@ -514,10 +538,16 @@ const membresiaEstaActiva = (registro) => {
     const estado = (registro.estadoMembresia?.descripcion || '').toLowerCase();
     if (estado === 'activa') return true;
     const inicio = registro.fechaInicio ? new Date(registro.fechaInicio).getTime() : null;
-    const fin = registro.fechaFin ? new Date(registro.fechaFin).getTime() : null;
+    const finDate = registro.fechaFin ? new Date(registro.fechaFin) : null;
     if (inicio == null || fin == null) return false;
     const ahora = Date.now();
-    const finInclusivo = fin + (24 * 60 * 60 * 1000 - 1);
+    // Fin de día LOCAL para la fecha de vencimiento
+    const finInclusivo = finDate ? new Date(
+        finDate.getFullYear(),
+        finDate.getMonth(),
+        finDate.getDate(),
+        23, 59, 59, 999
+    ).getTime() : null;
     return ahora >= inicio && ahora <= finInclusivo;
 };
 

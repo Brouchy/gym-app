@@ -1,34 +1,6 @@
 {
   "miembros": [
     {
-      "nombre": "Juan",
-      "apellidos": "Martinez",
-      "email": "martines@gmail.com",
-      "dni": "34234567",
-      "telefono": "1122336754",
-      "direccion": "calle 543",
-      "fechaNacimiento": "1885-07-12",
-      "foto": "https://i.ibb.co/ymwNGZyF/Facturacion-jpg.jpg",
-      "tipoDeMiembroId": 3,
-      "entrenadorId": 0,
-      "eliminado": false,
-      "id": 1
-    },
-    {
-      "nombre": "Florencia",
-      "apellidos": "Fernandez",
-      "email": "flore23@gmail.com",
-      "dni": "45678900",
-      "telefono": "1144779586",
-      "direccion": "calle 567",
-      "fechaNacimiento": "1996-07-20",
-      "foto": "https://i.ibb.co/hR69yScD/Reportes-jpg.jpg",
-      "tipoDeMiembroId": 2,
-      "entrenadorId": 0,
-      "eliminado": false,
-      "id": 2
-    },
-    {
       "nombre": "Carlos",
       "apellidos": "Llanos",
       "email": "carlos.19@gmail.com",
@@ -41,34 +13,6 @@
       "entrenadorId": 2,
       "eliminado": false,
       "id": 3
-    },
-    {
-      "nombre": "Ana",
-      "apellidos": "Gómez",
-      "email": "ana.gomez@example.com",
-      "dni": "33555111",
-      "telefono": "1133344455",
-      "direccion": "Calle 12 #345",
-      "fechaNacimiento": "1992-05-14",
-      "foto": "https://i.ibb.co/7z1Tq1H/avatar.png",
-      "tipoDeMiembroId": 1,
-      "entrenadorId": 0,
-      "eliminado": false,
-      "id": 4
-    },
-    {
-      "nombre": "Omar",
-      "apellidos": "Castro",
-      "email": "castro15@gmail.com",
-      "dni": "45789963",
-      "telefono": "1145856532",
-      "direccion": "calle bs as",
-      "fechaNacimiento": "1998-02-05",
-      "foto": "https://i.ibb.co/MkVz78mR/imagen-2025-11-08-231753020-png.png",
-      "tipoDeMiembroId": 3,
-      "entrenadorId": 0,
-      "eliminado": false,
-      "id": 5
     },
     {
       "nombre": "Luna",
