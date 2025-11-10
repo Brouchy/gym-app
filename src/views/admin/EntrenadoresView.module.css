@@ -163,26 +163,24 @@
 }
 
 .indicadorPagina {
-  font-size: 0.875rem;
-  color: #718096;
+   font-weight: bold;
+  color: #f0f0f0;
 }
 
 .botonPagina {
-  padding: 0.5rem 1rem;
-  background-color: #FF6B35;
-  color: #ffffff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background 0.25s, box-shadow 0.2s ease;
+padding: 0.5rem 1rem;
+    background-color: #E2E8F0;
+    color: #2D3748;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
 }
-.botonPagina:hover {
-  background-color: #FF5722;
-  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);
+.botonPagina:hover:not(:disabled) {
+  background-color: #CBD5E0;
 }
 .botonPagina:disabled {
-  opacity: 0.5;
+  background-color: #444;
   cursor: not-allowed;
 }
 

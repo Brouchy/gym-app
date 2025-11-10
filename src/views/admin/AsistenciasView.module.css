@@ -163,22 +163,21 @@
 
 /* ===== Paginación ===== */
 .paginacion {
-  margin-top: 1rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.7rem;
+   display: flex;
+    justify-content: center;
+    align-items: center;
+    gap:15px;
+    margin-top: 12px;
 }
 
 .botonPagina {
   padding: 0.5rem 1rem;
-  background-color: #FF6B35;
-  color: #ffffff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background 0.25s, box-shadow 0.2s ease;
+    background-color: #E2E8F0;
+    color: #2D3748;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
 }
 
 .botonPagina:disabled {
@@ -186,9 +185,8 @@
   cursor: not-allowed;
 }
 
-.botonPagina:hover:not(:disabled) {
-  background-color: #FF5722;
-  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);
+.botonPagina:hover {
+    background-color: #CBD5E0;
 }
 
 /* ===== Modal ===== */
@@ -443,6 +441,9 @@
   color: #222; /* <-- color de texto negro/oscuro */
   background-color: #fff; /* opcional, fondo blanco para contraste */
 }
+.cabecera #boton-registrar-gym {
+  margin-top: 10px;
+}
 .inputBuscar::placeholder {
   color: #555; /* gris oscuro para placeholder */
 }
@@ -510,11 +511,11 @@
 }
 
 .filaTabs button {
-  background-color: #FFA500; /* Naranja base */
+  background-color: #ff8800; /* Naranja base */
   color: #fff;
   border: none;
-  padding: 10px 20px;
-  font-size: 16px; /* Un poco más grande */
+  padding: 11px 20px;
+  font-size: 1.1rem; /* Un poco más grande */
   cursor: pointer;
   border-radius: 8px;
   transition: background-color 0.3s, transform 0.2s;
@@ -526,7 +527,7 @@
 }
 
 .tabActivo {
-  background-color: #f0972b !important; /* Naranja más intenso al estar activo */
+  background-color: #FF5722 !important; /* Naranja más intenso al estar activo */
   color: #fff;
   font-weight: bold;
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);

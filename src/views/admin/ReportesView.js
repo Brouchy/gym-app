@@ -45,10 +45,7 @@ export const renderizarVistaReportes = async (contenedor) => {
 async function renderizarReporteIngresos(contenedor) {
   contenedor.innerHTML = `
     <div class="${estilos.contenedor}">
-      <h2> 
-        <img src="https://cdn-icons-png.flaticon.com/512/14431/14431088.png" 
-            alt="icono" 
-            style="width:36px; vertical-align:middle; margin-right:6px;">
+      <h2>
         Reporte de ingresos por membresías
       </h2>
 
@@ -95,7 +92,7 @@ async function renderizarReporteIngresos(contenedor) {
               <th>Plan</th>
               <th>Monto</th>
               <th>Descuento aplicado</th>
-              <th>Fecha de cobro</th>
+              <th>Fecha de emision</th>
               <th>Pago total</th>
               <th>Método de pago</th>
             </tr>
@@ -104,6 +101,11 @@ async function renderizarReporteIngresos(contenedor) {
             <tr><td colspan="9">Cargando pagos...</td></tr>
           </tbody>
         </table>
+      </div>
+      <div class="${estilos.paginacion}">
+        <button id="prev-ingresos" class="${estilos.botonPagina}" disabled>Anterior</button>
+        <span id="indicador-ingresos">Mostrando 0–0 de 0 | Página 1 de 1</span>
+        <button id="next-ingresos" class="${estilos.botonPagina}" disabled>Siguiente</button>
       </div>
     </div>
   `;
@@ -134,7 +136,17 @@ async function renderizarReporteIngresos(contenedor) {
     filtroMetodo.appendChild(opt);
   });
 
-  // preparar datos combinados
+  // preparar datos combinados (normalizamos fecha a yyyy-mm-dd local)
+  const aYmd = (d) => {
+    if (!d) return null;
+    const dt = new Date(d);
+    if (isNaN(dt)) return null;
+    const y = dt.getFullYear();
+    const m = String(dt.getMonth() + 1).padStart(2, "0");
+    const da = String(dt.getDate()).padStart(2, "0");
+    return `${y}-${m}-${da}`;
+  };
+
   const datosCombinados = pagos.map((p, idx) => ({
     numeroTransaccion: `T-${String(idx + 1).padStart(4, "0")}`,
     documento: p.miembroDocumento ?? "-",
@@ -142,33 +154,31 @@ async function renderizarReporteIngresos(contenedor) {
     plan: p.planNombre ?? "-",
     monto: Number(p.monto ?? 0),
     descuento: Number(p.descuentoAplicado ?? 0),
-    fechaObj: p.fechaPago ? new Date(p.fechaPago) : null,
+    fechaYmd: aYmd(p.fechaPago),
     fecha: p.fechaPago ? new Date(p.fechaPago).toLocaleDateString("es-AR") : "-",
     total: Number(p.pagoTotal ?? (p.monto - (p.descuentoAplicado ?? 0))),
     metodo: p.metodoDescripcion ?? "No definido"
   }));
 
-  const renderizarTabla = () => {
-    const desde = filtroDesde.value ? new Date(filtroDesde.value).setHours(0,0,0,0) : null;
-    const hasta = filtroHasta.value ? new Date(filtroHasta.value).setHours(23,59,59,999) : null;
-    const metodo = filtroMetodo.value;
+  // Paginación
+  let paginaIng = 1;
+  let porPaginaIng = 5;
+  let cacheFiltradosIng = [];
 
-    const filtrados = datosCombinados.filter(d => {
-      if (!d.fechaObj) return false; // solo registros con fecha
-      const time = d.fechaObj.getTime();
-      const fechaOk = (!desde || time >= desde) && (!hasta || time <= hasta);
-      const metodoOk = metodo ? d.metodo === metodo : true;
-      return fechaOk && metodoOk;
-    });
+  const btnPrevIng = contenedor.querySelector('#prev-ingresos');
+  const btnNextIng = contenedor.querySelector('#next-ingresos');
+  const indicadorIng = contenedor.querySelector('#indicador-ingresos');
 
-    if (!filtrados.length) {
-      cuerpoTabla.innerHTML = `<tr><td colspan="9">No hay pagos para mostrar</td></tr>`;
-      return;
-    }
-
-    cuerpoTabla.innerHTML = filtrados.map((d, idx) => `
+  const renderPaginaIngresos = () => {
+    const total = cacheFiltradosIng.length;
+    const totalPag = Math.max(1, Math.ceil(total / porPaginaIng));
+    if (paginaIng > totalPag) paginaIng = totalPag;
+    const ini = (paginaIng - 1) * porPaginaIng;
+    const fin = Math.min(ini + porPaginaIng, total);
+    const vista = cacheFiltradosIng.slice(ini, fin);
+    cuerpoTabla.innerHTML = vista.map((d, idx) => `
       <tr>
-        <td>T-${String(idx + 1).padStart(4,"0")}</td>
+        <td>T-${String(ini + idx + 1).padStart(4,"0")}</td>
         <td>${d.documento}</td>
         <td>${d.miembro}</td>
         <td>${d.plan}</td>
@@ -179,10 +189,39 @@ async function renderizarReporteIngresos(contenedor) {
         <td>${d.metodo}</td>
       </tr>
     `).join("");
+    indicadorIng.textContent = `Mostrando ${total ? ini + 1 : 0}–${fin} de ${total} | Página ${paginaIng} de ${totalPag}`;
+    btnPrevIng.disabled = paginaIng <= 1;
+    btnNextIng.disabled = paginaIng >= totalPag;
+  };
+
+  const renderizarTabla = () => {
+    const desdeYmd = filtroDesde.value || null; // yyyy-mm-dd
+    const hastaYmd = filtroHasta.value || null; // yyyy-mm-dd
+    const metodo = filtroMetodo.value;
+
+    cacheFiltradosIng = datosCombinados.filter(d => {
+      if (!d.fechaYmd) return false; // solo registros con fecha válida
+      const fechaOk = (!desdeYmd || d.fechaYmd >= desdeYmd) && (!hastaYmd || d.fechaYmd <= hastaYmd);
+      const metodoOk = metodo ? d.metodo === metodo : true;
+      return fechaOk && metodoOk;
+    });
+
+    if (!cacheFiltradosIng.length) {
+      cuerpoTabla.innerHTML = `<tr><td colspan="9">No hay pagos para mostrar</td></tr>`;
+      indicadorIng.textContent = `Mostrando 0–0 de 0 | Página 1 de 1`;
+      btnPrevIng.disabled = true;
+      btnNextIng.disabled = true;
+      return;
+    }
+
+    paginaIng = 1;
+    renderPaginaIngresos();
   };
 
   renderizarTabla();
   contenedor.querySelector("#boton-filtrar").addEventListener("click", renderizarTabla);
+  btnPrevIng.addEventListener('click', () => { if (paginaIng > 1) { paginaIng--; renderPaginaIngresos(); } });
+  btnNextIng.addEventListener('click', () => { paginaIng++; renderPaginaIngresos(); });
 
   // Exportar a Excel
   contenedor.querySelector("#boton-excel").addEventListener("click", async () => {
@@ -221,7 +260,7 @@ contenedor.querySelector("#boton-imprimir").addEventListener("click", () => {
         ${estiloTabla}
       </head>
       <body>
-        <h2>💰 Reporte de ingresos por membresías</h2>
+        <h2>Reporte de ingresos por membresías</h2>
         <p>Fecha de impresión: ${fechaActual}</p>
         ${tablaHtml}
         <script>
@@ -245,7 +284,7 @@ contenedor.querySelector("#boton-imprimir").addEventListener("click", () => {
 async function renderizarReporteAsistenciaGimnasio(contenedor) {
   contenedor.innerHTML = `
     <div class="${estilos.contenedor}">
-      <h2>🏋️ Reporte de Asistencia al Gimnasio</h2>
+      <h2>Reporte de Asistencia al Gimnasio</h2>
       <div class="${estilos.filtros}">
         <label>Miembro:</label>
         <select id="filtro-miembro" class="${estilos.selectInput}">
@@ -383,7 +422,7 @@ async function renderizarReporteAsistenciaGimnasio(contenedor) {
 async function renderizarReporteAsistenciaClases(contenedor) {
   contenedor.innerHTML = `
     <div class="${estilos.contenedor}">
-      <h2>📅 Reporte de Asistencia a Clases</h2>
+      <h2>Reporte de Asistencia a Clases</h2>
       <div class="${estilos.filtros}">
         <label>Clase:</label>
         <select id="filtro-clase" class="${estilos.selectInput}">
