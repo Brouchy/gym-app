@@ -855,15 +855,21 @@ async function abrirModalAsistencia(divClases, asistencia = null) {
 // ========================================================
 export const renderizarVistaAsistencia = async (contenedor) => {
   contenedor.innerHTML = `
-    <div class="${estilos.filaTabs}">
-      <button id="btn-clases" class="${estilos.tabActivo}">Asistencia a Clases</button>
-      <button id="btn-gym" class="">Asistencia al Gimnasio</button>
-      <button id="btn-entrenadores" class="">Asistencia a Entrenadores</button>
-    </div>
+    <div class="${estilos.contenedor}">
+      <div class="${estilos.tituloModulo}">
+        <h2>Módulo de Asistencias</h2>
+      </div>
 
-    <div id="bloque-clases" class="${estilos.bloque}"></div>
-    <div id="bloque-gym" class="${estilos.bloque}" style="display:none;"></div>
-    <div id="bloque-entrenadores" class="${estilos.bloque}" style="display:none;"></div>
+      <div class="${estilos.filaTabs}">
+        <button id="btn-clases" class="${estilos.tabActivo}">Asistencia a Clases</button>
+        <button id="btn-gym" class="">Asistencia al Gimnasio</button>
+        <button id="btn-entrenadores" class="">Asistencia a Entrenadores</button>
+      </div>
+
+      <div id="bloque-clases" class="${estilos.bloque}"></div>
+      <div id="bloque-gym" class="${estilos.bloque}" style="display:none;"></div>
+      <div id="bloque-entrenadores" class="${estilos.bloque}" style="display:none;"></div>
+    </div>
   `;
 
   const btnClases = contenedor.querySelector("#btn-clases");

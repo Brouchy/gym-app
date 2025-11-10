@@ -12,6 +12,9 @@ import ExcelJS from "exceljs";
 export const renderizarVistaReportes = async (contenedor) => {
   contenedor.innerHTML = `
     <div class="${estilos.contenedor}">
+      <div class="${estilos.tituloModulo}">
+        <h2>Módulo de Reportes</h2>
+      </div>
       <div class="${estilos.bloquesReportesFila}">
         <button class="${estilos.bloqueMini}" id="reporte-ingresos"> Reporte de Ingresos </button>
         <button class="${estilos.bloqueMini}" id="reporte-asistencia-gimnasio">Reporte de Asistencia de socios al Gimnasio</button>
@@ -64,9 +67,22 @@ async function renderizarReporteIngresos(contenedor) {
             <option value="">Todos</option>
           </select>
         </div>
-        <button id="boton-filtrar" class="${estilos.botonFiltrar}">🔍 Ver Registro</button>
-        <button id="boton-imprimir" class="${estilos.botonImprimir}">🖨️ Imprimir</button>
-        <button id="boton-excel" class="${estilos.botonImprimir}">📥 Exportar Excel</button>
+        <button id="boton-filtrar" class="${estilos.accionIcon}" title="Ver registro" aria-label="Ver registro">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+            <path d="M10 2a8 8 0 106.32 12.9l4.39 4.39 1.41-1.41-4.39-4.39A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z"/>
+          </svg>
+        </button>
+        <button id="boton-imprimir" class="${estilos.accionIcon}" title="Imprimir" aria-label="Imprimir">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+            <path d="M19 8H5c-1.66 0-3 1.34-3 3v4h4v4h12v-4h4v-4c0-1.66-1.34-3-3-3zm-3 9H8v-5h8v5zM18 3H6v4h12V3z"/>
+          </svg>
+        </button>
+        <button id="boton-excel" class="${estilos.accionIcon}" title="Exportar Excel" aria-label="Exportar Excel">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+            <path d="M19 2H8c-1.1 0-2 .9-2 2v3h2V4h11v16H8v-3H6v3c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+            <path d="M10 9l-4 3 4 3v-2h4v-2h-4V9z"/>
+          </svg>
+        </button>
       </div>
 
       <div class="${estilos.tablaWrapper}">
@@ -239,9 +255,22 @@ async function renderizarReporteAsistenciaGimnasio(contenedor) {
         <input type="date" id="filtro-desde" class="${estilos.inputFecha}">
         <label>Hasta:</label>
         <input type="date" id="filtro-hasta" class="${estilos.inputFecha}">
-        <button id="boton-filtrar" class="${estilos.botonFiltrar}">🔍 Filtrar</button>
-        <button id="boton-imprimir" class="${estilos.botonImprimir}">🖨️ Imprimir</button>
-        <button id="boton-excel" class="${estilos.botonImprimir}">📥 Exportar Excel</button>
+        <button id="boton-filtrar" class="${estilos.accionIcon}" title="Ver registro" aria-label="Ver registro">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+            <path d="M10 2a8 8 0 106.32 12.9l4.39 4.39 1.41-1.41-4.39-4.39A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z"/>
+          </svg>
+        </button>
+        <button id="boton-imprimir" class="${estilos.accionIcon}" title="Imprimir" aria-label="Imprimir">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+            <path d="M19 8H5c-1.66 0-3 1.34-3 3v4h4v4h12v-4h4v-4c0-1.66-1.34-3-3-3zm-3 9H8v-5h8v5zM18 3H6v4h12V3z"/>
+          </svg>
+        </button>
+        <button id="boton-excel" class="${estilos.accionIcon}" title="Exportar Excel" aria-label="Exportar Excel">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+            <path d="M19 2H8c-1.1 0-2 .9-2 2v3h2V4h11v16H8v-3H6v3c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+            <path d="M10 9l-4 3 4 3v-2h4v-2h-4V9z"/>
+          </svg>
+        </button>
       </div>
       <div class="${estilos.tablaWrapper}">
         <table class="${estilos.tabla}">
@@ -368,9 +397,22 @@ async function renderizarReporteAsistenciaClases(contenedor) {
         <input type="date" id="filtro-desde" class="${estilos.inputFecha}">
         <label>Hasta:</label>
         <input type="date" id="filtro-hasta" class="${estilos.inputFecha}">
-        <button id="boton-filtrar" class="${estilos.botonFiltrar}">🔍 Ver Registro</button>
-        <button id="boton-imprimir" class="${estilos.botonImprimir}">🖨️ Imprimir</button>
-        <button id="boton-excel" class="${estilos.botonImprimir}">📥 Exportar Excel</button>
+        <button id="boton-filtrar" class="${estilos.accionIcon}" title="Ver registro" aria-label="Ver registro">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+            <path d="M10 2a8 8 0 106.32 12.9l4.39 4.39 1.41-1.41-4.39-4.39A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z"/>
+          </svg>
+        </button>
+        <button id="boton-imprimir" class="${estilos.accionIcon}" title="Imprimir" aria-label="Imprimir">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+            <path d="M19 8H5c-1.66 0-3 1.34-3 3v4h4v4h12v-4h4v-4c0-1.66-1.34-3-3-3zm-3 9H8v-5h8v5zM18 3H6v4h12V3z"/>
+          </svg>
+        </button>
+        <button id="boton-excel" class="${estilos.accionIcon}" title="Exportar Excel" aria-label="Exportar Excel">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+            <path d="M19 2H8c-1.1 0-2 .9-2 2v3h2V4h11v16H8v-3H6v3c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+            <path d="M10 9l-4 3 4 3v-2h4v-2h-4V9z"/>
+          </svg>
+        </button>
       </div>
 
       <div class="${estilos.tablaWrapper}">

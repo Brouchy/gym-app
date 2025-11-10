@@ -140,7 +140,12 @@ const renderizarTabla = (contenedor) => {
           <td>${e.telefono}</td>
           <td>${e.direccion}</td>
           <td>${e.email}</td>
-          <td>${e.activo ? "✅" : "❌"}</td>
+          <td>
+            <span class="${estilos.toggleActivo}" data-accion="toggle-activo" data-id="${e.id}" data-valor="${e.activo ? "true" : "false"}" style="cursor:pointer;">
+              <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${e.activo ? '#16a34a' : '#dc2626'};margin-right:6px;vertical-align:middle"></span>
+              ${e.activo ? "Activo" : "Inactivo"}
+            </span>
+          </td>
           <td class="${estilos.acciones}">
             <svg class="${estilos.botonEditar} ${estilos.accionIcon}" data-accion="editar" data-id="${e.id}" title="Editar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
               <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/>
@@ -170,22 +175,23 @@ const adjuntarEventos = (contenedor) => {
   });
 
   contenedor.addEventListener("click", async (e) => {
-    const id = e.target.dataset.id;
-    const accion = e.target.dataset.accion;
+    const accionEl = e.target.closest('[data-accion]');
+    const accion = accionEl?.dataset.accion;
+    const id = accionEl?.dataset.id;
 
-    if (e.target.matches("#boton-prev")) {
+    if (e.target.closest("#boton-prev")) {
       paginaActual--;
       renderizarTabla(contenedor);
       return;
     }
 
-    if (e.target.matches("#boton-next")) {
+    if (e.target.closest("#boton-next")) {
       paginaActual++;
       renderizarTabla(contenedor);
       return;
     }
 
-    if (e.target.matches("#boton-agregar")) {
+    if (e.target.closest("#boton-agregar")) {
       abrirModal();
       return;
     }
@@ -200,6 +206,28 @@ const adjuntarEventos = (contenedor) => {
       if (confirm("¿Eliminar entrenador?")) {
         await apiEliminarEntrenador(id);
         await cargarYMostrarEntrenadores(contenedor);
+      }
+      return;
+    }
+
+    if (accion === "toggle-activo") {
+      const entrenador = listaEntrenadores.find(ent => ent.id == id);
+      if (!entrenador) return;
+      const nuevoActivo = !Boolean(entrenador.activo);
+      try {
+        await apiActualizarEntrenador(id, {
+          nombre: entrenador.nombre || "",
+          dni: entrenador.dni || "",
+          telefono: entrenador.telefono || "",
+          fechaNacimiento: entrenador.fechaNacimiento || "",
+          direccion: entrenador.direccion || "",
+          email: entrenador.email || "",
+          activo: nuevoActivo
+        });
+        await cargarYMostrarEntrenadores(contenedor);
+      } catch (err) {
+        console.error("Error actualizando estado activo del entrenador", err);
+        alert("No se pudo actualizar el estado activo.");
       }
       return;
     }
@@ -254,4 +282,6 @@ const abrirModal = (entrenador = null) => {
   };
 
   modal.querySelectorAll(".modal-cerrar").forEach(el => el.addEventListener("click", () => modal.classList.remove(estilos.activo)));
+  const btnCancelar = modal.querySelector("#cancelar");
+  if (btnCancelar) btnCancelar.addEventListener("click", () => modal.classList.remove(estilos.activo));
 };

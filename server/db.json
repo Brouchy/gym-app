@@ -88,12 +88,11 @@
   "entrenadors": [
     {
       "nombre": "Karen Pérez",
-      "dni": 94325420,
-      "fechaNacimiento": "1998-08-10T00:00:00.000Z",
+      "dni": "94325420",
       "telefono": "11456781",
+      "fechaNacimiento": "2000-10-12",
       "direccion": "calle 1444",
       "email": "karenPerez@example.com",
-      "certificacion": "MEP-8010",
       "activo": true,
       "id": 1
     },
