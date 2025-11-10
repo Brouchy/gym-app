@@ -3,7 +3,7 @@ import { apiObtenerPagos } from "../../api/apiPago.js";
 import { apiObtenerClases } from "../../api/apiClases.js";
 import { apiObtenerMiembros } from "../../api/membersApi.js";
 import { apiObtenerMiembrosXClase } from "../../api/apiMiembroxClase.js";
-import { apiObtenerAsistenciasCompletas } from "../../api/apiAsistencias.js";
+import { apiObtenerAsistenciasCompletas, apiObtenerAsistenciasGenerales } from "../../api/apiAsistencias.js";
 import ExcelJS from "exceljs";
 
 /* ===============================

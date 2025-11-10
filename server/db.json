@@ -459,6 +459,12 @@
       "tipoDeAsistenciaId": 1,
       "fecha": "2025-11-10T22:41:27.472Z",
       "id": 1
+    },
+    {
+      "miembroId": 6,
+      "tipoDeAsistenciaId": 1,
+      "fecha": "2025-11-10T22:46:37.670Z",
+      "id": 2
     }
   ],
   "asistenciasEntrenadores": [
