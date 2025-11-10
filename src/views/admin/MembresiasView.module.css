@@ -67,6 +67,12 @@
   color: white;
 }
 
+.acciones {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .acciones button {
   margin-right: 5px;
 }
