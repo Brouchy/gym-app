@@ -330,6 +330,8 @@ export const renderizarVistaMiembros = async (contenedor) => {
     
     // 1. Renderizamos el "esqueleto" (controles, tabla vacía, modales ocultos)
     renderizarEsqueleto();
+    // Asegurar estado limpio de filtros al entrar a la vista
+    try { const busc = contenedorVista.querySelector('#buscador'); if (busc) busc.value = ''; } catch (_) {}
     
     // 2. Conectamos los listeners (botones, formularios, etc.)
     adjuntarEventListeners();
@@ -451,9 +453,14 @@ const mostrarContenido = () => {
             }
             const ahora = Date.now();
             const inicio = ultimo?.fechaInicio ? new Date(ultimo.fechaInicio).getTime() : null;
-            const fin = ultimo?.fechaFin ? new Date(ultimo.fechaFin).getTime() : null;
-            // Considerar el fin como inclusivo hasta el final del día
-            const finInclusivo = fin != null ? (fin + 24*60*60*1000 - 1) : null;
+            const finDate = ultimo?.fechaFin ? new Date(ultimo.fechaFin) : null;
+            // Fin de día LOCAL para la fecha de vencimiento (mismo criterio que Admin)
+            const finInclusivo = finDate ? new Date(
+                finDate.getFullYear(),
+                finDate.getMonth(),
+                finDate.getDate(),
+                23, 59, 59, 999
+            ).getTime() : null;
             const activaPorFecha = (inicio != null && finInclusivo != null) ? (ahora >= inicio && ahora <= finInclusivo) : false;
             const puntoColor = activaPorFecha ? '#16a34a' : '#dc2626';
             const puntoHtml = `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${puntoColor};margin-right:6px;vertical-align:middle"></span>`;

@@ -83,20 +83,6 @@
       "entrenadorId": 1,
       "eliminado": false,
       "id": 6
-    },
-    {
-      "nombre": "matias",
-      "apellidos": "quiroga",
-      "email": "mati@gmail.com",
-      "dni": "14200458",
-      "telefono": "42123453",
-      "direccion": "calle 830 n 2341",
-      "fechaNacimiento": "275760-04-02",
-      "foto": "https://i.ibb.co/vvhgd0KP/logo-Clahe-15-removebg-preview-png.png",
-      "tipoDeMiembroId": 3,
-      "entrenadorId": 0,
-      "eliminado": false,
-      "id": 7
     }
   ],
   "entrenadors": [
@@ -363,6 +349,7 @@
       "horaInicio": "18:00",
       "horaFin": "19:00",
       "cupo": 20,
+      "dias": [],
       "id": 1
     },
     {
@@ -371,8 +358,24 @@
       "fecha": "2028-05-02T00:00:00.000Z",
       "horaInicio": "18:00",
       "horaFin": "19:00",
-      "cupo": 20,
-      "id": 2
+      "cupo": 19,
+      "id": 2,
+      "actividad": {
+        "id": 2,
+        "nombre": "Zumba",
+        "descripcion": "Cardio y ritmo"
+      },
+      "entrenador": {
+        "nombre": "Javier Sandoval",
+        "dni": 6546498,
+        "fechaNacimiento": "1998-11-20T00:00:00.000Z",
+        "telefono": "1144990011",
+        "direccion": "calle 123",
+        "email": "javier@example.com",
+        "certificacion": "AMM-5047",
+        "activo": true,
+        "id": 2
+      }
     },
     {
       "actividadId": 3,
@@ -401,7 +404,13 @@
       "id": 3
     }
   ],
-  "miembrosXClase": [],
+  "miembrosXClase": [
+    {
+      "miembroId": 2,
+      "claseId": 2,
+      "id": 2
+    }
+  ],
   "tiposDeAsistencia": [
     {
       "id": 1,

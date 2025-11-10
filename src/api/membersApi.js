@@ -7,7 +7,12 @@ export const apiObtenerMiembros = async () => {
     const ENDPOINT = 'miembros?_expand=entrenador&_expand=tipoDeMiembro';
     
     try {
-        const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`);
+        const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`, {
+            cache: 'no-store',
+            headers: {
+                'Cache-Control': 'no-cache'
+            }
+        });
         if (!respuesta.ok) {
             console.error(`Error HTTP: ${respuesta.status}`);
             return []; 
@@ -26,7 +31,12 @@ export const apiObtenerMiembroPorId = async (id) => {
     const ENDPOINT = `miembros/${id}?_expand=entrenador&_expand=tipoDeMiembro`;
     
     try {
-        const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`);
+        const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`, {
+            cache: 'no-store',
+            headers: {
+                'Cache-Control': 'no-cache'
+            }
+        });
         if (!respuesta.ok) {
             console.error(`Error HTTP: ${respuesta.status}`);
             return null;

@@ -330,6 +330,8 @@ export const renderizarVistaMiembros = async (contenedor) => {
     
     // 1. Renderizamos el "esqueleto" (controles, tabla vacía, modales ocultos)
     renderizarEsqueleto();
+    // Asegurar estado limpio de filtros al entrar a la vista
+    try { const busc = contenedorVista.querySelector('#buscador'); if (busc) busc.value = ''; } catch (_) {}
     
     // 2. Conectamos los listeners (botones, formularios, etc.)
     adjuntarEventListeners();
