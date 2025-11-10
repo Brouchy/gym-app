@@ -1,6 +1,62 @@
 {
   "miembros": [
     {
+      "nombre": "Ana",
+      "apellidos": "Gutiérrez",
+      "email": "ana@example.com",
+      "dni": "20123456",
+      "telefono": "1144889900",
+      "direccion": "Calle Falsa 456",
+      "fechaNacimiento": "1985-10-15",
+      "foto": "https://i.pravatar.cc/150?img=2",
+      "tipoDeMiembroId": 1,
+      "entrenadorId": 2,
+      "eliminado": false,
+      "id": 1
+    },
+    {
+      "nombre": "Carla",
+      "apellidos": "Domínguez",
+      "email": "carla@example.com",
+      "dni": "23456789",
+      "telefono": "1144889901",
+      "direccion": "Calle Falsa 987",
+      "fechaNacimiento": "1995-09-20",
+      "foto": "https://i.pravatar.cc/150?img=3",
+      "tipoDeMiembroId": 1,
+      "entrenadorId": 1,
+      "eliminado": false,
+      "id": 2
+    },
+    {
+      "nombre": "María",
+      "apellidos": "Luna",
+      "email": "maria@example.com",
+      "dni": "30111222",
+      "telefono": "1144223344",
+      "direccion": "Calle Luna 55",
+      "fechaNacimiento": "1988-07-25",
+      "foto": "https://i.pravatar.cc/150?img=5",
+      "tipoDeMiembroId": 2,
+      "entrenadorId": 2,
+      "eliminado": false,
+      "id": 4
+    },
+    {
+      "nombre": "Pedro",
+      "apellidos": "Suárez",
+      "email": "pedro@example.com",
+      "dni": "28999111",
+      "telefono": "1144332211",
+      "direccion": "Av. Sol 100",
+      "fechaNacimiento": "1990-11-05",
+      "foto": "https://i.pravatar.cc/150?img=6",
+      "tipoDeMiembroId": 2,
+      "entrenadorId": 2,
+      "eliminado": false,
+      "id": 5
+    },
+    {
       "nombre": "Carlos",
       "apellidos": "Llanos",
       "email": "carlos.19@gmail.com",
