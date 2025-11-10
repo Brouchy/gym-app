@@ -88,6 +88,7 @@ export const renderizarVistaClasesCRUD = async (contenedor) => {
               <th>Fecha</th>
               <th>Horario</th>
               <th>Cupo</th>
+              <th>Días</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -146,6 +147,7 @@ const renderizarTabla = (contenedor) => {
           <td>${new Date(c.fecha).toLocaleDateString()}</td>
           <td>${c.horaInicio} - ${c.horaFin}</td>
           <td>${c.cupo}</td>
+          <td>${Array.isArray(c.dias) && c.dias.length ? c.dias.join(', ') : '-'}</td>
           <td class="${estilos.acciones}">
             <svg class="${estilos.botonEditar} ${estilos.accionIcon}" data-id="${c.id ?? c.claseId}" title="Editar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
               <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/>
@@ -196,6 +198,15 @@ const abrirModal = async (contenedor, clase = null) => {
         <label>Cupo</label>
         <input type="number" id="cupo" value="${clase?.cupo || ""}" min="1" required>
 
+        <label>Días específicos</label>
+        <div id="diasEspecificos" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+          ${["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"].map(d => {
+            const marcado = Array.isArray(clase?.dias) && clase.dias.includes(d) ? 'checked' : '';
+            const id = `dia_${d}`;
+            return `<label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" name="dias" value="${d}" ${marcado}> ${d}</label>`;
+          }).join('')}
+        </div>
+
         <div class="${estilos.modalAcciones}">
           <button type="button" id="cancelar">Cancelar</button>
           <button type="submit">${clase ? "Actualizar" : "Guardar"}</button>
@@ -214,6 +225,8 @@ const abrirModal = async (contenedor, clase = null) => {
 
   modal.querySelector("#form-clase").addEventListener("submit", async (e) => {
     e.preventDefault();
+    const checks = Array.from(e.target.querySelectorAll('input[name="dias"]:checked'));
+    const diasSeleccionados = checks.map(ch => ch.value);
     const nuevaClase = {
       actividadId: parseInt(e.target.actividadId.value),
       entrenadorId: parseInt(e.target.entrenadorId.value),
@@ -221,6 +234,7 @@ const abrirModal = async (contenedor, clase = null) => {
       horaInicio: e.target.horaInicio.value,
       horaFin: e.target.horaFin.value,
       cupo: parseInt(e.target.cupo.value),
+      dias: diasSeleccionados,
     };
     if (clase) await apiActualizarClase(clase.id ?? clase.claseId, nuevaClase);
     else await apiCrearClase(nuevaClase);

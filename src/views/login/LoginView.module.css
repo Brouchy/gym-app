@@ -34,6 +34,40 @@
     background-color: #2c2c2c;
     color: #ffffff;
 }
+
+/* Wrapper y botón para mostrar/ocultar contraseña */
+.passwordWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.passwordWrapper input {
+    width: 100%;
+    padding-right: 38px; /* espacio para el botón */
+}
+
+.togglePassword {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    color: #cbd5e1;
+    cursor: pointer;
+    padding: 0;
+}
+
+.togglePassword:hover {
+    color: #ffffff;
+}
+
 .grupoInput input:focus {
     outline: none;
     border-color: #FF6B35;

@@ -7,6 +7,7 @@ import { renderizarVistaMiembros } from "../views/admin/MiembrosView.js";
 import { renderizarVistaReportes } from "../views/admin/ReportesView";
 import { renderizarVistaBienvenida } from "../views/admin/BienvenidaView.js";
 import { renderizarVistaUsuarios } from "../views/admin/UsuariosView.js";
+import { renderizarVistaConfiguraciones } from "../views/admin/ConfiguracionesView.js";
 
 
 /**
@@ -52,6 +53,9 @@ export const navegarAdmin = async (modulo, contenedor) => {
                 break;
             case 'usuarios':
                 await renderizarVistaUsuarios(contenedor);
+                break;
+            case 'configuraciones':
+                await renderizarVistaConfiguraciones(contenedor);
                 break;
             default:
                 // Por defecto, mostramos la vista de bienvenida
