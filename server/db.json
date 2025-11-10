@@ -258,15 +258,6 @@
       "fechaInicio": "2025-11-09T00:00:00.000Z",
       "fechaFin": "2026-11-09T00:00:00.000Z",
       "id": 7
-    },
-    {
-      "miembroId": 7,
-      "membresiaId": 102,
-      "estadoMembresiaId": 1,
-      "pagoId": 21,
-      "fechaInicio": "2025-11-10T00:00:00.000Z",
-      "fechaFin": "2026-11-10T00:00:00.000Z",
-      "id": 8
     }
   ],
   "pagos": [
@@ -350,7 +341,23 @@
       "horaFin": "19:00",
       "cupo": 20,
       "dias": [],
-      "id": 1
+      "id": 1,
+      "actividad": {
+        "id": 1,
+        "nombre": "Funcional",
+        "descripcion": "Entrenamiento completo"
+      },
+      "entrenador": {
+        "nombre": "Karen Pérez",
+        "dni": 94325420,
+        "fechaNacimiento": "1998-08-10T00:00:00.000Z",
+        "telefono": "11456781",
+        "direccion": "calle 1444",
+        "email": "karenPerez@example.com",
+        "certificacion": "MEP-8010",
+        "activo": true,
+        "id": 1
+      }
     },
     {
       "actividadId": 2,
@@ -358,24 +365,9 @@
       "fecha": "2028-05-02T00:00:00.000Z",
       "horaInicio": "18:00",
       "horaFin": "19:00",
-      "cupo": 19,
-      "id": 2,
-      "actividad": {
-        "id": 2,
-        "nombre": "Zumba",
-        "descripcion": "Cardio y ritmo"
-      },
-      "entrenador": {
-        "nombre": "Javier Sandoval",
-        "dni": 6546498,
-        "fechaNacimiento": "1998-11-20T00:00:00.000Z",
-        "telefono": "1144990011",
-        "direccion": "calle 123",
-        "email": "javier@example.com",
-        "certificacion": "AMM-5047",
-        "activo": true,
-        "id": 2
-      }
+      "cupo": 20,
+      "dias": [],
+      "id": 2
     },
     {
       "actividadId": 3,
