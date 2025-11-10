@@ -348,9 +348,6 @@ const renderizarEsqueleto = () => {
                 <h2>Módulo de Gestión de Usuarios</h2>
             </div>
             <div class="${estilos.tituloModulo}">
-                <div class="${estilos.tabs}">
-                    <button id="tab-gestion" class="${estilos.tab} ${estilos.activa}">Gestión de Usuarios</button>
-                </div>
                 <div id="zona-dinamica">
                     <div class="${estilos.cabecera}">
                         <input type="search" id="buscador" class="${estilos.buscador}" placeholder="Buscar por ID, nombre, email, rol...">

@@ -70,31 +70,40 @@ export const apiEliminarMembresia = async (id) => {
 
 
 export const apiObtenerMembresiasXMiembros = async () => {
-  const ENDPOINT = `membresiaXMiembros?_expand=miembro&_expand=membresia&_expand=estadoMembresia&_expand=pago`;
+  const ENDPOINT = `membresiaXMiembros?_expand=miembro&_expand=membresia&_expand=pago`;
 
   try {
-    const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`);
+    const [membresiasRes, estadosRes, tiposRes] = await Promise.all([
+      fetch(`${URL_BASE}/${ENDPOINT}`),
+      fetch(`${URL_BASE}/estadoMembresias`),
+      fetch(`${URL_BASE}/tipoDeMembresias`)
+    ]);
 
-    if (!respuesta.ok) {
-      console.error(`❌ Error HTTP ${respuesta.status} al obtener membresías por miembros.`);
-      return []; // 🔄 Devolvemos un array vacío en lugar de null
+    if (!membresiasRes.ok) {
+      console.error(`Error HTTP: ${membresiasRes.status}`);
+      return null;
     }
 
-    const membresias = await respuesta.json();
+    const membresias = await membresiasRes.json();
+    const estados = estadosRes.ok ? await estadosRes.json() : [];
+    const tipos = tiposRes.ok ? await tiposRes.json() : [];
+
+    const estadosMap = new Map(estados.map((estado) => [estado.id, estado]));
+    const tiposMap = new Map(tipos.map((tipo) => [tipo.id, tipo]));
 
     // Expand manual del tipoDeMembresia (anidado dentro de membresia)
     for (const m of membresias) {
+      if (!m.estadoMembresia && m.estadoMembresiaId) {
+        const estado = estadosMap.get(m.estadoMembresiaId);
+        if (estado) {
+          m.estadoMembresia = estado;
+        }
+      }
+
       if (m.membresia?.tipoDeMembresiaId) {
-        try {
-          const tipoRes = await fetch(`${URL_BASE}/tipoDeMembresias/${m.membresia.tipoDeMembresiaId}`);
-          if (tipoRes.ok) {
-            const tipo = await tipoRes.json();
-            m.membresia.tipoDeMembresia = tipo;
-          } else {
-            console.warn(`⚠️ No se pudo obtener tipoDeMembresia con ID ${m.membresia.tipoDeMembresiaId}`);
-          }
-        } catch (error) {
-          console.warn(`⚠️ Error al expandir tipoDeMembresia:`, error);
+        const tipo = tiposMap.get(m.membresia.tipoDeMembresiaId);
+        if (tipo) {
+          m.membresia.tipoDeMembresia = tipo;
         }
       }
     }
@@ -126,6 +135,28 @@ export const apiCrearMembresiaXMiembro = async (nuevoRegistro) => {
   }
 };
 
+/**
+ * Actualiza parcialmente un registro de membresiaXMiembros (PATCH)
+ */
+export const apiActualizarMembresiaXMiembro = async (id, cambiosParciales) => {
+  const ENDPOINT = `membresiaXMiembros/${id}`;
+  try {
+    const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(cambiosParciales)
+    });
+    if (!respuesta.ok) {
+      console.error(`Error HTTP: ${respuesta.status}`);
+      return null;
+    }
+    return await respuesta.json();
+  } catch (error) {
+    console.error('Error en apiActualizarMembresiaXMiembro:', error);
+    return null;
+  }
+};
+
 export const apiObtenerTiposDeMembresia = async () => {
   try {
     const respuesta = await fetch(`${URL_BASE}/tipoDeMembresias`);
@@ -134,5 +165,46 @@ export const apiObtenerTiposDeMembresia = async () => {
   } catch (error) {
     console.error("Error en apiObtenerTiposDeMembresia:", error);
     return [];
+  }
+};
+
+export const apiCrearTipoDeMembresia = async (nuevo) => {
+  try {
+    const res = await fetch(`${URL_BASE}/tipoDeMembresias`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(nuevo)
+    });
+    if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
+    return await res.json();
+  } catch (error) {
+    console.error('Error en apiCrearTipoDeMembresia:', error);
+    return null;
+  }
+};
+
+export const apiActualizarTipoDeMembresia = async (id, cambios) => {
+  try {
+    const res = await fetch(`${URL_BASE}/tipoDeMembresias/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(cambios)
+    });
+    if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
+    return await res.json();
+  } catch (error) {
+    console.error('Error en apiActualizarTipoDeMembresia:', error);
+    return null;
+  }
+};
+
+export const apiEliminarTipoDeMembresia = async (id) => {
+  try {
+    const res = await fetch(`${URL_BASE}/tipoDeMembresias/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
+    return { exito: true };
+  } catch (error) {
+    console.error('Error en apiEliminarTipoDeMembresia:', error);
+    return { exito: false };
   }
 };

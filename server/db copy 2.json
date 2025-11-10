@@ -107,13 +107,19 @@
   "tipoDeMiembros": [
     {
       "id": 1,
-      "descripcion": "Básico",
+      "descripcion": "Sin descuento",
       "porcentajeDescuento": 0
     },
     {
       "id": 2,
-      "descripcion": "Premium",
+      "descripcion": "Descuento Adulto",
       "porcentajeDescuento": 10
+    }
+    ,
+    {
+      "id": 3,
+      "descripcion": "Descuento Estudiante",
+      "porcentajeDescuento": 5
     }
   ],
   "users": [

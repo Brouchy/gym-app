@@ -17,6 +17,8 @@ import { imprimirTicket } from '../../utils/imprimirTicket.js';
 let listaMembresias = [];
 let paginaActual = 1;
 const FILAS_POR_PAGINA = 5;
+const PERMITE_GESTIONAR_PLANES = false;
+const COLUMNAS_TABLA_PLANES = PERMITE_GESTIONAR_PLANES ? 6 : 5;
 
 const asegurarListenersPlanes = (zona) => {
   if (zona.__planesListenersRegistrados) return;
@@ -200,24 +202,26 @@ const manejarClickPlanes = async (e) => {
     return;
   }
 
-  if (e.target.closest('#boton-agregar')) {
+  if (PERMITE_GESTIONAR_PLANES && e.target.closest('#boton-agregar')) {
     abrirModal(null, zona);
     return;
   }
 
-  const botonEditar = e.target.closest(`.${estilos.botonEditar}`);
-  if (botonEditar) {
-    const registro = listaMembresias.find((m) => m.id == botonEditar.dataset.id);
-    abrirModal(registro, zona);
-    return;
-  }
-
-  const botonEliminar = e.target.closest(`.${estilos.botonEliminar}`);
-  if (botonEliminar) {
-    if (confirm('¿Eliminar esta membresía?')) {
-      await apiEliminarMembresia(botonEliminar.dataset.id);
-      listaMembresias = await apiObtenerMembresias();
-      mostrarContenido();
+  if (PERMITE_GESTIONAR_PLANES) {
+    const botonEditar = e.target.closest(`.${estilos.botonEditar}`);
+    if (botonEditar) {
+      const registro = listaMembresias.find((m) => m.id == botonEditar.dataset.id);
+      abrirModal(registro, zona);
+      return;
+    }
+  
+    const botonEliminar = e.target.closest(`.${estilos.botonEliminar}`);
+    if (botonEliminar) {
+      if (confirm('¿Eliminar esta membresía?')) {
+        await apiEliminarMembresia(botonEliminar.dataset.id);
+        listaMembresias = await apiObtenerMembresias();
+        mostrarContenido();
+      }
     }
   }
 };
@@ -273,10 +277,12 @@ const renderizarTablaPlanes = async (zona) => {
     <div data-zona-planes="true">
       <div class="${estilos.cabecera}">
         <input type="search" id="buscador" class="${estilos.buscador}" placeholder="Buscar membresía...">
-        <div class="${estilos.grupoBotones}">
-          <button id="boton-agregar" class="${estilos.botonAgregar}">+ Nueva Membresía</button>
-          <button id="boton-renovar" class="${estilos.botonAgregar}" style="margin-left:8px;">↻ Renovar vencidas</button>
-        </div>
+        ${PERMITE_GESTIONAR_PLANES
+          ? `<div class="${estilos.grupoBotones}">
+                <button id="boton-agregar" class="${estilos.botonAgregar}">+ Nueva Membresía</button>
+                <button id="boton-renovar" class="${estilos.botonAgregar}" style="margin-left:8px;">↻ Renovar vencidas</button>
+             </div>`
+          : `<button id="boton-renovar" class="${estilos.botonAgregar}" style="margin-left:8px;">↻ Renovar vencidas</button>`}
       </div>
 
       <div class="${estilos.tablaWrapper}">
@@ -288,7 +294,7 @@ const renderizarTablaPlanes = async (zona) => {
               <th>Tipo</th>
               <th>Duración</th>
               <th>Costo</th>
-              <th>Acciones</th>
+              ${PERMITE_GESTIONAR_PLANES ? '<th>Acciones</th>' : ''}
             </tr>
           </thead>
           <tbody id="membresias-cuerpo-tabla"></tbody>
@@ -334,16 +340,11 @@ const renderizarTablaPlanes = async (zona) => {
     cuerpo.innerHTML = '';
 
     if (pagina.length === 0) {
-      cuerpo.innerHTML = `<tr><td colspan="6">No se encontraron membresías.</td></tr>`;
+      cuerpo.innerHTML = `<tr><td colspan="${COLUMNAS_TABLA_PLANES}">No se encontraron membresías.</td></tr>`;
     } else {
       pagina.forEach(m => {
         const fila = document.createElement('tr');
-        fila.innerHTML = `
-          <td>${m.id}</td>
-          <td>${m.nombrePlan}</td>
-          <td>${m.tipoDeMembresia?.descripcion || 'N/A'}</td>
-          <td>${m.duracionEnDias} días</td>
-          <td>$${m.costoBase}</td>
+        const accionesHtml = PERMITE_GESTIONAR_PLANES ? `
           <td class="${estilos.acciones}">
             <svg class="${estilos.botonEditar} ${estilos.accionIcon}" data-id="${m.id}" title="Editar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
               <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/>
@@ -351,7 +352,14 @@ const renderizarTablaPlanes = async (zona) => {
             <svg class="${estilos.botonEliminar} ${estilos.accionIcon}" data-id="${m.id}" title="Eliminar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
               <path d="M9 3h6v1h5v2H4V4h5V3zm1 4h1v10h-1V7zm4 0h1v10h-1V7zm-7 0h12v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7z"/>
             </svg>
-          </td>`;
+          </td>` : '';
+        fila.innerHTML = `
+          <td>${m.id}</td>
+          <td>${m.nombrePlan}</td>
+          <td>${m.tipoDeMembresia?.descripcion || 'N/A'}</td>
+          <td>${m.duracionEnDias} días</td>
+          <td>$${m.costoBase}</td>
+          ${accionesHtml}`;
         cuerpo.appendChild(fila);
       });
     }

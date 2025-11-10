@@ -7,7 +7,12 @@ export const apiObtenerMiembros = async () => {
     const ENDPOINT = 'miembros?_expand=entrenador&_expand=tipoDeMiembro';
     
     try {
-        const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`);
+        const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`, {
+            cache: 'no-store',
+            headers: {
+                'Cache-Control': 'no-cache'
+            }
+        });
         if (!respuesta.ok) {
             console.error(`Error HTTP: ${respuesta.status}`);
             return []; 
@@ -26,7 +31,12 @@ export const apiObtenerMiembroPorId = async (id) => {
     const ENDPOINT = `miembros/${id}?_expand=entrenador&_expand=tipoDeMiembro`;
     
     try {
-        const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`);
+        const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`, {
+            cache: 'no-store',
+            headers: {
+                'Cache-Control': 'no-cache'
+            }
+        });
         if (!respuesta.ok) {
             console.error(`Error HTTP: ${respuesta.status}`);
             return null;
@@ -122,3 +132,47 @@ export const apiObtenerTiposDeMiembro = async () => {
         return []; 
     }
 }
+
+// Crear un Tipo de Miembro
+export const apiCrearTipoDeMiembro = async (nuevo) => {
+    try {
+        const res = await fetch(`${URL_BASE}/tipoDeMiembros`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(nuevo)
+        });
+        if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
+        return await res.json();
+    } catch (error) {
+        console.error('Error en apiCrearTipoDeMiembro:', error);
+        return null;
+    }
+};
+
+// Actualizar un Tipo de Miembro
+export const apiActualizarTipoDeMiembro = async (id, cambios) => {
+    try {
+        const res = await fetch(`${URL_BASE}/tipoDeMiembros/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(cambios)
+        });
+        if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
+        return await res.json();
+    } catch (error) {
+        console.error('Error en apiActualizarTipoDeMiembro:', error);
+        return null;
+    }
+};
+
+// Eliminar un Tipo de Miembro
+export const apiEliminarTipoDeMiembro = async (id) => {
+    try {
+        const res = await fetch(`${URL_BASE}/tipoDeMiembros/${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
+        return { exito: true };
+    } catch (error) {
+        console.error('Error en apiEliminarTipoDeMiembro:', error);
+        return { exito: false };
+    }
+};

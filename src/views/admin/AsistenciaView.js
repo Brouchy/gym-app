@@ -180,17 +180,25 @@ async function abrirModalAsistenciaMiembros(divClases, asistencia = null) {
   modal.className = estilos.modalFondo;
 
   const miembrosDeClase = await apiObtenerMiembrosXClase();
-  let miembrosFiltrados = miembrosDeClase.filter(
-    m => m.claseId == claseSeleccionada.id || m.clase?.id == claseSeleccionada.id
-  );
 
+  // Filtrado de miembros según la clase seleccionada (IDs seguros)
+  let miembrosFiltrados = miembrosDeClase.filter(m => {
+    const claseIdMiembro = m.claseId ?? m.clase?.id;
+    const claseIdSeleccionada = claseSeleccionada.id ?? claseSeleccionada.claseId;
+    return claseIdMiembro == claseIdSeleccionada; // == para manejar string/number
+  });
+
+  // Excluir miembros que ya tengan asistencia hoy si es nueva
   if (!asistencia) {
     const hoy = new Date().toISOString().slice(0, 10);
     miembrosFiltrados = miembrosFiltrados.filter(m =>
-      !listaAsistencias.some(a => a.miembroXClase?.id == m.id && a.fecha.slice(0, 10) === hoy)
+      !listaAsistencias.some(a =>
+        a.miembroXClase?.id == m.id && a.fecha.slice(0, 10) === hoy
+      )
     );
   }
 
+  // Ordenar alfabéticamente
   miembrosFiltrados.sort((a, b) =>
     (a.miembro?.apellido || "").localeCompare(b.miembro?.apellido || "", "es", { sensitivity: "base" })
   );
@@ -272,6 +280,7 @@ async function abrirModalAsistenciaMiembros(divClases, asistencia = null) {
 // ========================================================
 async function renderBloqueGym(divGym) {
   const miembros = await apiObtenerMiembros();
+  const tiposAsistencia = await apiObtenerTiposDeAsistencia(); // Para mostrar el tipo de asistencia
 
   divGym.innerHTML = `
     <div class="${estilos.cabecera}" style="flex-wrap:wrap; gap:20px; align-items:flex-start;">
@@ -292,11 +301,12 @@ async function renderBloqueGym(divGym) {
             <th>DNI</th>
             <th>Fecha</th>
             <th>Hora</th>
+            <th>Asistencia</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody id="cuerpo-asistencias-gym">
-          <tr><td colspan="5">No hay asistencias registradas.</td></tr>
+          <tr><td colspan="6">No hay asistencias registradas.</td></tr>
         </tbody>
       </table>
     </div>
@@ -309,12 +319,23 @@ async function renderBloqueGym(divGym) {
   const cuerpoTabla = divGym.querySelector("#cuerpo-asistencias-gym");
 
   let miembroSeleccionado = null;
-  let listaAsistenciasGym = await apiObtenerAsistenciasCompletas();
-  listaAsistenciasGym = listaAsistenciasGym.filter((a) => !a.miembroXClase);
+
+  // Obtener asistencias y mapear los miembros y tipos completos
+  let listaAsistenciasGym = (await apiObtenerAsistenciasCompletas())
+    .filter(a => !a.miembroXClase)
+    .map(a => {
+      const miembro = miembros.find(m => m.id === a.miembroId) || {};
+      const tipo = tiposAsistencia.find(t => t.id === a.tipoDeAsistenciaId) || {};
+      return {
+        ...a,
+        miembro,
+        tipoDeAsistencia: tipo
+      };
+    });
 
   const mostrarTabla = () => {
     if (listaAsistenciasGym.length === 0) {
-      cuerpoTabla.innerHTML = `<tr><td colspan="5">No hay asistencias registradas.</td></tr>`;
+      cuerpoTabla.innerHTML = `<tr><td colspan="6">No hay asistencias registradas.</td></tr>`;
       return;
     }
 
@@ -323,13 +344,13 @@ async function renderBloqueGym(divGym) {
         const fechaObj = new Date(a.fecha);
         const fecha = fechaObj.toLocaleDateString();
         const hora = fechaObj.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-
         return `
           <tr>
-            <td>${a.miembro ? `${a.miembro.nombre} ${a.miembro.apellidos || ""}`.trim() : "-"}</td>
+            <td>${a.miembro?.nombre ? `${a.miembro.nombre} ${a.miembro.apellidos || ""}`.trim() : "-"}</td>
             <td>${a.miembro?.dni || "-"}</td>
             <td>${fecha}</td>
             <td>${hora}</td>
+            <td>${a.tipoDeAsistencia?.descripcion || "-"}</td>
             <td>
               <button class="${estilos.botonEliminar}" data-id="${a.asistenciaId}">Eliminar</button>
             </td>
@@ -390,7 +411,7 @@ async function renderBloqueGym(divGym) {
         miembroSeleccionado = m;
         inputBuscar.value = `${nombreCompleto} (${m.dni})`;
         divSugerencias.innerHTML = "";
-        btnRegistrar.disabled = true;
+        btnRegistrar.disabled = false;
 
         cardMiembro.innerHTML = `
           <div><strong>Nombre:</strong> ${nombreCompleto}</div>
@@ -399,28 +420,30 @@ async function renderBloqueGym(divGym) {
           <div><strong>Teléfono:</strong> ${m.telefono || "-"}</div>
         `;
         cardMiembro.style.display = "block";
-        btnRegistrar.disabled = false;
       });
 
       divSugerencias.appendChild(div);
     });
   });
 
+  // Registrar asistencia
   btnRegistrar.addEventListener("click", async () => {
     if (!miembroSeleccionado) return;
 
     const nuevaAsistencia = {
       miembroId: miembroSeleccionado.id,
+      tipoDeAsistenciaId: tiposAsistencia[0]?.id || null, // Podés cambiar si querés elegir tipo
       fecha: new Date().toISOString(),
     };
 
     const asistenciaCreada = await apiCrearAsistencia(nuevaAsistencia);
 
     if (asistenciaCreada) {
+      const tipo = tiposAsistencia.find(t => t.id === nuevaAsistencia.tipoDeAsistenciaId) || {};
       listaAsistenciasGym.push({
         ...asistenciaCreada,
         miembro: miembroSeleccionado,
-        fecha: asistenciaCreada.fecha || nuevaAsistencia.fecha
+        tipoDeAsistencia: tipo,
       });
       mostrarTabla();
       inputBuscar.value = "";

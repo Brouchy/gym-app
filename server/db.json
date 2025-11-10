@@ -1,60 +1,88 @@
 {
   "miembros": [
     {
-      "id": 1,
+      "nombre": "Ana",
+      "apellidos": "Gutiérrez",
+      "email": "ana@example.com",
+      "dni": "20123456",
+      "telefono": "1144889900",
+      "direccion": "Calle Falsa 456",
+      "fechaNacimiento": "1985-10-15",
+      "foto": "https://i.pravatar.cc/150?img=2",
+      "tipoDeMiembroId": 1,
+      "entrenadorId": 2,
+      "eliminado": false,
+      "id": 1
+    },
+    {
+      "nombre": "Carla",
+      "apellidos": "Domínguez",
+      "email": "carla@example.com",
+      "dni": "23456789",
+      "telefono": "1144889901",
+      "direccion": "Calle Falsa 987",
+      "fechaNacimiento": "1995-09-20",
+      "foto": "https://i.pravatar.cc/150?img=3",
+      "tipoDeMiembroId": 1,
+      "entrenadorId": 1,
+      "eliminado": false,
+      "id": 2
+    },
+    {
+      "nombre": "María",
+      "apellidos": "Luna",
+      "email": "maria@example.com",
+      "dni": "30111222",
+      "telefono": "1144223344",
+      "direccion": "Calle Luna 55",
+      "fechaNacimiento": "1988-07-25",
+      "foto": "https://i.pravatar.cc/150?img=5",
       "tipoDeMiembroId": 2,
       "entrenadorId": 2,
-      "nombre": "Ana",
-      "apellidos": "Gómez",
-      "dni": "1234567",
-      "direccion": "Calle Falsa 456",
-      "telefono": "1144889900",
-      "fechaNacimiento": "1985-10-15T00:00:00",
-      "email": "ana@example.com",
-      "foto": "https://i.pravatar.cc/150?img=2",
-      "eliminado": false
+      "eliminado": false,
+      "id": 4
     },
     {
-      "id": 2,
-      "tipoDeMiembroId": 1,
-      "entrenadorId": 1,
-      "nombre": "Carla",
-      "apellidos": "Fernández",
-      "dni": "123432437",
-      "direccion": "Calle Falsa 987",
-      "telefono": "1144889900",
-      "fechaNacimiento": "1995-09-20T00:00:00",
-      "email": "carla@example.com",
-      "foto": "https://i.pravatar.cc/150?img=3",
-      "eliminado": false
+      "nombre": "Pedro",
+      "apellidos": "Suárez",
+      "email": "pedro@example.com",
+      "dni": "28999111",
+      "telefono": "1144332211",
+      "direccion": "Av. Sol 100",
+      "fechaNacimiento": "1990-11-05",
+      "foto": "https://i.pravatar.cc/150?img=6",
+      "tipoDeMiembroId": 2,
+      "entrenadorId": 2,
+      "eliminado": false,
+      "id": 5
     },
     {
-      "id": 3,
+      "nombre": "Carlos",
+      "apellidos": "Llanos",
+      "email": "carlos.19@gmail.com",
+      "dni": "78452102",
+      "telefono": "1122448578",
+      "direccion": "calle 543",
+      "fechaNacimiento": "1885-06-10",
+      "foto": "https://i.ibb.co/5x1Jz9rQ/Unaj-jpg.jpg",
       "tipoDeMiembroId": 1,
-      "entrenadorId": 1,
-      "nombre": "Luis",
-      "apellidos": "Martínez",
-      "dni": "212412412",
-      "direccion": "Av. Siempre Viva 321",
-      "telefono": "1144001122",
-      "fechaNacimiento": "1992-03-10T00:00:00",
-      "email": "luis@example.com",
-      "foto": "https://i.pravatar.cc/150?img=4",
-      "eliminado": false
+      "entrenadorId": 2,
+      "eliminado": false,
+      "id": 3
     },
     {
-      "id": 4,
+      "nombre": "Luna",
+      "apellidos": "Arroyo",
+      "email": "magaly3591@gmail.com",
+      "dni": "23456765",
+      "telefono": "1122334321",
+      "direccion": "calle 654",
+      "fechaNacimiento": "1995-12-31",
+      "foto": "https://i.ibb.co/tT2pZ6H2/Reportes-jpg.jpg",
       "tipoDeMiembroId": 1,
       "entrenadorId": 1,
-      "nombre": "pedro",
-      "apellidos": "Pérez",
-      "dni": "2141432",
-      "direccion": "Av. Siempre Viva 321",
-      "telefono": "1144001122",
-      "fechaNacimiento": "1991-03-10T00:00:00",
-      "email": "luis@example.com",
-      "foto": "https://i.pravatar.cc/150?img=4",
-      "eliminado": false
+      "eliminado": false,
+      "id": 6
     }
   ],
   "entrenadors": [
@@ -84,13 +112,18 @@
   "tipoDeMiembros": [
     {
       "id": 1,
-      "descripcion": "Básico",
+      "descripcion": "Sin descuento",
       "porcentajeDescuento": 0
     },
     {
       "id": 2,
-      "descripcion": "Premium",
+      "descripcion": "Descuento Adulto",
       "porcentajeDescuento": 10
+    },
+    {
+      "id": 3,
+      "descripcion": "Descuento Estudiante",
+      "porcentajeDescuento": 5
     }
   ],
   "users": [
@@ -117,18 +150,32 @@
   ],
   "membresias": [
     {
-      "id": 101,
       "nombrePlan": "Plan Mensual Básico",
       "duracionEnDias": 30,
-      "costoBase": 5000,
-      "tipoDeMembresiaId": 1
+      "costoBase": 35000,
+      "tipoDeMembresiaId": 1,
+      "id": 101
     },
     {
-      "id": 102,
       "nombrePlan": "Plan Anual Premium",
       "duracionEnDias": 365,
-      "costoBase": 50000,
-      "tipoDeMembresiaId": 2
+      "costoBase": 360000,
+      "tipoDeMembresiaId": 2,
+      "id": 102
+    },
+    {
+      "nombrePlan": "Plan 3M",
+      "duracionEnDias": 90,
+      "costoBase": 90000,
+      "tipoDeMembresiaId": 3,
+      "id": 103
+    },
+    {
+      "nombrePlan": "Clase",
+      "duracionEnDias": 1,
+      "costoBase": 8000,
+      "tipoDeMembresiaId": 4,
+      "id": 104
     }
   ],
   "tipoDeMembresias": [
@@ -139,6 +186,129 @@
     {
       "id": 2,
       "descripcion": "Anual"
+    },
+    {
+      "id": 3,
+      "descripcion": "Trimestral"
+    },
+    {
+      "id": 4,
+      "descripcion": "Dia"
+    }
+  ],
+  "membresiaXMiembros": [
+    {
+      "miembroId": 1,
+      "membresiaId": 101,
+      "estadoMembresiaId": 1,
+      "pagoId": 14,
+      "fechaInicio": "2025-11-08T00:00:00.000Z",
+      "fechaFin": "2025-12-08T00:00:00.000Z",
+      "id": 1
+    },
+    {
+      "miembroId": 2,
+      "membresiaId": 104,
+      "estadoMembresiaId": 1,
+      "pagoId": 15,
+      "fechaInicio": "2025-11-08T00:00:00.000Z",
+      "fechaFin": "2025-11-09T00:00:00.000Z",
+      "id": 2
+    },
+    {
+      "miembroId": 3,
+      "membresiaId": 102,
+      "estadoMembresiaId": 1,
+      "pagoId": 16,
+      "fechaInicio": "2025-11-09T00:00:00.000Z",
+      "fechaFin": "2026-11-09T00:00:00.000Z",
+      "id": 3
+    },
+    {
+      "miembroId": 4,
+      "membresiaId": 103,
+      "estadoMembresiaId": 2,
+      "pagoId": 17,
+      "fechaInicio": "2025-07-01T00:00:00.000Z",
+      "fechaFin": "2025-09-29T00:00:00.000Z",
+      "id": 4
+    },
+    {
+      "miembroId": 5,
+      "membresiaId": 104,
+      "estadoMembresiaId": 1,
+      "pagoId": 18,
+      "fechaInicio": "2025-11-09T00:00:00.000Z",
+      "fechaFin": "2025-11-10T00:00:00.000Z",
+      "id": 5
+    },
+    {
+      "miembroId": 4,
+      "membresiaId": 104,
+      "pagoId": 19,
+      "fechaInicio": "2025-11-09T02:43:38.426Z",
+      "fechaFin": "2025-11-10T02:43:38.426Z",
+      "id": 6
+    },
+    {
+      "miembroId": 6,
+      "membresiaId": 102,
+      "estadoMembresiaId": 1,
+      "pagoId": 20,
+      "fechaInicio": "2025-11-09T00:00:00.000Z",
+      "fechaFin": "2026-11-09T00:00:00.000Z",
+      "id": 7
+    }
+  ],
+  "pagos": [
+    {
+      "monto": 33250,
+      "fechaPago": "2025-11-08T23:44:38.806Z",
+      "metodoPago": "Efectivo",
+      "descuentoAplicado": 1750,
+      "id": 14
+    },
+    {
+      "monto": 7200,
+      "fechaPago": "2025-11-08T23:46:21.186Z",
+      "metodoPago": "QR",
+      "descuentoAplicado": 800,
+      "id": 15
+    },
+    {
+      "monto": 360000,
+      "fechaPago": "2025-11-09T00:55:18.086Z",
+      "metodoPago": "Efectivo",
+      "descuentoAplicado": 0,
+      "id": 16
+    },
+    {
+      "monto": 90000,
+      "fechaPago": "2025-07-01T10:00:00.000Z",
+      "metodoPago": "Efectivo",
+      "descuentoAplicado": 0,
+      "id": 17
+    },
+    {
+      "monto": 7600,
+      "fechaPago": "2025-11-09T02:19:25.433Z",
+      "metodoPago": "QR",
+      "descuentoAplicado": 400,
+      "id": 18
+    },
+    {
+      "monto": 8000,
+      "fechaPago": "2025-11-09T02:43:38.392Z",
+      "metodoPago": "QR",
+      "descuentoAplicado": 0,
+      "id": 19
+    },
+    {
+      "monto": 360000,
+      "fechaPago": "2025-11-09T23:57:03.986Z",
+      "metodoPago": "Efectivo",
+      "descuentoAplicado": 0,
+      "id": 20
     }
   ],
   "estadoMembresias": [
@@ -148,81 +318,7 @@
     },
     {
       "id": 2,
-      "descripcion": "Inactiva"
-    },
-    {
-      "id": 3,
-      "descripcion": "Suspendida"
-    }
-  ],
-  "membresiaXMiembros": [
-    {
-      "id": 1001,
-      "miembroId": 1,
-      "membresiaId": 102,
-      "estadoMembresiaId": 1,
-      "pagoId": 2,
-      "fechaInicio": "2025-09-15T00:00:00Z",
-      "fechaFin": "2026-09-14T23:59:59Z"
-    },
-    {
-      "id": 1002,
-      "miembroId": 2,
-      "membresiaId": 101,
-      "estadoMembresiaId": 1,
-      "pagoId": 1,
-      "fechaInicio": "2025-10-01T00:00:00Z",
-      "fechaFin": "2025-10-31T23:59:59Z"
-    },
-    {
-      "id": 1003,
-      "miembroId": 2,
-      "membresiaId": 101,
-      "estadoMembresiaId": 1,
-      "pagoId": 3,
-      "fechaInicio": "2025-11-03T23:14:33.671Z",
-      "fechaFin": "2025-12-03T23:14:33.671Z"
-    }
-  ],
-  "pagos": [
-    {
-      "id": 1,
-      "miembroId": 2,
-      "membresiaId": 101,
-      "estadoMembresiaId": 1,
-      "numeroTransaccion": "T-0001",
-      "facturaRegistro": "F-2025-0001",
-      "monto": 5000,
-      "descuentoAplicado": 0,
-      "pagoTotal": 5000,
-      "fechaPago": "2025-10-01T10:00:00Z",
-      "metodoPago": "Transferencia"
-    },
-    {
-      "id": 2,
-      "miembroId": 1,
-      "membresiaId": 102,
-      "estadoMembresiaId": 1,
-      "numeroTransaccion": "T-0002",
-      "facturaRegistro": "F-2025-0002",
-      "monto": 45000,
-      "descuentoAplicado": 5000,
-      "pagoTotal": 40000,
-      "fechaPago": "2025-09-15T11:30:00Z",
-      "metodoPago": "Transferencia"
-    },
-    {
-      "id": 3,
-      "miembroId": 2,
-      "membresiaId": 101,
-      "estadoMembresiaId": 1,
-      "numeroTransaccion": "T-0003",
-      "facturaRegistro": "F-2025-0003",
-      "monto": 5000,
-      "descuentoAplicado": 0,
-      "pagoTotal": 5000,
-      "fechaPago": "2025-11-03T23:14:33.638Z",
-      "metodoPago": "Transferencia"
+      "descripcion": "Vencida"
     }
   ],
   "clases": [
@@ -232,8 +328,25 @@
       "fecha": "2025-04-02T00:00:00.000Z",
       "horaInicio": "18:00",
       "horaFin": "19:00",
-      "cupo": 20,
-      "id": 1
+      "cupo": 19,
+      "dias": [],
+      "id": 1,
+      "actividad": {
+        "id": 1,
+        "nombre": "Funcional",
+        "descripcion": "Entrenamiento completo"
+      },
+      "entrenador": {
+        "nombre": "Karen Pérez",
+        "dni": 94325420,
+        "fechaNacimiento": "1998-08-10T00:00:00.000Z",
+        "telefono": "11456781",
+        "direccion": "calle 1444",
+        "email": "karenPerez@example.com",
+        "certificacion": "MEP-8010",
+        "activo": true,
+        "id": 1
+      }
     },
     {
       "actividadId": 2,
@@ -242,6 +355,7 @@
       "horaInicio": "18:00",
       "horaFin": "19:00",
       "cupo": 20,
+      "dias": [],
       "id": 2
     },
     {
@@ -273,22 +387,14 @@
   ],
   "miembrosXClase": [
     {
-      "miembroId": 4,
-      "claseId": 1,
-      "fechaInscripcion": "2025-11-03T13:56:37.412Z",
-      "id": 1
-    },
-    {
-      "miembroId": 3,
+      "miembroId": 2,
       "claseId": 2,
-      "fechaInscripcion": "2025-11-03T14:32:14.599Z",
-      "id": 4
+      "id": 2
     },
     {
       "miembroId": 1,
       "claseId": 1,
-      "fechaInscripcion": "2025-11-03T22:54:37.825Z",
-      "id": 5
+      "id": 3
     }
   ],
   "tiposDeAsistencia": [
@@ -307,20 +413,16 @@
   ],
   "asistencias": [
     {
-      "fecha": "2025-11-10T02:27:38.581Z",
-      "id": 15
+      "miembroXClaseId": "2",
+      "tipoDeAsistenciaId": "2",
+      "fecha": "2025-11-10T16:49",
+      "id": 21
     },
     {
-      "miembroXClaseId": "5",
+      "miembroXClaseId": "3",
       "tipoDeAsistenciaId": "1",
-      "fecha": "2025-11-10T02:57",
-      "id": 18
-    },
-    {
-      "miembroXClaseId": "1",
-      "tipoDeAsistenciaId": "1",
-      "fecha": "2025-11-10T02:59",
-      "id": 19
+      "fecha": "2025-11-10T17:02",
+      "id": 24
     }
   ],
   "asistenciasEntrenadores": [

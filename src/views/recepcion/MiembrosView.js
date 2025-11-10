@@ -17,6 +17,8 @@ import { apiCrearPago } from '../../api/apiPago.js';
 import { imprimirTicket } from '../../utils/imprimirTicket.js';
 import QRCode from 'qrcode';
 
+const PERMITE_ELIMINAR_MIEMBROS = false;
+
 /**
  * Muestra un modal con un código QR generado a partir de `textoQR`.
  * Retorna una Promise que se resuelve a true si el usuario confirma, false si cancela.
@@ -310,8 +312,6 @@ let listaEntrenadores = [];   // Cache para el <select>
 let listaTiposMiembro = []; // Cache para el <select>
 let listaMembresias = []; // Cache para el <select> de membresías
 let listaMembresiasXMiembros = []; // Registros de membresía por miembro
-let autoRefreshTimer = null; // Intervalo de auto-refresco
-const AUTO_REFRESH_MINUTOS = 5; // Cambia este valor para configurar X minutos
 let paginaActual = 1;
 const FILAS_POR_PAGINA = 5;
 let modoFormulario = 'crear';
@@ -356,17 +356,8 @@ export const renderizarVistaMiembros = async (contenedor) => {
 
     // 4. Cargamos los datos de los miembros y los mostramos
     await cargarYMostrarMiembros();
-    // Auto-refresco del estado sin recargar la página
-    try { if (autoRefreshTimer) clearInterval(autoRefreshTimer); } catch (_) {}
-    autoRefreshTimer = setInterval(async () => {
-        // Si la vista ya no está en el DOM, limpiar el timer
-        if (!contenedorVista || !contenedorVista.isConnected) {
-            try { clearInterval(autoRefreshTimer); } catch (_) {}
-            autoRefreshTimer = null;
-            return;
-        }
-        await cargarYMostrarMiembros();
-    }, AUTO_REFRESH_MINUTOS * 60 * 1000);
+    // const membresiasXMiembros = await apiObtenerMembresiasXMiembros();
+    // console.log('Membresias por Miembros:', membresiasXMiembros);
 }
 
 // Actualizar cuando otras vistas cambian las asignaciones
@@ -379,14 +370,6 @@ try {
  * Carga los miembros desde la API y actualiza la vista
  */
 const cargarYMostrarMiembros = async () => {
-    // Si la vista no existe, detener intervalos pendientes
-    if (!contenedorVista || !document.body.contains(contenedorVista)) {
-        if (autoRefreshTimer) {
-            try { clearInterval(autoRefreshTimer); } catch (_) {}
-            autoRefreshTimer = null;
-        }
-        return;
-    }
     // Mostramos un 'cargando' en la tabla
     const cuerpoTabla = contenedorVista.querySelector('#miembros-cuerpo-tabla');
     if (cuerpoTabla) cuerpoTabla.innerHTML = '<tr><td colspan="9">Cargando...</td></tr>';
@@ -471,7 +454,7 @@ const mostrarContenido = () => {
             const ahora = Date.now();
             const inicio = ultimo?.fechaInicio ? new Date(ultimo.fechaInicio).getTime() : null;
             const finDate = ultimo?.fechaFin ? new Date(ultimo.fechaFin) : null;
-            // Fin de día LOCAL para la fecha de vencimiento
+            // Fin de día LOCAL para la fecha de vencimiento (mismo criterio que Admin)
             const finInclusivo = finDate ? new Date(
                 finDate.getFullYear(),
                 finDate.getMonth(),
@@ -514,9 +497,11 @@ const mostrarContenido = () => {
                     <svg class="${estilos.botonEditar} ${estilos.accionIcon}" data-id="${miembro.id}" title="Editar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
                         <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/>
                     </svg>
-                    <svg class="${estilos.botonEliminar} ${estilos.accionIcon}" data-id="${miembro.id}" title="Eliminar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
-                        <path d="M9 3h6v1h5v2H4V4h5V3zm1 4h1v10h-1V7zm4 0h1v10h-1V7zm-7 0h12v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7z"/>
-                    </svg>
+                    ${PERMITE_ELIMINAR_MIEMBROS ? `
+                        <svg class="${estilos.botonEliminar} ${estilos.accionIcon}" data-id="${miembro.id}" title="Eliminar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
+                            <path d="M9 3h6v1h5v2H4V4h5V3zm1 4h1v10h-1V7zm4 0h1v10h-1V7zm-7 0h12v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7z"/>
+                        </svg>
+                    ` : ''}
                     <svg class="${estilos.botonImprimir} ${estilos.accionIcon}" data-id="${miembro.id}" title="Imprimir" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
                         <path d="M6 9V4h12v5h2a2 2 0 0 1 2 2v6h-4v4H8v-4H4v-6a2 2 0 0 1 2-2h2zm2-3v3h8V6H8zm0 10v2h8v-2H8z"/>
                     </svg>
@@ -540,16 +525,10 @@ const membresiaEstaActiva = (registro) => {
     const estado = (registro.estadoMembresia?.descripcion || '').toLowerCase();
     if (estado === 'activa') return true;
     const inicio = registro.fechaInicio ? new Date(registro.fechaInicio).getTime() : null;
-    const finDate = registro.fechaFin ? new Date(registro.fechaFin) : null;
+    const fin = registro.fechaFin ? new Date(registro.fechaFin).getTime() : null;
     if (inicio == null || fin == null) return false;
     const ahora = Date.now();
-    // Fin de día LOCAL para la fecha de vencimiento
-    const finInclusivo = finDate ? new Date(
-        finDate.getFullYear(),
-        finDate.getMonth(),
-        finDate.getDate(),
-        23, 59, 59, 999
-    ).getTime() : null;
+    const finInclusivo = fin + (24 * 60 * 60 * 1000 - 1);
     return ahora >= inicio && ahora <= finInclusivo;
 };
 
@@ -733,7 +712,7 @@ const manejarAsignacionEntrenador = async (miembroId) => {
 const adjuntarEventListeners = () => {
     // Usamos delegación de eventos en el contenedor de la vista
     contenedorVista.addEventListener('click', async (e) => {
-        if (e.target.matches('#boton-confirmar-eliminar')) {
+        if (PERMITE_ELIMINAR_MIEMBROS && e.target.matches('#boton-confirmar-eliminar')) {
             if (eliminandoMiembro) return;
             eliminandoMiembro = true;
             const { id } = e.target.dataset;
@@ -755,10 +734,12 @@ const adjuntarEventListeners = () => {
             abrirModalEditar(editarBtn.dataset.id);
             return;
         }
-        const eliminarBtn = e.target.closest(`.${estilos.botonEliminar}`);
-        if (eliminarBtn) {
-            abrirModalEliminar(eliminarBtn.dataset.id);
-            return;
+        if (PERMITE_ELIMINAR_MIEMBROS) {
+            const eliminarBtn = e.target.closest(`.${estilos.botonEliminar}`);
+            if (eliminarBtn) {
+                abrirModalEliminar(eliminarBtn.dataset.id);
+                return;
+            }
         }
         
         // --- Botones de Paginación ---
@@ -1070,13 +1051,23 @@ const abrirModalEditar = async (id) => {
 };
 
 const abrirModalEliminar = (id) => {
-    contenedorVista.querySelector('#boton-confirmar-eliminar').dataset.id = id;
-    contenedorVista.querySelector('#modal-eliminar').classList.add(estilos.activo);
+    if (!PERMITE_ELIMINAR_MIEMBROS) return;
+    const boton = contenedorVista.querySelector('#boton-confirmar-eliminar');
+    const modal = contenedorVista.querySelector('#modal-eliminar');
+    if (!boton || !modal) return;
+    boton.dataset.id = id;
+    modal.classList.add(estilos.activo);
 }
 
 const cerrarModales = () => {
-    contenedorVista.querySelector('#modal-miembro').classList.remove(estilos.activo);
-    contenedorVista.querySelector('#modal-eliminar').classList.remove(estilos.activo);
+    const modalMiembro = contenedorVista.querySelector('#modal-miembro');
+    if (modalMiembro) {
+        modalMiembro.classList.remove(estilos.activo);
+    }
+    const modalEliminar = contenedorVista.querySelector('#modal-eliminar');
+    if (modalEliminar) {
+        modalEliminar.classList.remove(estilos.activo);
+    }
     const modalAsignar = contenedorVista.querySelector('#modal-asignar-entrenador');
     if (modalAsignar) {
         modalAsignar.classList.remove(estilos.activo);
@@ -1713,6 +1704,7 @@ const renderizarEsqueleto = () => {
             </div>
         </div>
 
+        ${PERMITE_ELIMINAR_MIEMBROS ? `
         <div id="modal-eliminar" class="${estilos.modal}">
             <div class="${estilos.modalFondo} modal-cerrar"></div>
             <div class="${estilos.modalContenido}" style="max-width: 400px;">
@@ -1728,6 +1720,7 @@ const renderizarEsqueleto = () => {
                 </div>
             </div>
         </div>
+        ` : ''}
     `;
     
 }
