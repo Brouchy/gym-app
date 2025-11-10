@@ -1,0 +1,269 @@
+/* === Fondo del Wizard === */
+.modalFondo {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(17, 24, 39, 0.6); /* fondo translúcido */
+  backdrop-filter: blur(8px);
+  animation: aparecerFondo 0.3s ease forwards;
+}
+
+@keyframes aparecerFondo {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* === Contenedor principal del wizard === */
+.modalContenido {
+  background: #1f1f1f;
+  border-radius: 1rem;
+  /* Reducimos padding para que la sección de procedimiento ocupe menos alto */
+  padding: 1rem 1.25rem;
+  width: 100%;
+  max-width: 550px;
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 107, 53, 0.2);
+  animation: slideIn 0.35s ease;
+  position: relative;
+  color: #ffffff;
+  /* Mantener scroll interno como fallback, pero con contenido más compacto */
+  max-height: calc(100vh - 80px);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(40px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* === Títulos y textos === */
+h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.6rem;
+  text-align: center;
+}
+
+p {
+  color: #cccccc;
+  font-size: 0.9rem;
+  text-align: center;
+  margin-bottom: 0.8rem;
+}
+
+/* === Selects === */
+select {
+  width: 100%;
+  padding: 0.5rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #3a3a3a;
+  background: #2a2a2a;
+  color: #ffffff;
+  font-size: 0.92rem;
+  margin-bottom: 1rem;
+  transition: all 0.2s;
+}
+
+select:focus {
+  outline: none;
+  border-color: #FF6B35;
+  background: #2a2a2a;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
+}
+
+/* === Nombre destacado del miembro === */
+.nombre {
+  color: #FF6B35;
+  font-weight: 600;
+}
+
+/* === Sección de botones === */
+.botones {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+  flex-wrap: wrap;
+}
+
+/* === Botones generales === */
+.btnCancelar,
+.btnContinuar,
+.btnAtras,
+.btnConfirmar,
+.btnCerrar {
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* --- Estilo por tipo --- */
+.btnCancelar {
+  background: #555;
+  color: #ffffff;
+}
+.btnCancelar:hover {
+  background: #666;
+}
+
+.btnContinuar,
+.btnConfirmar,
+.btnCerrar {
+  background: #FF6B35;
+  color: #ffffff;
+}
+.btnContinuar:hover,
+.btnConfirmar:hover,
+.btnCerrar:hover {
+  background: #FF5722;
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);
+}
+
+.btnAtras {
+  background: #555;
+  color: #ffffff;
+}
+.btnAtras:hover {
+  background: #666;
+}
+
+/* Reducir espacio de bloques internos (divs que se usan como cajas dentro del wizard) */
+.modalContenido > div {
+  margin-bottom: 10px;
+  padding: 10px;
+}
+
+/* Ajustes para bloques de resumen y tarjetas para ocupar menos espacio */
+.modalContenido > div > h4 {
+  margin-bottom: 6px;
+  font-size: 1rem;
+}
+
+/* Inputs y campos más compactos */
+.modalContenido input,
+.modalContenido textarea {
+  padding: 0.5rem 0.7rem;
+  font-size: 0.92rem;
+}
+
+/* === Mensajes de estado === */
+#estado-carga {
+  text-align: center;
+  color: #6b7280;
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+
+/* === Estado de éxito === */
+.exito h3 {
+  color: #10b981;
+}
+
+.exito p {
+  color: #047857;
+}
+
+/* === Animaciones para los pasos === */
+@keyframes aparecerPaso {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modalContenido > * {
+  animation: aparecerPaso 0.3s ease;
+}
+
+/* === Responsivo === */
+@media (max-width: 768px) {
+  .modalContenido {
+    padding: 1.8rem;
+    width: 90%;
+    max-width: 100%;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+  }
+
+  p {
+    font-size: 0.9rem;
+  }
+
+  select {
+    font-size: 0.9rem;
+    padding: 0.6rem 0.9rem;
+  }
+
+  .botones {
+    gap: 0.6rem;
+  }
+
+  .btnCancelar,
+  .btnContinuar,
+  .btnAtras,
+  .btnConfirmar,
+  .btnCerrar {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 500px) {
+  .modalContenido {
+    padding: 1.5rem;
+    width: 92%;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+  }
+
+  p {
+    font-size: 0.85rem;
+  }
+
+  select {
+    font-size: 0.85rem;
+    padding: 0.55rem 0.8rem;
+  }
+
+  .btnCancelar,
+  .btnContinuar,
+  .btnAtras,
+  .btnConfirmar,
+  .btnCerrar {
+    width: 100%;
+    padding: 0.7rem 1rem;
+  }
+
+  .botones {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}

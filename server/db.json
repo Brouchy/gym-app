@@ -83,6 +83,20 @@
       "entrenadorId": 1,
       "eliminado": false,
       "id": 6
+    },
+    {
+      "nombre": "matias",
+      "apellidos": "quiroga",
+      "email": "mati@gmail.com",
+      "dni": "14200458",
+      "telefono": "42123453",
+      "direccion": "calle 830 n 2341",
+      "fechaNacimiento": "275760-04-02",
+      "foto": "https://i.ibb.co/vvhgd0KP/logo-Clahe-15-removebg-preview-png.png",
+      "tipoDeMiembroId": 3,
+      "entrenadorId": 0,
+      "eliminado": false,
+      "id": 7
     }
   ],
   "entrenadors": [
@@ -258,6 +272,15 @@
       "fechaInicio": "2025-11-09T00:00:00.000Z",
       "fechaFin": "2026-11-09T00:00:00.000Z",
       "id": 7
+    },
+    {
+      "miembroId": 7,
+      "membresiaId": 102,
+      "estadoMembresiaId": 1,
+      "pagoId": 21,
+      "fechaInicio": "2025-11-10T00:00:00.000Z",
+      "fechaFin": "2026-11-10T00:00:00.000Z",
+      "id": 8
     }
   ],
   "pagos": [
@@ -309,6 +332,13 @@
       "metodoPago": "Efectivo",
       "descuentoAplicado": 0,
       "id": 20
+    },
+    {
+      "monto": 342000,
+      "fechaPago": "2025-11-10T03:05:04.762Z",
+      "metodoPago": "Efectivo",
+      "descuentoAplicado": 18000,
+      "id": 21
     }
   ],
   "estadoMembresias": [

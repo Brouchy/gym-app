@@ -1,0 +1,845 @@
+/* src/views/admin/MiembrosView.module.css */
+
+/* Animación de entrada */
+.contenedor {
+    padding: 1.5rem 2rem;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Normalización del título del módulo */
+.tituloModulo,
+.tituloModulo h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    padding-top: 0;
+}
+
+.contenedor > h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* === TABS Modernos === */
+.tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.tab {
+    background: #2c2c2c;
+    border: 1px solid #3a3a3a;
+    border-radius: 10px;
+    padding: 0.6rem 1.4rem;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: #ffffff;
+    transition: all 0.25s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.tab:hover {
+    background: #3a3a3a;
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+.tab.activa {
+    background-color: #FF6B35;
+    color: #fff;
+    border-color: #FF6B35;
+    transform: translateY(-1px);
+}
+
+
+/* Cabecera con Buscador y Botón */
+.cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.accionesHeader {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.buscador {
+    padding: 0.65rem 1rem;
+    border: 1px solid #E2E8F0;
+    border-radius: 6px;
+    font-size: 1rem;
+    width: 350px;
+}
+.buscador {
+    background-color: #2c2c2c;
+    color: #ffffff;
+    border: 1px solid #2c2c2c;
+}
+.buscador:focus {
+    outline: none;
+    border-color: #FF6B35;
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
+}
+
+.botonAgregar {
+    padding: 0.65rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background-color: #FF6B35;
+    color: white;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.botonAgregar:hover {
+    background-color: #FF5722;
+    box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);
+}
+
+/* Tabla */
+.tablaWrapper {
+    overflow-x: auto;
+}
+.tabla {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #1f1f1f;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+}
+.tabla th,
+.tabla td {
+    padding: 12px;
+    border-bottom: 1px solid #333;
+    text-align: left;
+    vertical-align: middle;
+}
+.tabla th {
+    background-color: #2c2c2c;
+    color: #ccc;
+    font-weight: 600;
+}
+.tabla td {
+    color: white;
+}
+.tabla td img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+}
+.fotoNombre {
+    display: flex;
+    align-items: center;
+}
+
+/* Acciones de la Tabla */
+.acciones {
+    display: flex;
+    gap: 0.5rem;
+}
+.botonEditar {
+    background-color: #F6AD55; /* Naranja */
+    color: white;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.875rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.botonEliminar {
+    background-color: #E53E3E; /* Rojo */
+    color: white;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.875rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.botonImprimir {
+    background-color: #6dc75b; /* Rojo */
+    color: white;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.875rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.botonEditar:hover { background-color: #ED8936; }
+.botonEliminar:hover { background-color: #C53030; }
+.accionIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.accionIcon:hover {
+  transform: scale(1.2);
+  /* cambia el color de relleno al pasar el mouse */
+  fill: #D84315;
+}
+
+/* Paginación */
+.paginacion {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap:15px;
+}
+.indicadorPagina {
+    font-size: 0.875rem;
+    color: #718096;
+}
+.botonPagina {
+    padding: 0.5rem 1rem;
+    background-color: #E2E8F0;
+    color: #2D3748;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+.botonPagina:hover {
+    background-color: #CBD5E0;
+}
+.botonPagina:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* === Modal moderno (centrado, sin scroll y con animación suave) === */
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal.activo {
+  display: flex;
+}
+
+/* --- Caja del contenido --- */
+.modalContenido {
+  position: relative;
+  background: #1f1f1f;
+  border-radius: 1rem;
+  padding: 2rem 2.2rem;
+  width: 100%;
+  max-width: 550px;
+  color: white;
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 107, 53, 0.2);
+  animation: aparecerModal 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 30px);
+  overflow: auto;
+}
+
+.modalContenido h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.modalAsignar {
+  max-width: 900px;
+}
+
+.modalAsignarBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.asignarHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.buscadorAsignar {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background: #2c2c2c;
+  color: #ffffff;
+  font-size: 0.95rem;
+}
+
+.buscadorAsignar:focus {
+  outline: none;
+  border-color: #FF6B35;
+  box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.25);
+}
+
+.resumenPremium {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #cbd5f5;
+}
+
+.textoAyuda {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #fbbf24;
+}
+
+.premiumInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.premiumNombre {
+  font-weight: 600;
+  color: #fff;
+}
+
+.premiumDni {
+  font-size: 0.85rem;
+  color: #cbd5f5;
+}
+
+.premiumPlan {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  color: #fff;
+}
+
+.premiumPlan small {
+  color: #94a3b8;
+}
+
+.premiumEstado {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.estadoBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.1rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #14532d;
+  color: #4ade80;
+  width: fit-content;
+}
+
+.asignarAccion {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.selectAsignar {
+  flex: 1;
+  min-width: 150px;
+  padding: 0.45rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #2c2c2c;
+  background: #121212;
+  color: #ffffff;
+}
+
+.selectAsignar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.botonAsignarEntrenador {
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  border: none;
+  background: #FF6B35;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.botonAsignarEntrenador:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.botonAsignarEntrenador:not(:disabled):hover {
+  background: #ff5c1f;
+}
+
+@keyframes aparecerModal {
+  from {
+    transform: translateY(30px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* --- Cabecera --- */
+.modalCabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #2c2c2c;
+  padding-bottom: 0.5rem;
+}
+
+.modalCabecera h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.modalCerrar {
+  font-size: 1.8rem;
+  color: #ffffff;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.modalCerrar:hover {
+  color: #FF6B35;
+}
+
+/* --- Contenido del formulario --- */
+.formularioModal {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow: visible;
+}
+
+/* === Stepper (Indicador de Secciones) === */
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+  padding: 1rem 0;
+  border-bottom: 2px solid #2c2c2c;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 1;
+  max-width: 200px;
+}
+
+.stepNumber {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #2c2c2c;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1rem;
+  border: 2px solid #3a3a3a;
+  transition: all 0.3s ease;
+  margin-bottom: 0.5rem;
+}
+
+.stepLabel {
+  color: #888;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-align: center;
+  transition: color 0.3s ease;
+}
+
+.stepActivo .stepNumber {
+  background-color: #FF6B35;
+  border-color: #FF6B35;
+  color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.2);
+}
+
+.stepActivo .stepLabel {
+  color: #FF6B35;
+  font-weight: 600;
+}
+
+.stepCompletado .stepNumber {
+  background-color: #6dc75b;
+  border-color: #6dc75b;
+  color: #ffffff;
+}
+
+.stepCompletado .stepLabel {
+  color: #6dc75b;
+}
+
+.stepLine {
+  flex: 1;
+  height: 2px;
+  background-color: #3a3a3a;
+  margin: 0 1rem;
+  margin-top: -20px;
+  transition: background-color 0.3s ease;
+}
+
+.stepLine.activo {
+  background-color: #6dc75b;
+}
+
+/* Estilos para las secciones del formulario */
+.seccionFormulario {
+  margin-bottom: 1rem;
+  padding: 0.8rem;
+  background-color: #2a2a2a;
+  border-radius: 8px;
+  border: 1px solid #3a3a3a;
+}
+
+/* Clase para compactar la sección de registro (reducción ~50%) */
+.seccionCompacta {
+  padding: 6px !important;
+}
+
+.seccionCompacta .tituloSeccion {
+  font-size: 0.95rem;
+  padding-bottom: 0.4rem;
+}
+
+.seccionCompacta .grupoInput {
+  margin-bottom: 0.4rem;
+}
+
+.seccionCompacta .grupoInput label {
+  font-size: 0.85rem;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.seccionCompacta .grupoInput input,
+.seccionCompacta .grupoInput select,
+.seccionCompacta .grupoInput textarea {
+  padding: 0.45rem;
+  font-size: 0.88rem;
+}
+
+.tituloSeccion {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #FF6B35;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #FF6B35;
+}
+
+.grupoInput {
+  display: flex;
+  flex-direction: column;
+}
+
+.grupoInput label {
+  font-weight: 500;
+  color: #ffffff;
+  margin-bottom: 0.4rem;
+}
+
+.grupoInput input,
+.grupoInput select,
+.grupoInput textarea {
+  border: 1px solid #2c2c2c;
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.95rem;
+  background: #2c2c2c;
+  color: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.grupoInput input:focus,
+.grupoInput select:focus,
+.grupoInput textarea:focus {
+  border-color: #FF6B35;
+  background: #2c2c2c;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
+  outline: none;
+}
+
+/* --- Acciones (botones) --- */
+
+.modalAcciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.8rem;
+  margin-top: 1.8rem;
+}
+
+.botonSecundario {
+  background-color: #2c2c2c;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.botonSecundario:hover {
+  background-color: #3a3a3a;
+}
+
+.modalAcciones button[type="submit"],
+.modalAcciones .botonAgregar {
+  background-color: #FF6B35;
+  color: white;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.modalAcciones button[type="submit"]:hover,
+.modalAcciones .botonAgregar:hover {
+  background-color: #FF5722;
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);
+}
+
+.botonAgregar {
+  background-color: #FF6B35;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s ease;
+}
+
+.botonAgregar:hover {
+  background-color: #FF5722;
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);
+}
+
+/* --- Input de archivo personalizado --- */
+.fileInputWrapper {
+  position: relative;
+  margin-top: 5px;
+}
+
+.fileInput {
+  position: absolute;
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.fileInputLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1rem;
+  background-color: #2a2a2a;
+  color: #ffffff;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  width: 100%;
+  justify-content: center;
+}
+
+.fileInputLabel:hover {
+  background-color: #3a3a3a;
+  border-color: #FF6B35;
+  box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.2);
+}
+
+.fileInputText {
+  flex: 1;
+  text-align: center;
+}
+
+.fileInputIcon {
+  font-size: 1.2rem;
+}
+
+.fileInput:focus + .fileInputLabel {
+  outline: none;
+  border-color: #FF6B35;
+  box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.2);
+}
+
+.previewFoto {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin-top: 10px;
+  object-fit: cover;
+  border: 2px solid #FF6B35;
+}
+
+/* --- Ajuste responsivo --- */
+@media (max-width: 1024px) {
+    .tabla {
+        font-size: 0.85rem;
+    }
+
+    .tabla th,
+    .tabla td {
+        padding: 0.6rem 0.8rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .contenedor {
+        padding: 1rem 1.5rem;
+    }
+
+    .cabecera {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .buscador {
+        width: 100%;
+    }
+
+    .botonAgregar {
+        width: 100%;
+    }
+
+    .tabla {
+        font-size: 0.8rem;
+    }
+
+    .tabla th,
+    .tabla td {
+        padding: 0.5rem 0.6rem;
+    }
+
+    .acciones {
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+
+    .botonEditar,
+    .botonEliminar,
+    .botonImprimir {
+        width: 100%;
+        font-size: 0.8rem;
+    }
+
+    .paginacion {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .indicadorPagina {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .contenedor {
+        padding: 0.8rem 1rem;
+    }
+
+    .tituloModulo h2 {
+        font-size: 1.2rem;
+    }
+
+    .tabs {
+        gap: 0.5rem;
+    }
+
+    .tab {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    .tabla {
+        font-size: 0.75rem;
+    }
+
+    .tabla th,
+    .tabla td {
+        padding: 0.4rem 0.5rem;
+    }
+
+    .tabla td img {
+        width: 30px;
+        height: 30px;
+    }
+
+    .modalContenido {
+        padding: 1.5rem;
+        width: 92%;
+    }
+
+    .modalCabecera h3 {
+        font-size: 1.1rem;
+    }
+
+    .modalAcciones {
+        flex-direction: column;
+    }
+
+    .botonSecundario,
+    .botonAgregar {
+        width: 100%;
+    }
+
+    .asignarAccion {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
