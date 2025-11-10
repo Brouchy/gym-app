@@ -284,11 +284,11 @@ async function renderBloqueGym(divGym) {
 
   divGym.innerHTML = `
     <div class="${estilos.cabecera}" style="flex-wrap:wrap; gap:20px; align-items:flex-start;">
-      <div style="flex:1; position:relative;">
+      <div style="flex:1; position:relative; display:flex; flex-direction:column; gap:10px;">
         <label>Buscar miembro por nombre o DNI:</label>
         <input type="text" id="inputBuscarMiembro" class="${estilos.inputBuscar}" placeholder="Escribí nombre o DNI..." autocomplete="off"/>
         <div id="sugerenciasMiembro" class="${estilos.sugerencias}"></div>
-        <button id="boton-registrar-gym" class="${estilos.botonAgregar}" disabled>Registrar Asistencia</button>
+        <button id="boton-registrar-gym" class="${estilos.botonAgregar}" style="width:fit-content; align-self:flex-start;" disabled>Registrar Asistencia</button>
       </div>
       <div id="cardMiembroSeleccionado" class="${estilos.cardMiembro}" style="flex:1; display:none; color:#000;"></div>
     </div>

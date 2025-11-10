@@ -465,6 +465,23 @@
       "tipoDeAsistenciaId": "1",
       "fecha": "2025-11-10T17:02",
       "id": 24
+    },
+    {
+      "miembroXClaseId": "6",
+      "tipoDeAsistenciaId": "1",
+      "fecha": "2025-11-10T22:25",
+      "id": 26
+    },
+    {
+      "miembroXClaseId": "4",
+      "tipoDeAsistenciaId": "1",
+      "fecha": "2025-11-10T22:25",
+      "id": 27
+    },
+    {
+      "tipoDeAsistenciaId": 1,
+      "fecha": "2025-11-10T22:26:24.844Z",
+      "id": 28
     }
   ],
   "asistenciasEntrenadores": [
