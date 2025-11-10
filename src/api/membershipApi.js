@@ -135,6 +135,28 @@ export const apiCrearMembresiaXMiembro = async (nuevoRegistro) => {
   }
 };
 
+/**
+ * Actualiza parcialmente un registro de membresiaXMiembros (PATCH)
+ */
+export const apiActualizarMembresiaXMiembro = async (id, cambiosParciales) => {
+  const ENDPOINT = `membresiaXMiembros/${id}`;
+  try {
+    const respuesta = await fetch(`${URL_BASE}/${ENDPOINT}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(cambiosParciales)
+    });
+    if (!respuesta.ok) {
+      console.error(`Error HTTP: ${respuesta.status}`);
+      return null;
+    }
+    return await respuesta.json();
+  } catch (error) {
+    console.error('Error en apiActualizarMembresiaXMiembro:', error);
+    return null;
+  }
+};
+
 export const apiObtenerTiposDeMembresia = async () => {
   try {
     const respuesta = await fetch(`${URL_BASE}/tipoDeMembresias`);

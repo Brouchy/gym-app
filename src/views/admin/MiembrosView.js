@@ -455,10 +455,10 @@ const mostrarContenido = () => {
             const activaPorFecha = (inicio != null && finInclusivo != null) ? (ahora >= inicio && ahora <= finInclusivo) : false;
             const puntoColor = activaPorFecha ? '#16a34a' : '#dc2626';
             const puntoHtml = `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${puntoColor};margin-right:6px;vertical-align:middle"></span>`;
+            const fechaFinTexto = ultimo?.fechaFin ? new Date(ultimo.fechaFin).toLocaleDateString() : null;
             let textoMembresia = 'N/A';
             if (ultimo) {
                 let planName = ultimo?.membresia?.nombrePlan || null;
-                console.log("miembro",planName);
                 let typeName = ultimo?.membresia?.tipoDeMembresia?.descripcion || null;
                 if (!planName || !typeName) {
                     const targetId = Number(ultimo.membresiaId || ultimo.membresia?.id);
@@ -480,7 +480,10 @@ const mostrarContenido = () => {
                 <td>${fechaNac}</td>
                 <td><img src="${fotoUrl}" alt="${miembro.nombre}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"></td>
                 <td>${textoMembresia}</td>
-                <td>${puntoHtml}${activaPorFecha ? 'Activa' : 'Vencida'}</td>
+                <td>
+                    ${puntoHtml}${activaPorFecha ? 'Activa' : 'Vencida'}
+                    ${fechaFinTexto ? `<div style="margin-top:4px;color:#64748b;font-size:12px;">${activaPorFecha ? 'Hasta' : 'Venció'} ${fechaFinTexto}</div>` : ''}
+                </td>
                 <td class="${estilos.acciones}">
                     <svg class="${estilos.botonEditar} ${estilos.accionIcon}" data-id="${miembro.id}" title="Editar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
                         <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/>
@@ -1465,7 +1468,6 @@ const renderizarEsqueleto = () => {
                                 <th>Apellidos</th>
                                 <th>DNI</th>
                                 <th>F. Nac.</th>
-                               
                                 <th>Foto</th>
                                 <th>Membresía</th>
                                 <th>Estado</th>

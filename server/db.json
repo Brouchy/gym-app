@@ -69,6 +69,20 @@
       "entrenadorId": 0,
       "eliminado": false,
       "id": 5
+    },
+    {
+      "nombre": "Luna",
+      "apellidos": "Arroyo",
+      "email": "magaly3591@gmail.com",
+      "dni": "23456765",
+      "telefono": "1122334321",
+      "direccion": "calle 654",
+      "fechaNacimiento": "1995-12-31",
+      "foto": "https://i.ibb.co/tT2pZ6H2/Reportes-jpg.jpg",
+      "tipoDeMiembroId": 1,
+      "entrenadorId": 1,
+      "eliminado": false,
+      "id": 6
     }
   ],
   "entrenadors": [
@@ -235,6 +249,15 @@
       "fechaInicio": "2025-11-09T02:43:38.426Z",
       "fechaFin": "2025-11-10T02:43:38.426Z",
       "id": 6
+    },
+    {
+      "miembroId": 6,
+      "membresiaId": 102,
+      "estadoMembresiaId": 1,
+      "pagoId": 20,
+      "fechaInicio": "2025-11-09T00:00:00.000Z",
+      "fechaFin": "2026-11-09T00:00:00.000Z",
+      "id": 7
     }
   ],
   "pagos": [
@@ -279,6 +302,13 @@
       "metodoPago": "QR",
       "descuentoAplicado": 0,
       "id": 19
+    },
+    {
+      "monto": 360000,
+      "fechaPago": "2025-11-09T23:57:03.986Z",
+      "metodoPago": "Efectivo",
+      "descuentoAplicado": 0,
+      "id": 20
     }
   ],
   "estadoMembresias": [
