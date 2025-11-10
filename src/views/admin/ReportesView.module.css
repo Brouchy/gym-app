@@ -1,15 +1,17 @@
-/* 🧱 CONTENEDOR GENERAL */
+/* ReportesView.module.css */
+
+/* Contenedor principal de cada reporte */
 .contenedor {
-  background: #121212; /* Fondo oscuro */
-  color: #f0f0f0;
-  padding: 25px;
-  border-radius: 15px;
+  width: 100%;          /* ocupa todo el ancho del bloque padre */
+  min-height: 500px;    /* altura mínima, ajustable según tu diseño */
+  padding: 20px;        /* igual que los otros módulos */
+  box-sizing: border-box;
+  background-color: #121212;
+  border-radius: 10px;  /* opcional, para mantener estilo de tarjetas */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
-  max-width: 1100px;
-  margin: 30px auto;
-  font-family: 'Segoe UI', Arial, sans-serif;
-  transition: border 0.3s ease;
+  margin-bottom: 20px;
 }
+
 
 /* 🔹 Colores según tipo de registro */
 .contenedor.miembros {

@@ -1,21 +1,14 @@
-/* ===============================
-   👥 MÓDULO DE GESTIÓN DE ENTRENADORES
-================================= */
-
 import estilos from "./EntrenadoresView.module.css";
 import {
   apiObtenerEntrenadores,
   apiCrearEntrenador,
   apiActualizarEntrenador,
-  apiEliminarEntrenador,
-  apiObtenerClasesConNombre,
-  apiObtenerMiembrosPorEntrenador
+  apiEliminarEntrenador
 } from "../../api/trainersApi.js";
 
 let listaEntrenadores = [];
 let paginaActual = 1;
 const FILAS_POR_PAGINA = 5;
-let modoFormulario = "crear";
 
 export const renderizarVistaEntrenadores = async (contenedor) => {
   document.querySelectorAll('[class*="modal"]').forEach((el) => el.remove());
@@ -41,7 +34,6 @@ export const renderizarVistaEntrenadores = async (contenedor) => {
               <th>Teléfono</th>
               <th>Dirección</th>
               <th>Email</th>
-              <th>Certificación</th>
               <th>Activo</th>
               <th>Acciones</th>
             </tr>
@@ -91,8 +83,6 @@ export const renderizarVistaEntrenadores = async (contenedor) => {
               <input type="text" id="direccion" required>
               <label>Email</label>
               <input type="email" id="email" required>
-              <label>Certificación</label>
-              <input type="file" id="certificado" accept=".pdf,.jpg,.jpeg,.png">
             </div>
           </div>
 
@@ -103,30 +93,6 @@ export const renderizarVistaEntrenadores = async (contenedor) => {
         </form>
       </div>
     </div>
-
-    <!-- Modal Cargos -->
-    <div id="modal-cargos" class="${estilos.modal}">
-      <div class="${estilos.modalFondo} modal-cerrar"></div>
-      <div class="${estilos.modalContenido}">
-        <div class="${estilos.modalCabecera}">
-          <h3 id="modal-cargos-titulo">Cargos del Entrenador</h3>
-          <span class="${estilos.modalCerrar} modal-cerrar">&times;</span>
-        </div>
-        <div id="contenido-cargos"></div>
-      </div>
-    </div>
-
-    <!-- Modal Certificado -->
-    <div id="modal-certificado" class="${estilos.modal}">
-      <div class="${estilos.modalFondo} modal-cerrar"></div>
-      <div class="${estilos.modalContenido}">
-        <div class="${estilos.modalCabecera}">
-          <h3>Certificado</h3>
-          <span class="${estilos.modalCerrar} modal-cerrar">&times;</span>
-        </div>
-        <div id="contenido-certificado"></div>
-      </div>
-    </div>
   `;
 
   await cargarYMostrarEntrenadores(contenedor);
@@ -134,7 +100,7 @@ export const renderizarVistaEntrenadores = async (contenedor) => {
 };
 
 /* ==========================================
-   📄 Renderizado y filtrado de tabla
+    📄 Renderizado y filtrado de tabla
 ========================================== */
 
 const cargarYMostrarEntrenadores = async (contenedor) => {
@@ -163,7 +129,7 @@ const renderizarTabla = (contenedor) => {
 
   cuerpo.innerHTML =
     pagina.length === 0
-      ? `<tr><td colspan="9">No se encontraron entrenadores.</td></tr>`
+      ? `<tr><td colspan="8">No se encontraron entrenadores.</td></tr>`
       : pagina
           .map(
             (e) => `
@@ -174,7 +140,6 @@ const renderizarTabla = (contenedor) => {
           <td>${e.telefono}</td>
           <td>${e.direccion}</td>
           <td>${e.email}</td>
-          <td>${e.certificacion ? "✅ " + e.certificacion.split("/").pop() : "-"}</td>
           <td>${e.activo ? "✅" : "❌"}</td>
           <td class="${estilos.acciones}">
             <svg class="${estilos.botonEditar} ${estilos.accionIcon}" data-accion="editar" data-id="${e.id}" title="Editar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
@@ -183,8 +148,6 @@ const renderizarTabla = (contenedor) => {
             <svg class="${estilos.botonEliminar} ${estilos.accionIcon}" data-accion="eliminar" data-id="${e.id}" title="Eliminar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FF5722">
               <path d="M9 3h6v1h5v2H4V4h5V3zm1 4h1v10h-1V7zm4 0h1v10h-1V7zm-7 0h12v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7z"/>
             </svg>
-            <button data-accion="cargos" data-id="${e.id}" class="${estilos.botonAgregar}">⚡ Cargos</button>
-            <button data-accion="certificado" data-id="${e.id}" class="${estilos.botonSecundario}">📄 Certificado</button>
           </td>
         </tr>`
           )
@@ -196,7 +159,7 @@ const renderizarTabla = (contenedor) => {
 };
 
 /* ==========================================
-   ⚙️ Eventos y acciones principales
+    ⚙️ Eventos y acciones principales
 ========================================== */
 
 const adjuntarEventos = (contenedor) => {
@@ -241,25 +204,54 @@ const adjuntarEventos = (contenedor) => {
       return;
     }
 
-    if (accion === "cargos") {
-      const entrenador = listaEntrenadores.find(ent => ent.id == id);
-      abrirModalCargos(entrenador);
-      return;
-    }
-
-    if (accion === "certificado") {
-      const entrenador = listaEntrenadores.find(ent => ent.id == id);
-      abrirModalCertificado(entrenador);
-      return;
-    }
-
     if (e.target.classList.contains(estilos.modalCerrar) || e.target.classList.contains("modal-cerrar")) {
       document.querySelectorAll(`.${estilos.modal}`).forEach(m => m.classList.remove(estilos.activo));
     }
   });
 };
 
-/* ==========================================
-   🧩 Funciones de modales
-========================================== */
-// (La sección de modales la dejamos igual que la tuya)
+
+const abrirModal = (entrenador = null) => {
+  const modal = document.getElementById("modal-entrenador");
+  const form = modal.querySelector("#form-entrenador");
+  modal.classList.add(estilos.activo);
+
+  if (entrenador) {
+    modal.querySelector("#modal-titulo").textContent = "Editar Entrenador";
+    form.nombre.value = entrenador.nombre || "";
+    form.dni.value = entrenador.dni || "";
+    form.telefono.value = entrenador.telefono || "";
+    form.fechaNacimiento.value = entrenador.fechaNacimiento || "";
+    form.direccion.value = entrenador.direccion || "";
+    form.email.value = entrenador.email || "";
+    form.activo.value = entrenador.activo ? "true" : "false";
+    form["entrenador-id"].value = entrenador.id;
+  } else {
+    modal.querySelector("#modal-titulo").textContent = "Agregar Entrenador";
+    form.reset();
+    form["entrenador-id"].value = "";
+  }
+
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const data = {
+      nombre: form.nombre.value,
+      dni: form.dni.value,
+      telefono: form.telefono.value,
+      fechaNacimiento: form.fechaNacimiento.value,
+      direccion: form.direccion.value,
+      email: form.email.value,
+      activo: form.activo.value === "true"
+    };
+    const id = form["entrenador-id"].value;
+    if (id) {
+      await apiActualizarEntrenador(id, data);
+    } else {
+      await apiCrearEntrenador(data);
+    }
+    modal.classList.remove(estilos.activo);
+    await cargarYMostrarEntrenadores(document.querySelector(`.${estilos.contenedor}`));
+  };
+
+  modal.querySelectorAll(".modal-cerrar").forEach(el => el.addEventListener("click", () => modal.classList.remove(estilos.activo)));
+};

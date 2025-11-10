@@ -451,7 +451,7 @@
 .sugerencias {
   position: absolute;
   background: white;
-  border: 1px solid #c11515;
+  border: 1px solid #ccc;
   border-radius: 8px;
   width: 100%;
   max-height: 200px;
@@ -476,4 +476,71 @@
   padding: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   font-size: 14px;
+}
+.filaTabs {
+  display: flex;
+  width: 100%;
+  margin-bottom: 20px;
+  gap: 10px;
+}
+
+.filaTabs button {
+  flex: 1;
+  padding: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  background-color: #ddd;
+  transition: background-color 0.2s;
+}
+
+.filaTabs button:hover {
+  background-color: #ccc;
+}
+
+.tabActivo {
+  background-color: #4CAF50; /* verde activo */
+  color: white;
+}
+/* Bloques de tabs */
+.filaTabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.filaTabs button {
+  background-color: #FFA500; /* Naranja base */
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px; /* Un poco más grande */
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.filaTabs button:hover {
+  background-color: #ffb733; /* Naranja más claro al pasar mouse */
+  transform: scale(1.05); /* Leve aumento al pasar mouse */
+}
+
+.tabActivo {
+  background-color: #f0972b !important; /* Naranja más intenso al estar activo */
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+/* Sugerencias del buscador */
+.sugerenciaItem {
+  padding: 8px 12px;
+  cursor: pointer;
+  background-color: #fff; /* fondo blanco */
+  color: #000; /* texto negro */
+  border-bottom: 1px solid #ddd;
+}
+
+.sugerenciaItem:hover {
+  background-color: #ffb733; /* naranja clarito al pasar mouse */
+  color: #000; /* sigue negro */
 }

@@ -254,3 +254,14 @@ export const apiObtenerTiposDeAsistencia = async () => {
     return [];
   }
 };
+// apiCrearAsistencia.js
+export const apiObtenerMiembros = async () => {
+  try {
+    const respuesta = await fetch(`${URL_BASE}/${ENDPOINT_MIEMBROS}`);
+    if (!respuesta.ok) throw new Error(`Error HTTP ${respuesta.status}`);
+    return await respuesta.json();
+  } catch (error) {
+    console.error("❌ Error en apiObtenerMiembros:", error);
+    return [];
+  }
+};
