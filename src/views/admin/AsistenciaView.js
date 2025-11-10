@@ -4,6 +4,8 @@ import { apiObtenerMiembrosXClase } from "../../api/apiMiembroxClase.js";
 import {
   apiObtenerAsistenciasCompletas,
   apiCrearAsistencia,
+  apiCrearAsistenciaGeneral,
+  apiObtenerAsistenciasGenerales,
   apiEliminarAsistencia,
   apiActualizarAsistencia,
   apiObtenerTiposDeAsistencia,
@@ -320,18 +322,13 @@ async function renderBloqueGym(divGym) {
 
   let miembroSeleccionado = null;
 
-  // Obtener asistencias y mapear los miembros y tipos completos
-  let listaAsistenciasGym = (await apiObtenerAsistenciasCompletas())
-    .filter(a => !a.miembroXClase)
-    .map(a => {
-      const miembro = miembros.find(m => m.id === a.miembroId) || {};
-      const tipo = tiposAsistencia.find(t => t.id === a.tipoDeAsistenciaId) || {};
-      return {
-        ...a,
-        miembro,
-        tipoDeAsistencia: tipo
-      };
-    });
+  // Obtener asistencias generales (gimnasio) y enriquecer con miembro y tipo
+  const asistenciasGenerales = await apiObtenerAsistenciasGenerales();
+  let listaAsistenciasGym = asistenciasGenerales.map(a => {
+    const miembro = miembros.find(m => String(m.id) === String(a.miembroId)) || {};
+    const tipo = tiposAsistencia.find(t => String(t.id) === String(a.tipoDeAsistenciaId)) || {};
+    return { ...a, miembro, tipoDeAsistencia: tipo, asistenciaId: a.id };
+  });
 
   const mostrarTabla = () => {
     if (listaAsistenciasGym.length === 0) {
@@ -341,18 +338,23 @@ async function renderBloqueGym(divGym) {
 
     cuerpoTabla.innerHTML = listaAsistenciasGym
       .map((a) => {
+        const m = a.miembro || miembros.find(mm => String(mm.id) === String(a.miembroId));
+        const t = a.tipoDeAsistencia || tiposAsistencia.find(tt => String(tt.id) === String(a.tipoDeAsistenciaId));
         const fechaObj = new Date(a.fecha);
         const fecha = fechaObj.toLocaleDateString();
         const hora = fechaObj.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        const nombre = m ? `${m.nombre || ""} ${m.apellidos || m.apellido || ""}`.trim() : "-";
+        const dni = m?.dni || "-";
+        const idRow = a.asistenciaId ?? a.id;
         return `
           <tr>
-            <td>${a.miembro?.nombre ? `${a.miembro.nombre} ${a.miembro.apellidos || ""}`.trim() : "-"}</td>
-            <td>${a.miembro?.dni || "-"}</td>
+            <td>${nombre || "-"}</td>
+            <td>${dni}</td>
             <td>${fecha}</td>
             <td>${hora}</td>
-            <td>${a.tipoDeAsistencia?.descripcion || "-"}</td>
+            <td>${t?.descripcion || "-"}</td>
             <td>
-              <button class="${estilos.botonEliminar}" data-id="${a.asistenciaId}">Eliminar</button>
+              <button class="${estilos.botonEliminar}" data-id="${idRow}">Eliminar</button>
             </td>
           </tr>
         `;
@@ -364,7 +366,7 @@ async function renderBloqueGym(divGym) {
         const id = parseInt(btn.dataset.id);
         const ok = await apiEliminarAsistencia(id);
         if (ok) {
-          listaAsistenciasGym = listaAsistenciasGym.filter((a) => a.asistenciaId !== id);
+          listaAsistenciasGym = listaAsistenciasGym.filter((a) => (a.asistenciaId ?? a.id) !== id);
           mostrarTabla();
         }
       })
@@ -436,7 +438,7 @@ async function renderBloqueGym(divGym) {
       fecha: new Date().toISOString(),
     };
 
-    const asistenciaCreada = await apiCrearAsistencia(nuevaAsistencia);
+    const asistenciaCreada = await apiCrearAsistenciaGeneral(nuevaAsistencia);
 
     if (asistenciaCreada) {
       const tipo = tiposAsistencia.find(t => t.id === nuevaAsistencia.tipoDeAsistenciaId) || {};
@@ -444,6 +446,7 @@ async function renderBloqueGym(divGym) {
         ...asistenciaCreada,
         miembro: miembroSeleccionado,
         tipoDeAsistencia: tipo,
+        asistenciaId: asistenciaCreada.id
       });
       mostrarTabla();
       inputBuscar.value = "";

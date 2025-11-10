@@ -337,20 +337,26 @@ async function renderizarReporteAsistenciaGimnasio(contenedor) {
   const botonExcel = contenedor.querySelector("#boton-excel");
   const cuerpo = contenedor.querySelector("#cuerpo-asistencias-gimnasio");
 
-  const [asistenciasFull, miembrosFull] = await Promise.all([
-    apiObtenerAsistenciasCompletas(),
+  const [asistenciasGym, miembrosFull] = await Promise.all([
+    apiObtenerAsistenciasGenerales(),
     apiObtenerMiembros()
   ]);
 
+  // Enriquecer asistencias generales con datos del miembro
+  const asistenciasEnriquecidas = asistenciasGym.map(a => {
+    const m = miembrosFull.find(mm => String(mm.id) === String(a.miembroId));
+    return { ...a, miembro: m || null };
+  });
+
   // llenar select de miembros
-  selectMiembro.innerHTML += miembrosFull.map(m => `<option value="${m.id}">${m.nombre}</option>`).join("");
+  selectMiembro.innerHTML += miembrosFull.map(m => `<option value="${m.id}">${`${m.nombre} ${m.apellidos || m.apellido || ""}`.trim()}</option>`).join("");
 
   function renderTabla() {
     const miembroSel = selectMiembro.value;
     const desdeVal = inputDesde.value ? new Date(inputDesde.value) : null;
     const hastaVal = inputHasta.value ? new Date(inputHasta.value + "T23:59:59") : null;
 
-    let filtradas = asistenciasFull.filter(a => a.tipo === "gimnasio"); // solo gimnasio
+    let filtradas = asistenciasEnriquecidas.slice(); // todas son de gimnasio
     if (miembroSel) filtradas = filtradas.filter(a => String(a.miembro?.id) === String(miembroSel));
     filtradas = filtradas.filter(a => {
       const f = new Date(a.fecha);
@@ -364,14 +370,18 @@ async function renderizarReporteAsistenciaGimnasio(contenedor) {
       return;
     }
 
-    cuerpo.innerHTML = filtradas.map(a => `
-      <tr>
-        <td>${a.miembro?.nombre ?? "-"}</td>
-        <td>${a.miembro?.dni ?? "-"}</td>
-        <td>${new Date(a.fecha).toLocaleDateString("es-AR")}</td>
-        <td>${a.tipoDeAsistencia?.descripcion ?? "-"}</td>
-      </tr>
-    `).join("");
+    cuerpo.innerHTML = filtradas.map(a => {
+      const nombreCompleto = a.miembro ? `${a.miembro.nombre || ""} ${a.miembro.apellidos || a.miembro.apellido || ""}`.trim() : "-";
+      const dni = a.miembro?.dni ?? "-";
+      return `
+        <tr>
+          <td>${nombreCompleto || "-"}</td>
+          <td>${dni}</td>
+          <td>${new Date(a.fecha).toLocaleDateString("es-AR")}</td>
+          <td>${a.tipoDeAsistenciaId ? (/* descripcion no disponible aquí */ "Presente") : (a.tipoDeAsistencia?.descripcion ?? "-")}</td>
+        </tr>
+      `;
+    }).join("");
   }
 
   renderTabla();

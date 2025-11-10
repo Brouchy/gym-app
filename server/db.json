@@ -455,43 +455,13 @@
   ],
   "asistencias": [
     {
-      "miembroXClaseId": "2",
-      "tipoDeAsistenciaId": "2",
-      "fecha": "2025-11-10T16:49",
-      "id": 21
-    },
-    {
-      "miembroXClaseId": "3",
-      "tipoDeAsistenciaId": "1",
-      "fecha": "2025-11-10T17:02",
-      "id": 24
-    },
-    {
-      "miembroXClaseId": "6",
-      "tipoDeAsistenciaId": "1",
-      "fecha": "2025-11-10T22:25",
-      "id": 26
-    },
-    {
-      "miembroXClaseId": "4",
-      "tipoDeAsistenciaId": "1",
-      "fecha": "2025-11-10T22:25",
-      "id": 27
-    },
-    {
+      "miembroId": 1,
       "tipoDeAsistenciaId": 1,
-      "fecha": "2025-11-10T22:26:24.844Z",
-      "id": 28
+      "fecha": "2025-11-10T22:41:27.472Z",
+      "id": 1
     }
   ],
   "asistenciasEntrenadores": [
-    {
-      "entrenadorId": "2",
-      "claseId": "2",
-      "tipoDeAsistenciaId": "1",
-      "fecha": "2025-11-09T21:56",
-      "id": 2
-    },
     {
       "entrenadorId": "1",
       "claseId": "1",
